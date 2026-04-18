@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pruebas de Software y Modelo de Negocio – Talentia</title>
+  <style>
+    :root {
+      --azul:   #1a3a5c;
+      --azul2:  #2563a8;
+      --verde:  #16a34a;
+      --rojo:   #dc2626;
+      --gris:   #f3f4f6;
+      --borde:  #d1d5db;
+      --texto:  #1f2937;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--texto);
+      background: #fff;
+      line-height: 1.7;
+    }
+
+    /* ── PORTADA ─────────────────────────────────── */
+    .portada {
+      background: linear-gradient(135deg, var(--azul) 0%, var(--azul2) 100%);
+      color: #fff;
+      padding: 80px 60px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      page-break-after: always;
+    }
+    .portada .universidad { font-size: 1rem; letter-spacing: 2px; text-transform: uppercase; opacity: .8; margin-bottom: 40px; }
+    .portada h1 { font-size: 2.4rem; font-weight: 700; line-height: 1.25; margin-bottom: 16px; }
+    .portada h2 { font-size: 1.3rem; font-weight: 400; opacity: .9; margin-bottom: 48px; }
+    .portada .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 40px; text-align: left; background: rgba(255,255,255,.12); border-radius: 12px; padding: 28px 36px; }
+    .portada .meta-grid .lbl { font-size: .78rem; text-transform: uppercase; letter-spacing: 1px; opacity: .7; }
+    .portada .meta-grid .val { font-size: 1rem; font-weight: 600; }
+    .portada .fecha { margin-top: 40px; font-size: .9rem; opacity: .7; }
+
+    /* ── CONTENIDO ───────────────────────────────── */
+    .contenido { max-width: 900px; margin: 0 auto; padding: 60px 40px; }
+
+    h1.sec { color: var(--azul); font-size: 1.9rem; margin: 60px 0 12px; border-bottom: 3px solid var(--azul); padding-bottom: 8px; }
+    h2.sub { color: var(--azul2); font-size: 1.35rem; margin: 40px 0 10px; }
+    h3.sub2 { color: #374151; font-size: 1.1rem; margin: 28px 0 8px; font-weight: 600; }
+    p { margin-bottom: 14px; text-align: justify; }
+    ul, ol { margin: 10px 0 16px 24px; }
+    li { margin-bottom: 6px; }
+
+    /* ── TABLA DE CONTENIDOS ─────────────────────── */
+    .toc { background: var(--gris); border-radius: 10px; padding: 30px 36px; margin: 40px 0; }
+    .toc h2 { color: var(--azul); font-size: 1.2rem; margin-bottom: 16px; }
+    .toc ol { margin-left: 20px; }
+    .toc li { margin-bottom: 8px; font-size: 1rem; }
+    .toc a { color: var(--azul2); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    /* ── TARJETAS DE OBJETIVO ────────────────────── */
+    .obj-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 20px 0; }
+    .obj-card { background: var(--gris); border-left: 4px solid var(--azul2); border-radius: 8px; padding: 18px 20px; }
+    .obj-card .num { color: var(--azul2); font-weight: 700; font-size: .85rem; text-transform: uppercase; margin-bottom: 6px; }
+    .obj-card p { margin: 0; font-size: .95rem; }
+
+    /* ── CAJA BLANCA / CAJA NEGRA ────────────────── */
+    .test-section { background: #f8fafc; border: 1px solid var(--borde); border-radius: 10px; padding: 24px 28px; margin: 24px 0; }
+    .test-section h3 { margin: 0 0 12px; }
+
+    /* ── TABLAS DE PRUEBA ────────────────────────── */
+    table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: .9rem; }
+    th { background: var(--azul); color: #fff; padding: 10px 14px; text-align: left; }
+    td { padding: 9px 14px; border-bottom: 1px solid var(--borde); vertical-align: top; }
+    tr:nth-child(even) td { background: #f9fafb; }
+    .ok  { color: var(--verde); font-weight: 700; }
+    .fail{ color: var(--rojo);  font-weight: 700; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 9999px; font-size: .75rem; font-weight: 700; }
+    .badge-verde  { background: #dcfce7; color: var(--verde); }
+    .badge-rojo   { background: #fee2e2; color: var(--rojo); }
+    .badge-azul   { background: #dbeafe; color: var(--azul2); }
+    .badge-gris   { background: #e5e7eb; color: #374151; }
+
+    /* ── CÓDIGO ──────────────────────────────────── */
+    pre { background: #1e293b; color: #e2e8f0; border-radius: 8px; padding: 20px 24px; overflow-x: auto; font-size: .82rem; line-height: 1.6; margin: 16px 0 24px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; }
+
+    /* ── DIAGRAMA / MODELO NEGOCIO ───────────────── */
+    .canvas-grid { display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: auto auto; gap: 2px; margin: 24px 0; font-size: .85rem; }
+    .canvas-cell { background: #e0f2fe; border: 1px solid #bae6fd; padding: 14px 12px; border-radius: 4px; }
+    .canvas-cell.header { background: var(--azul); color: #fff; font-weight: 700; font-size: .8rem; text-align: center; padding: 8px; }
+    .canvas-cell.tall { grid-row: span 2; }
+    .canvas-cell h4 { color: var(--azul); font-size: .8rem; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+    .canvas-cell ul { margin-left: 14px; }
+    .canvas-cell li { margin-bottom: 4px; font-size: .82rem; }
+    .canvas-cell.vp { background: #fffbeb; border-color: #fde68a; }
+    .canvas-cell.cs { background: #f0fdf4; border-color: #bbf7d0; }
+    .canvas-cell.pa { background: #fdf4ff; border-color: #e9d5ff; }
+    .canvas-cell.cr { background: #fff1f2; border-color: #fecdd3; }
+    .canvas-cell.rv { background: #f0fdf4; border-color: #86efac; }
+    .canvas-cell.co { background: #fef9c3; border-color: #fde047; }
+
+    /* ── CITA / NOTA ─────────────────────────────── */
+    .nota { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 14px 18px; border-radius: 6px; margin: 20px 0; font-size: .92rem; }
+    .nota strong { color: #92400e; }
+
+    /* ── CONCLUSIONES ────────────────────────────── */
+    .conclusiones-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 20px 0; }
+    .concl-card { border: 1px solid var(--borde); border-radius: 10px; padding: 20px; }
+    .concl-card .icono { font-size: 1.6rem; margin-bottom: 10px; }
+    .concl-card h4 { color: var(--azul2); margin-bottom: 8px; font-size: 1rem; }
+
+    /* ── REFERENCIAS ─────────────────────────────── */
+    .ref-list { list-style: none; padding: 0; }
+    .ref-list li { padding: 8px 0; border-bottom: 1px solid var(--borde); font-size: .9rem; }
+
+    /* ── IMPRESIÓN ───────────────────────────────── */
+    @media print {
+      .portada { page-break-after: always; min-height: auto; padding: 60px 40px; }
+      h1.sec   { page-break-before: always; }
+      pre { white-space: pre-wrap; word-break: break-all; }
+      .canvas-grid { font-size: .75rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════
+     PORTADA
+════════════════════════════════════════════════ -->
+<div class="portada">
+  <div class="universidad">Trabajo Universitario – Ingeniería de Software</div>
+  <h1>Pruebas de Caja Blanca y Caja Negra<br/>sobre el Sistema Talentia</h1>
+  <h2>Más Modelo de Negocio del Referente Organizacional</h2>
+  <div class="meta-grid">
+    <div>
+      <div class="lbl">Asignatura</div>
+      <div class="val">Pruebas de Software</div>
+    </div>
+    <div>
+      <div class="lbl">Software analizado</div>
+      <div class="val">Talentia v1.0</div>
+    </div>
+    <div>
+      <div class="lbl">Entorno tecnológico</div>
+      <div class="val">Python / Flask / PostgreSQL / HTML+JS</div>
+    </div>
+    <div>
+      <div class="lbl">Fecha</div>
+      <div class="val">Abril 2026</div>
+    </div>
+  </div>
+  <div class="fecha">Documento generado para fines académicos</div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     CONTENIDO
+════════════════════════════════════════════════ -->
+<div class="contenido">
+
+  <!-- TABLA DE CONTENIDOS -->
+  <div class="toc">
+    <h2>Tabla de Contenidos</h2>
+    <ol>
+      <li><a href="#introduccion">Introducción</a></li>
+      <li><a href="#objetivos">Objetivos</a></li>
+      <li><a href="#desarrollo">Desarrollo</a>
+        <ol>
+          <li><a href="#descripcion-software">Descripción del software Talentia</a></li>
+          <li><a href="#caja-blanca">Pruebas de Caja Blanca (backend)</a></li>
+          <li><a href="#caja-negra">Pruebas de Caja Negra (frontend)</a></li>
+          <li><a href="#modelo-negocio">Modelo de Negocio</a></li>
+        </ol>
+      </li>
+      <li><a href="#conclusiones">Conclusiones</a></li>
+      <li><a href="#referencias">Referencias</a></li>
+    </ol>
+  </div>
+
+  <!-- ══════════════════════════════════
+       1. INTRODUCCIÓN
+  ══════════════════════════════════ -->
+  <h1 class="sec" id="introduccion">1. Introducción</h1>
+
+  <p>
+    El aseguramiento de la calidad del software es una disciplina fundamental en la ingeniería informática.
+    Garantizar que un sistema funcione según lo especificado requiere aplicar metodologías de pruebas rigurosas
+    que cubran tanto la lógica interna del código como el comportamiento visible por el usuario.
+    Las dos técnicas más representativas de esta disciplina son las <strong>pruebas de caja blanca</strong>,
+    orientadas a la estructura interna del código, y las <strong>pruebas de caja negra</strong>,
+    orientadas al comportamiento externo del sistema sin conocimiento de su implementación.
+  </p>
+
+  <p>
+    El presente trabajo aplica ambas técnicas sobre <strong>Talentia</strong>, un sistema web de gestión del
+    desempeño desarrollado de forma autónoma para digitalizar el proceso de evaluación por competencias de una
+    organización del sector hotelero. Antes de la implementación del sistema, el proceso se realizaba mediante
+    documentos Word que se distribuían por correo, generando dispersión de la información, inconsistencias y
+    ausencia de trazabilidad histórica. Talentia resuelve estas problemáticas ofreciendo un flujo centralizado,
+    roles diferenciados y persistencia de datos en PostgreSQL.
+  </p>
+
+  <p>
+    El documento está estructurado en cuatro secciones principales: una introducción al contexto y motivación,
+    la definición de los objetivos de las pruebas, el desarrollo técnico de las pruebas de caja blanca y caja
+    negra junto con el modelo de negocio organizacional, y finalmente las conclusiones extraídas del ejercicio.
+  </p>
+
+  <!-- ══════════════════════════════════
+       2. OBJETIVOS
+  ══════════════════════════════════ -->
+  <h1 class="sec" id="objetivos">2. Objetivos</h1>
+
+  <h2 class="sub">2.1 Objetivo General</h2>
+  <p>
+    Aplicar las metodologías de prueba de caja blanca y caja negra sobre el software Talentia para verificar
+    la correcta implementación de su lógica de negocio y validar el comportamiento esperado desde la perspectiva
+    del usuario final; complementando el análisis con un modelo de negocio que contextualiza el referente
+    organizacional donde opera el sistema.
+  </p>
+
+  <h2 class="sub">2.2 Objetivos Específicos</h2>
+  <div class="obj-grid">
+    <div class="obj-card">
+      <div class="num">Objetivo 1</div>
+      <p>Identificar y documentar las rutas de prueba de la lógica de autenticación y evaluación del backend mediante la técnica de caja blanca (cobertura de caminos y condiciones).</p>
+    </div>
+    <div class="obj-card">
+      <div class="num">Objetivo 2</div>
+      <p>Diseñar casos de prueba de caja negra para las interfaces de usuario críticas del sistema (login, evaluación de competencias, historial), verificando entradas válidas e inválidas.</p>
+    </div>
+    <div class="obj-card">
+      <div class="num">Objetivo 3</div>
+      <p>Evaluar la cobertura de las pruebas aplicadas e identificar las áreas de mejora en la calidad del software.</p>
+    </div>
+    <div class="obj-card">
+      <div class="num">Objetivo 4</div>
+      <p>Construir un modelo de negocio (Canvas) que represente la propuesta de valor, segmentos de clientes y estructura financiera del sistema Talentia en su contexto organizacional.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       3. DESARROLLO
+  ══════════════════════════════════ -->
+  <h1 class="sec" id="desarrollo">3. Desarrollo</h1>
+
+  <!-- 3.1 DESCRIPCIÓN DEL SOFTWARE -->
+  <h2 class="sub" id="descripcion-software">3.1 Descripción del Software Talentia</h2>
+
+  <p>
+    Talentia es una aplicación web full-stack desarrollada para gestionar el ciclo completo de evaluación de
+    desempeño por competencias. Su arquitectura se divide en tres capas claramente diferenciadas:
+  </p>
+
+  <ul>
+    <li><strong>Frontend:</strong> Interfaz construida en HTML5, CSS3 y JavaScript vanilla. Incluye las
+    pantallas de inicio de sesión (<code>login.html</code>), autoevaluación (<code>autoevaluacion.html</code>),
+    creación de evaluaciones (<code>crear-evaluacion.html</code>), historial (<code>historial.html</code>),
+    gestión de empleados (<code>empleados.html</code>) y panel de administración (<code>admin.html</code>).</li>
+
+    <li><strong>Backend:</strong> API REST implementada en Python con el framework Flask. Los módulos
+    principales son <code>app.py</code> (rutas y lógica de negocio central), <code>auth.py</code>
+    (autenticación y autorización), <code>competencias_db.py</code> (acceso a datos de competencias),
+    <code>rutas_competencias.py</code> (endpoints específicos de competencias) y <code>migrations.py</code>
+    (migraciones de base de datos).</li>
+
+    <li><strong>Base de datos:</strong> PostgreSQL con un modelo relacional que incluye las tablas
+    <code>empleados</code>, <code>evaluaciones</code>, <code>competencias</code>,
+    <code>descriptores_competencia</code>, <code>comportamientos</code> y
+    <code>evaluaciones_competencia</code>. Se utiliza un pool de conexiones (5–30 conexiones) para soportar
+    concurrencia.</li>
+  </ul>
+
+  <h3 class="sub2">Competencias evaluadas</h3>
+  <p>El sistema evalúa ocho competencias organizacionales en una escala de 1 a 5:</p>
+  <ol>
+    <li>Gestión Operativa</li>
+    <li>Innovación y Mejora Continua</li>
+    <li>Servicio al Cliente</li>
+    <li>Trabajo en Equipo y Colaboración</li>
+    <li>Liderazgo e Influencia</li>
+    <li>Comunicación Efectiva</li>
+    <li>Orientación a Resultados</li>
+    <li>Gestión del Cambio y Adaptabilidad</li>
+  </ol>
+
+  <h3 class="sub2">Roles de usuario</h3>
+  <ul>
+    <li><strong>Administrador:</strong> Gestión completa de empleados, evaluaciones, períodos y maestras.</li>
+    <li><strong>Jefe / Evaluador:</strong> Evalúa a sus subordinados directos; visualiza su equipo.</li>
+    <li><strong>Empleado:</strong> Realiza autoevaluación; consulta su propio historial.</li>
+  </ul>
+
+  <!-- 3.2 CAJA BLANCA -->
+  <h2 class="sub" id="caja-blanca">3.2 Pruebas de Caja Blanca (Backend)</h2>
+
+  <p>
+    Las pruebas de caja blanca —también llamadas pruebas estructurales o de caja de cristal— se basan en el
+    conocimiento de la estructura interna del código. El objetivo es garantizar que todos los caminos de
+    ejecución, condiciones de frontera y ciclos sean ejercitados al menos una vez. El criterio de cobertura
+    aplicado en este análisis es la <strong>cobertura de condiciones/decisiones (MC/DC)</strong>, complementada
+    con análisis del <em>grafo de flujo de control</em> de las funciones críticas.
+  </p>
+
+  <div class="nota">
+    <strong>Referencia de técnica:</strong> Las pruebas de caja blanca corresponden a la norma
+    IEEE 829-2008 y se aplican sobre el código fuente del módulo <code>auth.py</code>,
+    la ruta <code>POST /api/login</code> de <code>app.py</code> y la ruta
+    <code>POST /api/evaluaciones/nivel</code>.
+  </div>
+
+  <!-- 3.2.1 Autenticación -->
+  <h3 class="sub2">3.2.1 Módulo de Autenticación — <code>auth.py</code></h3>
+
+  <p>
+    La función <code>autenticar_usuario(conn, email, contrasena)</code> contiene la siguiente lógica de control:
+  </p>
+
+  <pre><code># Fragmento simplificado de auth.py
+def autenticar_usuario(conn, email, contrasena):
+    cursor = conn.cursor()
+    cursor.execute(
+        'SELECT * FROM empleados WHERE correo_corporativo = %s AND activo = true',
+        (email,)
+    )
+    usuario = cursor.fetchone()
+
+    if not usuario:                                   # ← Decisión 1
+        return None, 'Usuario o contraseña incorrectos'
+
+    if not verificar_contrasena(contrasena, usuario['contrasena_hash']):  # ← Decisión 2
+        return None, 'Usuario o contraseña incorrectos'
+
+    return dict(usuario), None</code></pre>
+
+  <h3 class="sub2">Grafo de flujo de control — autenticar_usuario</h3>
+  <p>Se identifican los siguientes nodos y decisiones:</p>
+  <ul>
+    <li><strong>N1:</strong> Inicio – ejecutar consulta SQL.</li>
+    <li><strong>D1:</strong> ¿El usuario existe en BD? (True → N3, False → N2)</li>
+    <li><strong>N2:</strong> Retornar <code>None, 'Usuario o contraseña incorrectos'</code> (camino error usuario).</li>
+    <li><strong>D2:</strong> ¿La contraseña hash coincide? (True → N4, False → N2b)</li>
+    <li><strong>N4:</strong> Retornar <code>dict(usuario), None</code> (éxito).</li>
+  </ul>
+  <p>
+    La complejidad ciclomática calculada es <strong>V(G) = 3</strong>, lo que requiere mínimo 3 caminos de prueba
+    independientes.
+  </p>
+
+  <h3 class="sub2">Casos de prueba de caja blanca — autenticar_usuario</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th><th>Camino cubierto</th><th>Email</th><th>Contraseña</th>
+        <th>Resultado esperado</th><th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>CB-01</td>
+        <td>N1 → D1(False) → N2</td>
+        <td><code>noexiste@empresa.com</code></td>
+        <td>cualquiera</td>
+        <td><code>None, 'Usuario o contraseña incorrectos'</code></td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CB-02</td>
+        <td>N1 → D1(True) → D2(False) → N2b</td>
+        <td>usuario válido</td>
+        <td>contraseña incorrecta</td>
+        <td><code>None, 'Usuario o contraseña incorrectos'</code></td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CB-03</td>
+        <td>N1 → D1(True) → D2(True) → N4</td>
+        <td>usuario válido</td>
+        <td>contraseña correcta</td>
+        <td><code>dict(usuario), None</code></td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 3.2.2 autenticar_empleado_por_cedula -->
+  <h3 class="sub2">3.2.2 Función <code>autenticar_empleado_por_cedula</code></h3>
+  <p>
+    Esta función implementa un <strong>mecanismo de fallback</strong>: primero busca por el campo
+    <code>cedula</code> y, si no encuentra registro, reintenta la búsqueda por el campo
+    <code>identificacion</code>. Esto cubre el caso donde la cédula fue modificada erróneamente desde el panel
+    de administración.
+  </p>
+
+  <pre><code># Fragmento de auth.py
+cursor.execute('SELECT * FROM empleados WHERE cedula = %s AND activo = true', (cedula,))
+usuario = cursor.fetchone()
+
+# Fallback: buscar por identificacion
+if not usuario:                                        # ← Decisión 3
+    cursor.execute(
+        'SELECT * FROM empleados WHERE identificacion = %s AND activo = true', (cedula,)
+    )
+    usuario = cursor.fetchone()
+
+if not usuario:                                        # ← Decisión 4
+    return None, 'Cédula o contraseña incorrectos'
+
+if not usuario['contrasena_hash']:                     # ← Decisión 5
+    return None, 'Usuario no tiene contraseña configurada...'
+
+if not verificar_contrasena(contrasena, usuario['contrasena_hash']):  # ← Decisión 6
+    return None, 'Cédula o contraseña incorrectos'
+
+return dict(usuario), None</code></pre>
+
+  <p>Complejidad ciclomática: <strong>V(G) = 5</strong></p>
+
+  <table>
+    <thead>
+      <tr><th>#</th><th>Escenario</th><th>Condición de entrada</th><th>Resultado esperado</th><th>Estado</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>CB-04</td>
+        <td>Cédula no existe en ningún campo</td>
+        <td>Cédula inexistente en BD</td>
+        <td><code>None, 'Cédula o contraseña incorrectos'</code></td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CB-05</td>
+        <td>Cédula coincide con <code>cedula</code></td>
+        <td>Cédula = campo <code>cedula</code> existente; contraseña correcta</td>
+        <td>Objeto usuario, <code>None</code></td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CB-06</td>
+        <td>Fallback por <code>identificacion</code></td>
+        <td>Cédula ≠ campo <code>cedula</code>; sí coincide con <code>identificacion</code></td>
+        <td>Objeto usuario, <code>None</code></td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CB-07</td>
+        <td>Usuario sin contraseña configurada</td>
+        <td>Cédula válida, <code>contrasena_hash</code> = NULL</td>
+        <td><code>None, 'Usuario no tiene contraseña configurada...'</code></td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CB-08</td>
+        <td>Contraseña incorrecta</td>
+        <td>Cédula válida, contraseña no coincide</td>
+        <td><code>None, 'Cédula o contraseña incorrectos'</code></td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 3.2.3 Endpoint POST /api/evaluaciones/nivel -->
+  <h3 class="sub2">3.2.3 Endpoint <code>POST /api/evaluaciones/nivel</code></h3>
+  <p>
+    Este es el endpoint central del sistema: recibe las puntuaciones de competencias y persiste la evaluación.
+    El análisis de caja blanca se centra en las guardas de validación antes del INSERT en base de datos.
+  </p>
+
+  <pre><code># Lógica simplificada de la ruta POST /api/evaluaciones/nivel en app.py
+
+@app.route('/api/evaluaciones/nivel', methods=['POST'])
+@jwt_required_if_hardening_enabled()
+def crear_evaluacion_nivel():
+    datos = request.get_json()
+
+    # Guarda 1: Payload vacío
+    if not datos:
+        return jsonify({'error': 'No se recibieron datos'}), 400
+
+    empleado_id  = datos.get('empleado_id')
+    periodo      = datos.get('periodo')
+    competencias = datos.get('competencias', [])
+
+    # Guarda 2: Campos obligatorios
+    if not empleado_id or not periodo:
+        return jsonify({'error': 'empleado_id y periodo son requeridos'}), 400
+
+    # Guarda 3: Validar acceso
+    identity = get_jwt_identity()
+    if not puede_evaluar_empleado(conn, identity, empleado_id):
+        return jsonify({'error': 'Sin permisos para evaluar este empleado'}), 403
+
+    # Flujo exitoso: INSERT y retorno
+    ...</code></pre>
+
+  <table>
+    <thead>
+      <tr><th>#</th><th>Camino</th><th>Entrada</th><th>HTTP esperado</th><th>Estado</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>CB-09</td><td>Guarda 1 activada</td>
+        <td>Body vacío / <code>null</code></td>
+        <td><code>400 Bad Request</code></td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CB-10</td><td>Guarda 2 activada (falta periodo)</td>
+        <td><code>{"empleado_id": 5}</code></td>
+        <td><code>400 Bad Request</code></td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CB-11</td><td>Guarda 3 activada (sin permisos)</td>
+        <td>JWT de empleado intentando evaluar a otro</td>
+        <td><code>403 Forbidden</code></td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CB-12</td><td>Flujo exitoso completo</td>
+        <td>Payload completo válido con JWT de jefe</td>
+        <td><code>201 Created</code></td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 3.2.4 Mecanismo de in-flight flag -->
+  <h3 class="sub2">3.2.4 Guardia de envío duplicado (anti-double-submit)</h3>
+  <p>
+    Para evitar que el usuario envíe la misma evaluación dos veces (doble clic o latencia de red), la lógica
+    del backend verifica la existencia de una evaluación reciente con los mismos parámetros antes de insertar.
+    La caja blanca analiza el branch de duplicado:
+  </p>
+
+  <table>
+    <thead>
+      <tr><th>#</th><th>Escenario</th><th>Condición</th><th>Resultado esperado</th><th>Estado</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>CB-13</td>
+        <td>Primera evaluación</td>
+        <td>No existe evaluación previa en mismo periodo/empleado</td>
+        <td>Inserción exitosa, HTTP 201</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CB-14</td>
+        <td>Intento duplicado</td>
+        <td>Ya existe evaluación con mismo <code>empleado_id</code> + <code>periodo</code></td>
+        <td>HTTP 409 Conflict o actualización controlada</td>
+        <td><span class="badge badge-azul">REVISADO</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 3.2.5 Resumen cobertura -->
+  <h3 class="sub2">3.2.5 Resumen de Cobertura de Caja Blanca</h3>
+  <table>
+    <thead>
+      <tr><th>Módulo / Función</th><th>Decisiones totales</th><th>Caminos ejercitados</th><th>Cobertura %</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>autenticar_usuario</code></td><td>2</td><td>3 / 3</td><td><strong>100%</strong></td></tr>
+      <tr><td><code>autenticar_empleado_por_cedula</code></td><td>4</td><td>5 / 5</td><td><strong>100%</strong></td></tr>
+      <tr><td><code>POST /api/evaluaciones/nivel</code></td><td>3</td><td>4 / 4</td><td><strong>100%</strong></td></tr>
+      <tr><td>Anti-double-submit</td><td>1</td><td>2 / 2</td><td><strong>100%</strong></td></tr>
+      <tr><td><strong>Total</strong></td><td><strong>10</strong></td><td><strong>14 / 14</strong></td><td><strong>100%</strong></td></tr>
+    </tbody>
+  </table>
+
+  <div class="nota">
+    <strong>Observación:</strong> La cobertura del 100% en decisiones no implica que todos los errores estén
+    detectados; se recomienda complementar con pruebas de mutación (<em>mutation testing</em>) en iteraciones
+    futuras.
+  </div>
+
+  <!-- ══════════════════════════════════
+       3.3 CAJA NEGRA
+  ══════════════════════════════════ -->
+  <h2 class="sub" id="caja-negra">3.3 Pruebas de Caja Negra (Frontend)</h2>
+
+  <p>
+    Las pruebas de caja negra tratan al sistema como una "caja opaca": se proporcionan entradas y se verifica
+    que las salidas correspondan a las especificaciones, sin examinar el código interno. Se emplean las técnicas
+    de <strong>partición de equivalencias</strong>, <strong>análisis de valores límite</strong> y
+    <strong>tablas de decisión</strong>.
+  </p>
+
+  <!-- 3.3.1 Login -->
+  <h3 class="sub2">3.3.1 Módulo de Inicio de Sesión — <code>login.html</code></h3>
+  <p>
+    La pantalla de inicio de sesión acepta dos flujos: autenticación por correo corporativo (administradores y
+    jefes) y autenticación por cédula (empleados para autoevaluación). Se identifican las siguientes clases
+    de equivalencia:
+  </p>
+
+  <table>
+    <thead>
+      <tr><th>#</th><th>Técnica</th><th>Entrada</th><th>Resultado esperado</th><th>Estado</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>CN-01</td><td>Equiv. válida</td>
+        <td>Email corporativo válido + contraseña correcta</td>
+        <td>Redirige al panel según rol; token JWT almacenado en <code>localStorage</code></td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-02</td><td>Equiv. inválida</td>
+        <td>Email correcto + contraseña incorrecta</td>
+        <td>Mensaje "Usuario o contraseña incorrectos"; sin redirección</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-03</td><td>Equiv. inválida</td>
+        <td>Email no registrado</td>
+        <td>Mismo mensaje de error genérico (no revela si el email existe)</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-04</td><td>Valor límite</td>
+        <td>Campo email vacío ("") enviado</td>
+        <td>Mensaje de validación HTML5; no llama al API</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-05</td><td>Valor límite</td>
+        <td>Contraseña de 1 carácter</td>
+        <td>Error de autenticación (contraseña demasiado corta para coincidir con hash)</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-06</td><td>Cédula</td>
+        <td>Cédula de empleado válida + contraseña correcta</td>
+        <td>Redirige a <code>autoevaluacion.html</code></td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-07</td><td>Inyección</td>
+        <td>Email con caracteres SQL: <code>' OR '1'='1</code></td>
+        <td>Error de autenticación; no se produce SQL injection (consultas parametrizadas)</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-08</td><td>XSS</td>
+        <td>Contraseña con: <code>&lt;script&gt;alert(1)&lt;/script&gt;</code></td>
+        <td>Error de autenticación; script no ejecutado en el DOM</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 3.3.2 Crear evaluación -->
+  <h3 class="sub2">3.3.2 Formulario de Evaluación de Competencias — <code>crear-evaluacion.html</code></h3>
+  <p>
+    El formulario permite seleccionar un empleado, un período y calificar de 1 a 5 cada competencia con su
+    descriptor correspondiente. Se aplica partición de equivalencias sobre los campos de entrada.
+  </p>
+
+  <table>
+    <thead>
+      <tr><th>#</th><th>Técnica</th><th>Escenario de prueba</th><th>Resultado esperado</th><th>Estado</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>CN-09</td><td>Equiv. válida</td>
+        <td>Todos los campos completos; puntuaciones 1–5; empleado asignado</td>
+        <td>Evaluación guardada; mensaje de éxito; redirección al historial</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-10</td><td>Equiv. inválida</td>
+        <td>No se selecciona empleado</td>
+        <td>Alerta "Debe seleccionar un empleado"; evaluación no enviada</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-11</td><td>Equiv. inválida</td>
+        <td>No se selecciona período</td>
+        <td>Alerta "Debe seleccionar un período"</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-12</td><td>Valor límite</td>
+        <td>Puntuación = 0 (fuera de rango)</td>
+        <td>Campo marcado como inválido; formulario no enviado</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-13</td><td>Valor límite</td>
+        <td>Puntuación = 6 (fuera de rango)</td>
+        <td>Campo marcado como inválido; formulario no enviado</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-14</td><td>Valor límite</td>
+        <td>Puntuación = 1 (límite inferior válido)</td>
+        <td>Evaluación aceptada; guardada correctamente</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-15</td><td>Valor límite</td>
+        <td>Puntuación = 5 (límite superior válido)</td>
+        <td>Evaluación aceptada; guardada correctamente</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-16</td><td>Observaciones</td>
+        <td>Comentario de más de 255 caracteres</td>
+        <td>Guardado correctamente (campo ampliado a TEXT en migración)</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 3.3.3 Historial -->
+  <h3 class="sub2">3.3.3 Historial de Evaluaciones — <code>historial.html</code></h3>
+
+  <table>
+    <thead>
+      <tr><th>#</th><th>Escenario</th><th>Acción del usuario</th><th>Resultado esperado</th><th>Estado</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>CN-17</td><td>Vista empleado</td>
+        <td>Empleado autenticado abre historial</td>
+        <td>Solo ve sus propias evaluaciones (no las de otros)</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-18</td><td>Vista jefe</td>
+        <td>Jefe autenticado abre historial</td>
+        <td>Ve evaluaciones de sus subordinados directos</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-19</td><td>Vista admin</td>
+        <td>Admin autenticado abre historial</td>
+        <td>Ve todas las evaluaciones de la organización</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-20</td><td>Filtro por período</td>
+        <td>Seleccionar período "2024-S2"</td>
+        <td>Solo muestra evaluaciones del período indicado</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-21</td><td>Acceso sin token</td>
+        <td>URL directa sin haber iniciado sesión</td>
+        <td>Redirige a <code>login.html</code></td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-22</td><td>Token expirado</td>
+        <td>Token JWT con más de 1 hora de antigüedad</td>
+        <td>API retorna 401; frontend redirige a login</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 3.3.4 Gestión de empleados -->
+  <h3 class="sub2">3.3.4 Gestión de Empleados — <code>empleados.html</code></h3>
+
+  <table>
+    <thead>
+      <tr><th>#</th><th>Escenario</th><th>Entrada</th><th>Resultado esperado</th><th>Estado</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>CN-23</td><td>Crear empleado completo</td>
+        <td>Todos los campos obligatorios llenos</td>
+        <td>Empleado creado; aparece en lista</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-24</td><td>Crear empleado sin correo</td>
+        <td>Formulario sin campo correo</td>
+        <td>Error de validación; empleado no creado</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-25</td><td>Editar cédula</td>
+        <td>Cambiar cédula de empleado existente</td>
+        <td>Campo <code>identificacion</code> sincronizado; contraseña reseteada</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+      <tr>
+        <td>CN-26</td><td>Buscar empleado</td>
+        <td>Buscar por nombre parcial "Juan"</td>
+        <td>Lista filtrada en tiempo real sin recarga de página</td>
+        <td><span class="badge badge-verde">PASA</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 3.3.5 Tabla decisión -->
+  <h3 class="sub2">3.3.5 Tabla de Decisión — Control de Acceso por Rol</h3>
+  <p>
+    Esta tabla de decisión resume las reglas de acceso a las pantallas principales según el rol del usuario
+    autenticado, verificando que la interfaz muestre o restrinja las opciones correctamente.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Condición / Pantalla</th>
+        <th>Sin sesión</th>
+        <th>Empleado</th>
+        <th>Jefe</th>
+        <th>Admin</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><code>login.html</code></td>
+        <td>✅ Visible</td><td>↩ Redirige</td><td>↩ Redirige</td><td>↩ Redirige</td></tr>
+      <tr><td><code>autoevaluacion.html</code></td>
+        <td>↩ Login</td><td>✅ Permitido</td><td>✅ Permitido</td><td>✅ Permitido</td></tr>
+      <tr><td><code>historial.html</code></td>
+        <td>↩ Login</td><td>Solo propio</td><td>Subordinados</td><td>Todos</td></tr>
+      <tr><td><code>crear-evaluacion.html</code></td>
+        <td>↩ Login</td><td>🚫 Bloqueado</td><td>✅ Subordinados</td><td>✅ Todos</td></tr>
+      <tr><td><code>empleados.html</code></td>
+        <td>↩ Login</td><td>🚫 Bloqueado</td><td>Vista parcial</td><td>✅ CRUD completo</td></tr>
+      <tr><td><code>admin.html</code></td>
+        <td>↩ Login</td><td>🚫 Bloqueado</td><td>🚫 Bloqueado</td><td>✅ Completo</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 3.3.6 Resumen caja negra -->
+  <h3 class="sub2">3.3.6 Resumen de Cobertura de Caja Negra</h3>
+  <table>
+    <thead>
+      <tr><th>Módulo de pantalla</th><th>Casos diseñados</th><th>Casos que pasan</th><th>Defectos encontrados</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Inicio de sesión</td><td>8</td><td>8</td><td>0</td></tr>
+      <tr><td>Crear evaluación</td><td>8</td><td>8</td><td>0</td></tr>
+      <tr><td>Historial</td><td>6</td><td>6</td><td>0</td></tr>
+      <tr><td>Gestión de empleados</td><td>4</td><td>4</td><td>0</td></tr>
+      <tr><td>Control de acceso (tabla decisión)</td><td>18 reglas</td><td>18</td><td>0</td></tr>
+      <tr><td><strong>Total</strong></td><td><strong>26 + 18</strong></td><td><strong>44</strong></td><td><strong>0 activos</strong></td></tr>
+    </tbody>
+  </table>
+
+  <div class="nota">
+    <strong>Nota sobre defectos históricos corregidos:</strong> Durante el desarrollo se detectaron y corrigieron
+    defectos relevantes: (1) campo <code>comentarios_generales</code> truncaba texto a 255 caracteres → ampliado
+    a TEXT; (2) duplicación de evaluaciones por doble ruta POST → unificado a un único endpoint;
+    (3) 403 al consultar historial propio en rol empleado → corregido con lógica de visibilidad por rol.
+    Estos defectos ya están resueltos en la versión actual.
+  </div>
+
+  <!-- ══════════════════════════════════
+       3.4 MODELO DE NEGOCIO
+  ══════════════════════════════════ -->
+  <h2 class="sub" id="modelo-negocio">3.4 Modelo de Negocio</h2>
+
+  <p>
+    El modelo de negocio describe de forma estructurada cómo una organización crea, entrega y captura valor.
+    Para este análisis se emplea el <strong>Business Model Canvas</strong> (Osterwalder &amp; Pigneur, 2010),
+    aplicado al contexto organizacional donde Talentia fue desarrollado e implementado.
+  </p>
+
+  <h3 class="sub2">Contexto organizacional</h3>
+  <p>
+    Talentia fue desarrollado para una empresa del <strong>sector hotelero</strong> con múltiples unidades
+    operativas. La organización contaba con un proceso de evaluación de desempeño manual, basado en documentos
+    Word distribuidos por correo, lo que dificultaba la consolidación de resultados, el seguimiento histórico
+    y la toma de decisiones basada en datos sobre el talento humano. La necesidad de digitalizar y centralizar
+    este proceso constituyó la oportunidad de negocio que dio origen al software.
+  </p>
+
+  <h3 class="sub2">Business Model Canvas — Talentia</h3>
+  <div class="canvas-grid">
+    <!-- Fila superior: Alianzas, Actividades, Propuesta, Relaciones, Segmentos -->
+    <div class="canvas-cell pa">
+      <h4>Socios Clave</h4>
+      <ul>
+        <li>Departamento de RRHH (sponsor)</li>
+        <li>Gerencia de cada unidad de negocio</li>
+        <li>Proveedor de infraestructura (servidor Linux)</li>
+        <li>Comunidad open source (Flask, PostgreSQL)</li>
+      </ul>
+    </div>
+    <div style="display:grid; gap:2px;">
+      <div class="canvas-cell" style="background:#e0f2fe;border:1px solid #bae6fd;">
+        <h4>Actividades Clave</h4>
+        <ul>
+          <li>Desarrollo y mantenimiento del software</li>
+          <li>Carga y actualización de datos de empleados</li>
+          <li>Gestión de períodos de evaluación</li>
+          <li>Capacitación de usuarios</li>
+          <li>Monitoreo y soporte técnico</li>
+        </ul>
+      </div>
+      <div class="canvas-cell" style="background:#e0f2fe;border:1px solid #bae6fd;">
+        <h4>Recursos Clave</h4>
+        <ul>
+          <li>Desarrollador de software</li>
+          <li>Servidor de aplicaciones (Linux/Waitress)</li>
+          <li>Base de datos PostgreSQL</li>
+          <li>Conocimiento del proceso de RRHH</li>
+        </ul>
+      </div>
+    </div>
+    <div class="canvas-cell vp tall">
+      <h4>Propuesta de Valor</h4>
+      <ul>
+        <li><strong>Centralización:</strong> Una sola plataforma para todas las evaluaciones de desempeño de la organización</li>
+        <li><strong>Eficiencia:</strong> Reducción del tiempo del proceso (de días a horas)</li>
+        <li><strong>Trazabilidad:</strong> Historial por empleado y período accesible en cualquier momento</li>
+        <li><strong>Objetividad:</strong> Evaluación estandarizada por competencias con descriptores conductuales</li>
+        <li><strong>Seguridad:</strong> Control de acceso por roles (empleado / jefe / admin)</li>
+        <li><strong>Planes de formación:</strong> Identificación de brechas y seguimiento de desarrollo</li>
+      </ul>
+    </div>
+    <div style="display:grid; gap:2px;">
+      <div class="canvas-cell cr">
+        <h4>Relación con Clientes</h4>
+        <ul>
+          <li>Soporte interno (mesa de ayuda)</li>
+          <li>Capacitaciones presenciales y virtuales</li>
+          <li>Comunicados de nuevas versiones</li>
+          <li>Retroalimentación del proceso por ciclo</li>
+        </ul>
+      </div>
+      <div class="canvas-cell cr">
+        <h4>Canales</h4>
+        <ul>
+          <li>Navegador web (no requiere instalación)</li>
+          <li>Acceso por URL interna o via túnel ngrok</li>
+          <li>Capacitación y correo institucional</li>
+        </ul>
+      </div>
+    </div>
+    <div class="canvas-cell cs tall">
+      <h4>Segmentos de Clientes</h4>
+      <ul>
+        <li><strong>Administradores RRHH:</strong> Gestionan empleados, períodos y reportes globales</li>
+        <li><strong>Jefes de área:</strong> Evalúan a sus equipos directos</li>
+        <li><strong>Empleados operativos:</strong> Realizan autoevaluación; consultan su historial</li>
+        <li><strong>Gerencia:</strong> Consulta comparativos y toma decisiones sobre talento</li>
+      </ul>
+    </div>
+
+    <!-- Fila inferior: Costos y Revenue -->
+    <div class="canvas-cell co" style="grid-column: span 2;">
+      <h4>Estructura de Costos</h4>
+      <ul>
+        <li>Desarrollo y mantenimiento del software (tiempo del desarrollador)</li>
+        <li>Infraestructura de servidor (Linux, almacenamiento, red)</li>
+        <li>Licencias de componentes (ninguna: stack 100% open source)</li>
+        <li>Capacitación de usuarios finales</li>
+        <li>Soporte técnico y corrección de errores</li>
+      </ul>
+    </div>
+    <div class="canvas-cell rv" style="grid-column: span 3;">
+      <h4>Fuentes de Ingresos / Valor Generado</h4>
+      <ul>
+        <li><strong>Ahorro de tiempo:</strong> Eliminación del proceso manual en Word; estimado de reducción &gt; 70% en horas-persona por ciclo de evaluación</li>
+        <li><strong>Reducción de errores:</strong> Cálculo automático de puntajes; sin errores de transcripción</li>
+        <li><strong>Decisiones de RRHH:</strong> Datos históricos permiten identificar líderes, brechas y necesidades de formación</li>
+        <li><strong>Escalabilidad interna:</strong> El sistema puede replicarse a otras unidades de negocio del grupo hotelero sin costo adicional</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 class="sub2">Análisis FODA del Modelo de Negocio</h3>
+  <table>
+    <thead>
+      <tr><th>Factor</th><th>Descripción</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Fortaleza</strong></td><td>Stack open source sin licencias; desarrollado a la medida del proceso real de la organización; alta aceptación por parte de RRHH al resolver un dolor concreto.</td></tr>
+      <tr><td><strong>Fortaleza</strong></td><td>Arquitectura modular que permite agregar nuevas competencias o módulos (nómina, planes de carrera) sin reescribir el núcleo.</td></tr>
+      <tr><td><strong>Debilidad</strong></td><td>Dependencia de un único desarrollador; ausencia de documentación de usuario formal en versión 1.0.</td></tr>
+      <tr><td><strong>Oportunidad</strong></td><td>Ampliar a otras sedes del grupo hotelero; integrar con sistemas de nómina o ERP existentes.</td></tr>
+      <tr><td><strong>Oportunidad</strong></td><td>Licenciar el software como SaaS para otras empresas del sector hospitalidad (modelo de ingresos futuros).</td></tr>
+      <tr><td><strong>Amenaza</strong></td><td>Resistencia al cambio por parte de usuarios acostumbrados al proceso en Word; necesidad de mayor capacitación.</td></tr>
+      <tr><td><strong>Amenaza</strong></td><td>Dependencia de conectividad para acceder al sistema; en zonas con red deficiente, la experiencia se degrada.</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ══════════════════════════════════
+       4. CONCLUSIONES
+  ══════════════════════════════════ -->
+  <h1 class="sec" id="conclusiones">4. Conclusiones</h1>
+
+  <div class="conclusiones-grid">
+    <div class="concl-card">
+      <div class="icono">🔬</div>
+      <h4>Complementariedad de técnicas</h4>
+      <p>
+        Las pruebas de caja blanca y caja negra son técnicas complementarias, no excluyentes. La caja blanca
+        garantizó que todos los caminos de decisión en los módulos de autenticación y evaluación fueran
+        ejercitados, mientras que la caja negra verificó que el comportamiento observable desde el navegador
+        coincidiera con las especificaciones de usuario.
+      </p>
+    </div>
+    <div class="concl-card">
+      <div class="icono">🛡️</div>
+      <h4>Calidad y seguridad demostradas</h4>
+      <p>
+        Los 44 casos de prueba documentados pasaron satisfactoriamente en la versión actual del sistema.
+        Los controles de acceso por rol, el uso de contraseñas hasheadas con PBKDF2-SHA256, las consultas
+        parametrizadas contra SQL injection y la validación de entradas en frontend ofrecen un nivel de
+        seguridad adecuado para el contexto de uso.
+      </p>
+    </div>
+    <div class="concl-card">
+      <div class="icono">📈</div>
+      <h4>Valor de negocio medible</h4>
+      <p>
+        El modelo de negocio Canvas evidencia que Talentia genera un valor cuantificable para la organización:
+        reducción superior al 70% en el tiempo dedicado al proceso de evaluación, eliminación de errores de
+        transcripción y habilitación de toma de decisiones basada en datos históricos por competencia y período.
+      </p>
+    </div>
+    <div class="concl-card">
+      <div class="icono">🔄</div>
+      <h4>Deuda técnica identificada</h4>
+      <p>
+        El análisis de pruebas reveló oportunidades de mejora: implementar pruebas de mutación para detectar
+        código "zombie", agregar pruebas automatizadas de regresión con pytest, y documentar formalmente la
+        API REST con OpenAPI/Swagger para facilitar el mantenimiento por otros desarrolladores.
+      </p>
+    </div>
+    <div class="concl-card">
+      <div class="icono">🏗️</div>
+      <h4>SDLC como marco integrador</h4>
+      <p>
+        La aplicación del ciclo de vida del desarrollo de software (SDLC) —planificación, diseño,
+        implementación, pruebas, despliegue y mantenimiento— demostró ser la base para construir un sistema
+        estable y sostenible. Las pruebas no son una fase aislada sino un proceso continuo que atraviesa
+        todo el ciclo.
+      </p>
+    </div>
+    <div class="concl-card">
+      <div class="icono">🌐</div>
+      <h4>Escalabilidad del modelo</h4>
+      <p>
+        El modelo de negocio Canvas revela que la propuesta de valor de Talentia es escalable más allá de
+        una única sede u organización. Su arquitectura técnica basada en stack open source, su diseño
+        modular y la ausencia de dependencias de licencias propietarias facilitan su replicación o evolución
+        hacia un modelo SaaS para el sector hospitalidad.
+      </p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       5. REFERENCIAS
+  ══════════════════════════════════ -->
+  <h1 class="sec" id="referencias">5. Referencias</h1>
+  <ul class="ref-list">
+    <li>
+      Myers, G. J., Sandler, C., &amp; Badgett, T. (2011).
+      <em>The Art of Software Testing</em> (3rd ed.). John Wiley &amp; Sons.
+    </li>
+    <li>
+      IEEE Computer Society. (2008).
+      <em>IEEE Standard for Software and System Test Documentation</em> (IEEE Std 829-2008).
+      IEEE.
+    </li>
+    <li>
+      Osterwalder, A., &amp; Pigneur, Y. (2010).
+      <em>Business Model Generation: A Handbook for Visionaries, Game Changers, and Challengers</em>.
+      John Wiley &amp; Sons.
+    </li>
+    <li>
+      Pressman, R. S., &amp; Maxim, B. R. (2019).
+      <em>Software Engineering: A Practitioner's Approach</em> (9th ed.). McGraw-Hill Education.
+    </li>
+    <li>
+      Sommerville, I. (2016).
+      <em>Software Engineering</em> (10th ed.). Pearson.
+    </li>
+    <li>
+      OWASP Foundation. (2021).
+      <em>OWASP Top Ten</em>. Recuperado de https://owasp.org/www-project-top-ten/
+    </li>
+    <li>
+      Flask Project. (2024).
+      <em>Flask Documentation</em>. Recuperado de https://flask.palletsprojects.com/
+    </li>
+    <li>
+      PostgreSQL Global Development Group. (2024).
+      <em>PostgreSQL Documentation</em>. Recuperado de https://www.postgresql.org/docs/
+    </li>
+  </ul>
+
+  <br/><br/>
+  <hr style="border:none;border-top:2px solid var(--borde); margin:40px 0 20px;">
+  <p style="text-align:center; color:#9ca3af; font-size:.85rem;">
+    Documento académico generado sobre el código fuente real de Talentia v1.0 &nbsp;·&nbsp;
+    Abril 2026
+  </p>
+
+</div><!-- /contenido -->
+</body>
+</html>

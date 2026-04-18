@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Evaluaciones - Talentia</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .navigation {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .nav-link {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-link.active {
+            background: #764ba2;
+        }
+
+        .filters {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-item label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .filter-item select,
+        .filter-item input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .historial-card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .historial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .employee-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .evaluation-date {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .card-body {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .info-value {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .promedio-badge {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .promedio-excelente {
+            background: #28a745;
+            color: white;
+        }
+
+        .promedio-bueno {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .promedio-satisfactorio {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .promedio-mejora {
+            background: #dc3545;
+            color: white;
+        }
+
+        .card-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .trend-chart-container {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+            border: 2px solid rgba(102, 126, 234, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .trend-chart-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            background-size: 200% auto;
+            animation: gradientShift 3s linear infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .trend-chart-container h2 {
+            color: #667eea;
+            margin-bottom: 25px;
+            font-size: 1.5em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .trend-chart-container h2::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.3) 0%, transparent 100%);
+        }
+
+        #trendChart {
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .chart-legend {
+            margin-top: 25px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid rgba(102, 126, 234, 0.15);
+        }
+
+        .legend-title {
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .legend-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .legend-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+        }
+
+        .legend-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 3px solid;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .legend-text {
+            font-size: 0.95em;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        /* Encabezado compacto como en empleados */
+        header {
+            padding: 24px 24px 18px;
+            gap: 8px;
+            min-height: auto;
+        }
+
+        header h1 {
+            font-size: 2.1em;
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 900px) {
+            header {
+                padding: 20px 16px 14px;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Historial de Evaluaciones</h1>
+            <p class="subtitle">Seguimiento y Análisis de Desempeño</p>
+            <p style="margin-top: 5px; color: #666; font-size: 0.95em;">
+                Usuario: <span id="nombre-evaluador" style="font-weight: bold; color: #333;">Cargando...</span>
+            </p>
+            <button onclick="logout()" style="position: absolute; top: 20px; right: 20px; padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: 500;">🚪 Salir</button>
+        </header>
+
+        <div class="content">
+            <div class="navigation">
+                <button class="nav-link" onclick="window.location.href='index.html'">🏠 Inicio</button>
+                <button class="nav-link" onclick="window.location.href='empleados.html'">👥 Empleados</button>
+                <button class="nav-link" onclick="window.location.href='evaluacion-competencias.html'" style="background: #28a745;">🎯 Evalua tu equipo</button>
+                <button class="nav-link active" onclick="window.location.href='historial.html'">📜 Historial</button>
+            </div>
+
+            <!-- Filtros -->
+            <div class="filters">
+                <div class="filter-item">
+                    <label>Empleado</label>
+                    <select id="filterEmpleado">
+                        <option value="">Todos los empleados</option>
+                    </select>
+                </div>
+
+                <div class="filter-item">
+                    <label>Centro de costo</label>
+                    <select id="filterDepartamento">
+                        <option value="">Todos los centros de costo</option>
+                    </select>
+                </div>
+
+                <div class="filter-item">
+                    <label>Período</label>
+                    <select id="filterPeriodo">
+                        <option value="">Todos los períodos</option>
+                    </select>
+                </div>
+
+                <div class="filter-item">
+                    <label>Año</label>
+                    <select id="filterAnio">
+                        <option value="">Todos</option>
+                        <option value="2026">2026</option>
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Gráfico de Tendencias -->
+            <div id="trendChartSection" class="trend-chart-container" style="display: none;">
+                <h2>📈 Tendencia de Desempeño</h2>
+                <canvas id="trendChart" height="80"></canvas>
+                <div class="chart-legend">
+                    <div class="legend-title">Niveles de Desempeño:</div>
+                    <div class="legend-items">
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #10b981; border-color: #059669;"></span>
+                            <span class="legend-text">Excelente (4.5-5.0)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #3b82f6; border-color: #2563eb;"></span>
+                            <span class="legend-text">Bueno (3.5-4.4)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #f59e0b; border-color: #d97706;"></span>
+                            <span class="legend-text">Satisfactorio (2.5-3.4)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #ef4444; border-color: #dc2626;"></span>
+                            <span class="legend-text">Necesita Mejorar (< 2.5)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Evaluaciones -->
+            <div id="historialContainer">
+                <div class="empty-state">
+                    <div class="empty-state-icon">⏳</div>
+                    <p>Cargando evaluaciones...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Verificación INMEDIATA de autenticación (antes de cualquier otra cosa)
+        if (!sessionStorage.getItem('token')) {
+            console.log('❌ No hay token. Redirigiendo a login...');
+            window.location.href = 'login.html';
+        }
+
+        // Verificar rol: solo jefe y admin pueden acceder
+        const usuarioStr = sessionStorage.getItem('usuario');
+        if (usuarioStr) {
+            const usuario = JSON.parse(usuarioStr);
+            if (usuario.rol === 'empleado') {
+                console.log('❌ Empleados no pueden acceder a evaluaciones.');
+                setTimeout(() => {
+                    alert('❌ Solo jefes y administradores pueden crear evaluaciones.');
+                    window.location.href = 'index.html';
+                }, 100);
+            }
+        }
+
+        let API_URL = '/api'; // URL relativa para funcionar con ngrok
+        let allEvaluaciones = [];
+        let trendChart = null;
+        let empleadoIdForzado = null;
+
+        function dedupeEvaluaciones(evaluaciones) {
+            const map = new Map();
+            (evaluaciones || []).forEach(ev => {
+                const key = `${ev.empleado_id}|${ev.periodo}|${ev.autoevaluacion ?? 0}`;
+                const actual = map.get(key);
+                if (!actual) {
+                    map.set(key, ev);
+                    return;
+                }
+                const fechaActual = new Date(actual.fecha_evaluacion || 0);
+                const fechaNueva = new Date(ev.fecha_evaluacion || 0);
+                if (fechaNueva > fechaActual) {
+                    map.set(key, ev);
+                    return;
+                }
+
+                if (fechaNueva.getTime() === fechaActual.getTime() && Number(ev.id) > Number(actual.id)) {
+                    map.set(key, ev);
+                }
+            });
+            return Array.from(map.values());
+        }
+
+        // Funciones de autenticación JWT
+        function getToken() {
+            const token = sessionStorage.getItem('token');
+            console.log('Token recuperado:', token ? '✓ Existe' : '✗ No existe');
+            if (!token) {
+                console.error('❌ No hay token. Redirigiendo a login...');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 500);
+                return null;
+            }
+            return token;
+        }
+
+        // Obtener headers con autenticación
+        function getHeaders() {
+            const token = getToken();
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+            console.log('Headers:', headers);
+            return headers;
+        }
+
+        // Manejar sesión expirada (después de 1 hora de inactividad)
+        function handleSessionExpired() {
+            const mensajeExpiracion = `
+╔════════════════════════════════════════╗
+║     SESIÓN EXPIRADA                    ║
+╠════════════════════════════════════════╣
+║ Tu sesión ha caducado por inactividad  ║
+║ durante más de 1 hora.                 ║
+║                                        ║
+║ Por favor, inicia sesión nuevamente.   ║
+╚════════════════════════════════════════╝
+            `;
+            console.warn(mensajeExpiracion);
+            
+            // Limpiar datos de sesión
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('usuario');
+            sessionStorage.removeItem('empleadoData');
+            
+            // Mostrar alerta al usuario
+            alert('Tu sesión ha expirado.\n\nPor favor, inicia sesión nuevamente.');
+            
+            // Redirigir a login
+            window.location.href = 'login.html';
+        }
+
+        // Función para chequear respuesta y manejar 401
+        async function fetchConValidacionSesion(url, options = {}) {
+            const response = await fetch(url, options);
+            
+            // Si es 401 (Unauthorized), la sesión expiró
+            if (response.status === 401) {
+                handleSessionExpired();
+                return null;
+            }
+            
+            return response;
+        }
+
+        // Inicializar
+        async function init() {
+            try {
+                cargarNombreEvaluador();
+                await loadEvaluaciones();
+                setupFilters();
+                checkURLParams();
+            } catch (error) {
+                console.error('❌ Error crítico en inicialización:', error);
+                document.getElementById('historialContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">❌</div>
+                        <p style="color: red;">Error al cargar la página: ${error.message}</p>
+                        <button onclick="window.location.reload()" class="btn btn-primary" style="margin-top: 20px;">
+                            🔄 Reintentar
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Cargar nombre del evaluador actual
+        function cargarNombreEvaluador() {
+            try {
+                const usuarioStr = sessionStorage.getItem('usuario');
+                if (usuarioStr) {
+                    const usuario = JSON.parse(usuarioStr);
+                    const nombreEvaluador = usuario.nombres_completos || usuario.nombre || 'Usuario';
+                    document.getElementById('nombre-evaluador').textContent = nombreEvaluador;
+                    console.log('Evaluador cargado:', nombreEvaluador);
+                } else {
+                    document.getElementById('nombre-evaluador').textContent = 'Sin información';
+                }
+            } catch (error) {
+                console.error('Error al cargar nombre del evaluador:', error);
+                document.getElementById('nombre-evaluador').textContent = 'Error';
+            }
+        }
+
+        // Verificar parámetros URL (para filtrar por empleado)
+        function checkURLParams() {
+            const params = new URLSearchParams(window.location.search);
+            const empleadoId = params.get('empleado');
+            const empleadoNombre = (params.get('empleadoNombre') || '').trim();
+            
+            if (empleadoId) {
+                empleadoIdForzado = String(empleadoId);
+                const filterEmpleado = document.getElementById('filterEmpleado');
+                if (filterEmpleado) {
+                    // Si no existe la opción en el select, crearla para mantener visible el filtro aplicado.
+                    if (!Array.from(filterEmpleado.options).some(opt => opt.value === empleadoIdForzado)) {
+                        const option = document.createElement('option');
+                        option.value = empleadoIdForzado;
+                        option.textContent = empleadoNombre || `Empleado ${empleadoIdForzado}`;
+                        filterEmpleado.appendChild(option);
+                    }
+                    filterEmpleado.value = empleadoIdForzado;
+                }
+                filterEvaluaciones();
+            }
+        }
+
+        // Fetch JSON con reintento automático
+        async function fetchJsonConReintento(url, options = {}, maxRetries = 1) {
+            const timeoutMs = options.timeoutMs || 15000;
+            const headers = options.headers || {};
+            
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                try {
+                    const response = await fetch(url, { 
+                        ...options,
+                        headers,
+                        timeoutMs,
+                        retries: 0
+                    });
+                    
+                    // Si es 401, NO reintentar - es error de autenticación
+                    if (response.status === 401) {
+                        handleSessionExpired();
+                        throw new Error('Sesión expirada');
+                    }
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    return await response.json();
+                } catch (error) {
+                    console.warn(`Intento ${attempt}/${maxRetries} fallido en ${url}:`, error.message);
+                    
+                    if (attempt === maxRetries) {
+                        throw error;
+                    }
+                    
+                    // Esperar antes de reintentar (exponencial)
+                    await new Promise(resolve => setTimeout(resolve, 300 * attempt));
+                }
+            }
+        }
+
+        // Cargar evaluaciones
+        async function loadEvaluaciones() {
+            const container = document.getElementById('historialContainer');
+            
+            try {
+                // Mostrar indicador de carga
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⏳</div>
+                        <p>Cargando evaluaciones...</p>
+                    </div>
+                `;
+                
+                // Usar fetchJsonConReintento para cargar con reintentos automáticos
+                const data = await fetchJsonConReintento(
+                    `${API_URL}/evaluaciones`, 
+                    { headers: getHeaders(), timeoutMs: 15000 },
+                    1  // maxRetries
+                );
+                
+                allEvaluaciones = dedupeEvaluaciones(data);
+                
+                // Poblar filtros
+                populateFilters();
+                
+                // Mostrar evaluaciones
+                renderEvaluaciones(allEvaluaciones);
+                
+            } catch (error) {
+                console.error('Error cargando evaluaciones:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">❌</div>
+                        <p style="color: red;">Error: No se pudo cargar las evaluaciones.</p>
+                        <p style="color: #666; font-size: 0.9em; margin-top: 10px;">${error.message}</p>
+                        <button onclick="loadEvaluaciones()" class="btn btn-primary" style="margin-top: 20px;">
+                            🔄 Reintentar
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Poblar filtros dinámicamente
+        function populateFilters() {
+            // Empleados únicos
+            const empleados = [...new Set(allEvaluaciones.map(e => 
+                JSON.stringify({ id: e.empleado_id, nombre: e.nombres_completos })
+            ))].map(e => JSON.parse(e));
+            
+            const empleadoSelect = document.getElementById('filterEmpleado');
+            empleados.forEach(emp => {
+                const option = document.createElement('option');
+                option.value = emp.id;
+                option.textContent = emp.nombre;
+                empleadoSelect.appendChild(option);
+            });
+
+            // Centros de costo únicos
+            const centros = [...new Set(allEvaluaciones.map(e => e.centro_costo).filter(c => c))];
+            const deptoSelect = document.getElementById('filterDepartamento');
+            centros.forEach(centro => {
+                const option = document.createElement('option');
+                option.value = centro;
+                option.textContent = centro;
+                deptoSelect.appendChild(option);
+            });
+
+            // Períodos únicos
+            const periodos = [...new Set(allEvaluaciones.map(e => e.periodo))];
+            const periodoSelect = document.getElementById('filterPeriodo');
+            periodos.forEach(periodo => {
+                const option = document.createElement('option');
+                option.value = periodo;
+                option.textContent = periodo;
+                periodoSelect.appendChild(option);
+            });
+        }
+
+        // Configurar filtros
+        function setupFilters() {
+            document.getElementById('filterEmpleado').addEventListener('change', () => {
+                // Si el usuario cambia el filtro manualmente, dejar de forzar el valor de URL.
+                empleadoIdForzado = null;
+                filterEvaluaciones();
+            });
+            document.getElementById('filterDepartamento').addEventListener('change', filterEvaluaciones);
+            document.getElementById('filterPeriodo').addEventListener('change', filterEvaluaciones);
+            document.getElementById('filterAnio').addEventListener('change', filterEvaluaciones);
+        }
+
+        // Filtrar evaluaciones
+        function filterEvaluaciones() {
+            const empleado = document.getElementById('filterEmpleado').value;
+            const centro = document.getElementById('filterDepartamento').value;
+            const periodo = document.getElementById('filterPeriodo').value;
+            const anio = document.getElementById('filterAnio').value;
+            const empleadoFiltroActivo = empleado || empleadoIdForzado;
+
+            let filtered = allEvaluaciones;
+
+            if (empleadoFiltroActivo) {
+                filtered = filtered.filter(e => String(e.empleado_id) === String(empleadoFiltroActivo));
+            }
+            if (centro) {
+                filtered = filtered.filter(e => e.centro_costo === centro);
+            }
+            if (periodo) {
+                filtered = filtered.filter(e => e.periodo === periodo);
+            }
+            if (anio) {
+                filtered = filtered.filter(e => e.fecha_evaluacion.includes(anio));
+            }
+
+            renderEvaluaciones(filtered);
+            
+            // Mostrar gráfico de tendencia si es un solo empleado
+            if (empleadoFiltroActivo && filtered.length > 0) {
+                showTrendChart(filtered);
+            } else {
+                document.getElementById('trendChartSection').style.display = 'none';
+            }
+        }
+
+        // Renderizar evaluaciones
+        function renderEvaluaciones(evaluaciones) {
+            const container = document.getElementById('historialContainer');
+
+            if (evaluaciones.length === 0) {
+                const mensaje = empleadoIdForzado
+                    ? 'Este empleado aún no tiene evaluaciones ni autoevaluaciones registradas.'
+                    : 'No se encontraron evaluaciones';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>${mensaje}</p>
+                        <button onclick="window.location.href='evaluacion-competencias.html'" class="btn btn-primary" style="margin-top: 20px;">
+                            🎯 Crear Primera Evaluación
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            const findPairIds = (ev) => {
+                const delMismoPeriodo = (evaluaciones || []).filter(item =>
+                    Number(item.empleado_id) === Number(ev.empleado_id) && item.periodo === ev.periodo
+                );
+                const evaluacion = delMismoPeriodo.find(item => !item.autoevaluacion);
+                const autoevaluacion = delMismoPeriodo.find(item => !!item.autoevaluacion);
+                return {
+                    evaluacion_id: evaluacion ? evaluacion.id : null,
+                    autoevaluacion_id: autoevaluacion ? autoevaluacion.id : null
+                };
+            };
+
+            container.innerHTML = evaluaciones.map(ev => {
+                const par = findPairIds(ev);
+                return `
+                <div class="historial-card">
+                    <div class="card-header">
+                        <div>
+                            <div class="employee-name">
+                                ${ev.nombres_completos}
+                                <span style="margin-left: 8px; font-size: 0.75em; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: ${ev.autoevaluacion ? '#fff3cd' : '#d1e7dd'}; color: ${ev.autoevaluacion ? '#8a6d3b' : '#0f5132'};">
+                                    ${ev.autoevaluacion ? 'Autoevaluación' : 'Evaluación'}
+                                </span>
+                            </div>
+                            <div class="evaluation-date">📅 ${formatDate(ev.fecha_evaluacion)} - ${ev.periodo}</div>
+                        </div>
+                        <div class="promedio-badge ${getPromedioClass(ev.promedio_general)}">
+                            ${ev.promedio_general.toFixed(1)}
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="info-item">
+                            <span class="info-label">Cargo</span>
+                            <span class="info-value">${ev.cargo || 'Sin asignar'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Centro de costo</span>
+                            <span class="info-value">${ev.centro_costo || 'Sin asignar'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Evaluador</span>
+                            <span class="info-value">${ev.nombre_evaluador || ev.evaluador || 'No especificado'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Frecuencia</span>
+                            <span class="info-value">${
+                                ev.frecuencia === 'semestral' ? 'Semestral (2x/año)' :
+                                ev.frecuencia === 'trimestral' ? 'Trimestral (4x/año)' :
+                                ev.frecuencia === 'mensual' ? 'Mensual' :
+                                'Anual (1x/año)'
+                            }</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Nivel</span>
+                            <span class="info-value">${getNivel(ev.promedio_general)}</span>
+                        </div>
+                    </div>
+
+                    <div class="card-actions">
+                        <button onclick="event.stopPropagation(); viewComparativo(${ev.empleado_id}, '${ev.periodo}', ${par.evaluacion_id ?? 'null'}, ${par.autoevaluacion_id ?? 'null'})" class="btn btn-primary btn-small">
+                            📊 Ver Informe Comparativo
+                        </button>
+                        <button onclick="event.stopPropagation(); viewDetalle(${ev.id}, ${ev.autoevaluacion ? 'true' : 'false'})" class="btn btn-secondary btn-small">
+                            👁️ Ver Detalle
+                        </button>
+                        <button onclick="event.stopPropagation(); deleteEvaluacion(${ev.id}, '${ev.nombres_completos}')" class="btn btn-tertiary btn-small">
+                            🗑️ Eliminar
+                        </button>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        // Mostrar gráfico de tendencia
+        function showTrendChart(evaluaciones) {
+            document.getElementById('trendChartSection').style.display = 'block';
+            
+            // Ordenar por fecha
+            evaluaciones.sort((a, b) => new Date(a.fecha_evaluacion) - new Date(b.fecha_evaluacion));
+            
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            
+            if (trendChart) {
+                trendChart.destroy();
+            }
+
+            // Crear gradientes
+            const gradientAzul = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientAzul.addColorStop(0, 'rgba(59, 130, 246, 0.3)');
+            gradientAzul.addColorStop(0.5, 'rgba(59, 130, 246, 0.1)');
+            gradientAzul.addColorStop(1, 'rgba(59, 130, 246, 0)');
+
+            const gradientNaranja = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientNaranja.addColorStop(0, 'rgba(249, 115, 22, 0.3)');
+            gradientNaranja.addColorStop(0.5, 'rgba(249, 115, 22, 0.1)');
+            gradientNaranja.addColorStop(1, 'rgba(249, 115, 22, 0)');
+
+            // Función para obtener colores según desempeño
+            const getPointColor = (val) => {
+                if (val >= 4.5) return '#10b981'; // Verde excelente
+                if (val >= 3.5) return '#3b82f6'; // Azul bueno
+                if (val >= 2.5) return '#f59e0b'; // Amarillo satisfactorio
+                return '#ef4444'; // Rojo necesita mejorar
+            };
+
+            const getPointBorderColor = (val) => {
+                if (val >= 4.5) return '#059669';
+                if (val >= 3.5) return '#2563eb';
+                if (val >= 2.5) return '#d97706';
+                return '#dc2626';
+            };
+
+            // Mapear datos para alineación correcta
+            const datasetEvaluaciones = evaluaciones.map(e => {
+                if (!e.autoevaluacion) {
+                    return e.promedio_general;
+                }
+                return null;
+            });
+
+            const datasetAutoevaluaciones = evaluaciones.map(e => {
+                if (e.autoevaluacion) {
+                    return e.promedio_general;
+                }
+                return null;
+            });
+
+            const pointColorsEval = evaluaciones.map((e, i) => {
+                if (!e.autoevaluacion) {
+                    return getPointColor(e.promedio_general);
+                }
+                return 'rgba(0,0,0,0)';
+            });
+
+            const pointBorderColorsEval = evaluaciones.map((e, i) => {
+                if (!e.autoevaluacion) {
+                    return getPointBorderColor(e.promedio_general);
+                }
+                return 'rgba(0,0,0,0)';
+            });
+
+            const pointColorsAuto = evaluaciones.map((e, i) => {
+                if (e.autoevaluacion) {
+                    return getPointColor(e.promedio_general);
+                }
+                return 'rgba(0,0,0,0)';
+            });
+
+            const pointBorderColorsAuto = evaluaciones.map((e, i) => {
+                if (e.autoevaluacion) {
+                    return getPointBorderColor(e.promedio_general);
+                }
+                return 'rgba(0,0,0,0)';
+            });
+
+            // Datasets
+            const datasets = [
+                {
+                    label: '📊 Evaluación',
+                    data: datasetEvaluaciones,
+                    borderColor: '#3b82f6',
+                    backgroundColor: gradientAzul,
+                    borderWidth: 3,
+                    borderDash: [],
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 8,
+                    pointHoverRadius: 12,
+                    pointBackgroundColor: pointColorsEval,
+                    pointBorderColor: pointBorderColorsEval,
+                    pointBorderWidth: 3,
+                    pointHoverBorderWidth: 4,
+                    segment: {
+                        borderColor: (ctx) => {
+                            const cur = ctx.p1.parsed.y;
+                            const prev = ctx.p0.parsed.y;
+                            if (cur === null || prev === null) return '#3b82f6';
+                            return cur > prev ? '#10b981' : cur < prev ? '#ef4444' : '#3b82f6';
+                        }
+                    }
+                },
+                {
+                    label: '🙋 Autoevaluación',
+                    data: datasetAutoevaluaciones,
+                    borderColor: '#f97316',
+                    backgroundColor: gradientNaranja,
+                    borderWidth: 3,
+                    borderDash: [5, 5],
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 8,
+                    pointHoverRadius: 12,
+                    pointBackgroundColor: pointColorsAuto,
+                    pointBorderColor: pointBorderColorsAuto,
+                    pointBorderWidth: 3,
+                    pointHoverBorderWidth: 4,
+                    segment: {
+                        borderColor: (ctx) => {
+                            const cur = ctx.p1.parsed.y;
+                            const prev = ctx.p0.parsed.y;
+                            if (cur === null || prev === null) return '#f97316';
+                            return cur > prev ? '#10b981' : cur < prev ? '#ef4444' : '#f97316';
+                        }
+                    }
+                }
+            ];
+
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: evaluaciones.map(e => `${e.periodo}\n${formatDate(e.fecha_evaluacion)}`),
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    const val = context.parsed.y;
+                                    label += val.toFixed(2);
+                                    
+                                    // Agregar nivel
+                                    if (val >= 4.5) label += ' - Excelente 🌟';
+                                    else if (val >= 3.5) label += ' - Bueno ✓';
+                                    else if (val >= 2.5) label += ' - Satisfactorio';
+                                    else label += ' - Necesita Mejorar';
+                                    
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 5,
+                            ticks: {
+                                stepSize: 1,
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                },
+                                callback: function(value) {
+                                    const labels = {
+                                        5: '5 - Excelente',
+                                        4: '4 - Bueno',
+                                        3: '3 - Satisfactorio',
+                                        2: '2 - Regular',
+                                        1: '1 - Deficiente',
+                                        0: '0'
+                                    };
+                                    return labels[value] || value;
+                                }
+                            },
+                            grid: {
+                                color: function(context) {
+                                    // Líneas de referencia con colores
+                                    if (context.tick.value === 5) return 'rgba(16, 185, 129, 0.3)';
+                                    if (context.tick.value === 4) return 'rgba(59, 130, 246, 0.3)';
+                                    if (context.tick.value === 3) return 'rgba(245, 158, 11, 0.3)';
+                                    if (context.tick.value === 2) return 'rgba(239, 68, 68, 0.3)';
+                                    return 'rgba(0, 0, 0, 0.1)';
+                                },
+                                lineWidth: function(context) {
+                                    return [2, 3, 4, 5].includes(context.tick.value) ? 2 : 1;
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 11,
+                                    weight: 'bold'
+                                }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        }
+
+        // Ver informe comparativo (evaluación + autoevaluación)
+        function viewComparativo(empleado_id, periodo, evaluacionId, autoevaluacionId) {
+
+            const query = new URLSearchParams({
+                empleado_id: String(empleado_id),
+                periodo: String(periodo),
+                evaluacion_id: evaluacionId ? String(evaluacionId) : '',
+                autoevaluacion_id: autoevaluacionId ? String(autoevaluacionId) : ''
+            });
+
+            window.location.href = `informe-comparativo.html?${query.toString()}`;
+        }
+
+        // Ver detalle de evaluación (redirigir a detalle-evaluacion.html)
+        function viewDetalle(id, esAutoevaluacion = false) {
+            const url = `detalle-evaluacion.html?id=${id}${esAutoevaluacion ? '&tipo=autoevaluacion' : ''}`;
+            window.location.href = url;
+        }
+
+        // Eliminar evaluación
+        async function deleteEvaluacion(id, nombre) {
+            if (!confirm(`¿Está seguro de eliminar la evaluación de ${nombre}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/evaluaciones/${id}`, {
+                    method: 'DELETE',
+                    headers: getHeaders()
+                });
+
+                if (response.ok) {
+                    alert('Evaluación eliminada exitosamente');
+                    loadEvaluaciones();
+                } else {
+                    alert('Error al eliminar evaluación');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al eliminar evaluación');
+            }
+        }
+
+        // Formatear fecha
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        // Obtener clase de promedio
+        function getPromedioClass(promedio) {
+            if (promedio >= 5) return 'promedio-excelente';
+            if (promedio >= 4) return 'promedio-bueno';
+            if (promedio >= 3) return 'promedio-satisfactorio';
+            return 'promedio-mejora';
+        }
+
+        // Obtener nivel textual
+        function getNivel(promedio) {
+            if (promedio >= 5) return 'Excelente';
+            if (promedio >= 4) return 'Bueno';
+            if (promedio >= 3) return 'Satisfactorio';
+            return 'Necesita Mejora';
+        }
+
+        // Inicializar cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            // DOM ya está cargado
+            init();
+        }
+
+        // Función logout
+        async function logout() {
+            try {
+                const token = sessionStorage.getItem('token');
+                if (token) {
+                    // Llamar al backend para cerrar sesión en la BD
+                    await fetch('/api/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                }
+            } catch (error) {
+                console.log('Error al cerrar sesión:', error);
+            } finally {
+                // Siempre limpiar sessionStorage y redirigir
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('usuario');
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+    <script src="keep-alive.js"></script>
+    <footer style="background: #f8f9fa; padding: 15px; text-align: center; color: #666; border-top: 1px solid #dee2e6; margin-top: 20px;">
+        <p>&copy; 2026 Bluedoors-Talentia. Desarrollado por Wilson Herrera.</p>
+    </footer>
+</body>
+</html>

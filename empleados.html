@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Empleados - Sistema de Desempeño</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 2% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .close-modal {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 3px;
+            font-weight: bold;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.95em;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            position: sticky;
+            bottom: 0;
+            background: white flex-end;
+            margin-top: 20px;
+        }
+
+        .empleados-table {
+            margin-top: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 5px 15px;
+            font-size: 0.9em;
+        }
+
+        .btn-edit {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-view {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .navigation {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .nav-link {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-link.active {
+            background: #764ba2;
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+            padding: 10px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        /* Estilos para tabla compacta con scroll horizontal */
+        .empleados-table {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        .table-scroll-top {
+            overflow-x: auto;
+            overflow-y: hidden;
+            height: 16px;
+            margin-top: 10px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            background: #f9f9fb;
+        }
+
+        .table-scroll-top .scroll-inner {
+            height: 1px;
+        }
+
+        #empleadosTable {
+            width: 100%;
+            min-width: 1900px; /* Ancho mínimo para que la tabla no se comprima demasiado */
+            font-size: 0.9em;
+        }
+
+        #empleadosTable th,
+        #empleadosTable td {
+            padding: 8px 10px;
+            white-space: nowrap;
+        }
+
+        /* Anchos específicos para columnas más compactas */
+        #empleadosTable th:nth-child(1), /* Identificación */
+        #empleadosTable td:nth-child(1) {
+            width: 100px;
+            max-width: 100px;
+        }
+
+        #empleadosTable th:nth-child(2), /* Nombre Completo */
+        #empleadosTable td:nth-child(2) {
+            width: 180px;
+            max-width: 180px;
+            white-space: normal;
+        }
+
+        #empleadosTable th:nth-child(3), /* Email */
+        #empleadosTable td:nth-child(3) {
+            width: 200px;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #empleadosTable th:nth-child(4), /* Celular */
+        #empleadosTable td:nth-child(4) {
+            width: 130px;
+            max-width: 130px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #empleadosTable th:nth-child(5), /* Empresa */
+        #empleadosTable td:nth-child(5) {
+            width: 140px;
+            max-width: 140px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #empleadosTable th:nth-child(6), /* Puesto */
+        #empleadosTable td:nth-child(6) {
+            width: 150px;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+<!--         #empleadosTable th:nth-child(7), /* Nivel Ocupacional */
+        #empleadosTable td:nth-child(7) {
+            width: 260px;
+            max-width: 260px;
+            white-space: normal;
+        } -->
+
+/*      #empleadosTable th:nth-child(8),
+        #empleadosTable td:nth-child(8) {
+            width: 110px;
+            max-width: 110px;
+            text-transform: uppercase;
+        } */
+
+        #empleadosTable th:nth-child(7), /* Fecha Ingreso */
+        #empleadosTable td:nth-child(7) {
+            width: 120px;
+            max-width: 120px;
+        }
+
+        #empleadosTable th:nth-child(8), /* Acciones */
+        #empleadosTable td:nth-child(8) {
+            width: 150px;
+            max-width: 150px;
+            text-align: center;
+            position: sticky;
+            right: 0;
+            background: white;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.05);
+        }
+
+        #empleadosTable thead th:nth-child(8) {
+            position: sticky;
+            right: 0;
+            background: #667eea;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .btn-view, .btn-edit, .btn-delete {
+            padding: 6px 12px;
+            font-size: 1em;
+            min-width: 35px;
+        }
+
+        /* Encabezado compacto solo para la vista de empleados */
+        header {
+            padding: 24px 24px 18px;
+            gap: 8px;
+            min-height: auto;
+        }
+
+        header h1 {
+            font-size: 2.1em;
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 900px) {
+            header {
+                padding: 20px 16px 14px;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+                <h1>Gestión de Empleados</h1>
+                <p class="subtitle">Administración de Personal</p>
+                <p style="margin-top: 5px; color: #666; font-size: 0.95em;">
+                    Usuario: <span id="nombre-evaluador" style="font-weight: bold; color: #333;">Cargando...</span>
+                </p>
+            </div>
+            <button onclick="logout()" style="position: absolute; top: 20px; right: 20px; padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: 500;">🚪 Salir</button>
+        </header>
+
+        <div class="content">
+            <div class="navigation">
+                <button class="nav-link" onclick="window.location.href='index.html'">🏠 Inicio</button>
+                <button class="nav-link active" onclick="window.location.href='empleados.html'">👥 Empleados</button>
+                <button class="nav-link" onclick="window.location.href='evaluacion-competencias.html'" style="background: #28a745;">🎯 Evalua tu equipo</button>
+                <button class="nav-link" onclick="window.location.href='historial.html'">📜 Historial</button>
+                <button id="btnMaestras" class="nav-link" onclick="window.location.href='admin-maestras.html'" style="background: #17a2b8;display: none;">📊 Tablas Maestras</button>
+            </div>
+
+            <div class="empleados-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Lista de Empleados</h2>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button id="btnAsignarContrasenas" onclick="asignarContrasenasExistentes()" class="btn btn-secondary" style="display: none;">🔑 Asignar Contraseñas</button>
+                        <button id="btnAnalizarExcel" onclick="seleccionarExcelParaAnalisis()" class="btn btn-secondary" style="display: none;">📂 Analizar Excel</button>
+                        <button id="btnRecargarExcel" onclick="recargarDesdeExcel()" class="btn btn-primary" style="display: none;" disabled>🔄 Recargar desde Excel</button>
+                        <button id="btnNuevoEmpleado" onclick="openModal()" class="btn btn-primary" style="display: none;">➕ Nuevo Empleado</button>
+                    </div>
+                </div>
+
+                <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display: none;">
+                <div id="excelAnalisisPanel" style="display: none; margin-bottom: 15px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa;"></div>
+
+                <input type="text" id="searchInput" class="search-bar" placeholder="🔍 Buscar empleado...">
+
+                <div class="table-scroll-top" id="empleadosScrollTop">
+                    <div class="scroll-inner" id="empleadosScrollTopInner"></div>
+                </div>
+
+                <div class="empleados-table">
+                    <table id="empleadosTable">
+                        <thead>
+                            <tr>
+                                <th>Cédula</th>
+                                <th>Nombres Completos</th>
+                                <th>Correo Corporativo</th>
+                                <th>Celular</th>
+                                <th>Empresa</th>
+                                <th>Cargo</th>
+<!--                                 <th>Nivel Ocupacional</th>
+                                <th>Rol</th> -->
+                                <th>Fecha Ingreso</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="empleadosBody">
+                            <tr>
+                                <td colspan="10" style="text-align: center;">Cargando empleados...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para crear/editar empleado -->
+    <div id="empleadoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">Nuevo Empleado</h2>
+            
+            <form id="empleadoForm">
+                <input type="hidden" id="empleadoId">
+                
+                <div class="form-group">
+                    <label for="cedula">Cédula *</label>
+                    <input type="text" id="cedula" required placeholder="Solo números, máx. 10 dígitos"
+                           maxlength="10" pattern="[0-9]+" inputmode="numeric"
+                           title="Solo números, máximo 10 dígitos"
+                           oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                </div>
+
+                <div class="form-group">
+                    <label for="nombresCompletos">Nombres Completos *</label>
+                    <input type="text" id="nombresCompletos" required placeholder="Nombres completos"
+                           maxlength="100" title="Máximo 100 caracteres">
+                </div>
+
+                <div class="form-group">
+                    <label for="correoPersonal">Correo Personal</label>
+                    <input type="email" id="correoPersonal" placeholder="correo@personal.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="correoCorporativo">Correo Corporativo </label>
+                    <input type="email" id="correoCorporativo" placeholder="correo@empresa.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="celular">Celular </label>
+                    <input type="tel" id="celular" placeholder="10 dígitos sin espacios"
+                           maxlength="10" pattern="[0-9]{10}" inputmode="numeric"
+                           title="10 dígitos numéricos (ej: 3001234567)"
+                           oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                </div>
+
+                <div class="form-group">
+                    <label for="empresaId">Empresa / Razón Social *</label>
+                    <select id="empresaId" required>
+                        <option value="">Seleccionar empresa...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cargoId">Cargo *</label>
+                    <select id="cargoId" required>
+                        <option value="">Seleccionar cargo...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="centroCostoId">Centro de Costo *</label>
+                    <select id="centroCostoId" required>
+                        <option value="">Seleccionar centro de costo...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="jefeId" id="jefeIdLabel">Jefe Directo *</label>
+                    <select id="jefeId" required>
+                        <option value="">Sin jefe asignado</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="fechaIngreso">Fecha de Ingreso *</label>
+                    <input type="text" id="fechaIngreso" required placeholder="dd/mm/aaaa" pattern="^\d{2}/\d{2}/\d{4}$">
+                </div>
+
+                <div class="form-group">
+                    <label for="rolEmpleado">Rol *</label>
+                    <select id="rolEmpleado" required>
+                        <option value="empleado">Empleado</option>
+                        <option value="jefe">Jefe</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="nivelOcupacional">Nivel Ocupacional *</label>
+                    <select id="nivelOcupacional" required>
+                        <option value="HACEMOS QUE LAS COSAS PASEN (Ejecutando)">Hacemos que las cosas pasen (Ejecutando)</option>
+                        <option value="GESTORES DE EXPERIENCIAS (Gestionando)">Gestores de experiencias (Gestionando)</option>
+                        <option value="POTENCIANDO EQUIPOS (Potenciando)">Potenciando equipos (Potenciando)</option>
+                        <option value="EMPODERANDO Y FOMENTANDO (Dando forma)">Empoderando y fomentando (Dando forma)</option>
+                        <option value="LIDERAZGO ESTRATÉGICO (Liderando)">Liderazgo estratégico (Liderando)</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="aplicaKpi" style="width: auto;">
+                    <label for="aplicaKpi" style="margin: 0; font-weight: bold; cursor: pointer;">¿Aplica KPI? (Metas del Cargo)</label>
+                </div>
+
+                <div id="kpiItemsContainer" style="display: none; margin-bottom: 12px; border: 1px solid #e3e3e3; border-radius: 8px; padding: 12px; background: #fafafa;">
+                    <div class="form-group">
+                        <label for="kpiItem1">KPI 1 *</label>
+                        <input type="text" id="kpiItem1" maxlength="200" placeholder="Ingrese el primer ítem KPI">
+                    </div>
+                    <div class="form-group">
+                        <label for="kpiItem2">KPI 2 *</label>
+                        <input type="text" id="kpiItem2" maxlength="200" placeholder="Ingrese el segundo ítem KPI">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="kpiItem3">KPI 3 *</label>
+                        <input type="text" id="kpiItem3" maxlength="200" placeholder="Ingrese el tercer ítem KPI">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" onclick="closeModal()" class="btn btn-tertiary">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Verificación INMEDIATA de autenticación (antes de cualquier otra cosa)
+        if (!sessionStorage.getItem('token')) {
+            console.log('❌ No hay token. Redirigiendo a login...');
+            window.location.href = 'login.html';
+        }
+
+        // Verificar rol: solo jefe y admin pueden acceder
+        const usuarioStr = sessionStorage.getItem('usuario');
+        if (usuarioStr) {
+            const usuario = JSON.parse(usuarioStr);
+            if (usuario.rol === 'empleado') {
+                console.log('❌ Empleados no pueden acceder a gestión de empleados.');
+                setTimeout(() => {
+                    alert('❌ Solo jefes y administradores pueden gestionar empleados.');
+                    window.location.href = 'index.html';
+                }, 100);
+            } else if (usuario.rol === 'admin') {
+                // Mostrar botones solo para administradores
+                document.getElementById('btnMaestras').style.display = 'inline-flex';
+                //document.getElementById('btnAsignarContrasenas').style.display = 'inline-flex';
+                document.getElementById('btnAnalizarExcel').style.display = 'inline-flex';
+                document.getElementById('btnRecargarExcel').style.display = 'inline-flex';
+                document.getElementById('btnNuevoEmpleado').style.display = 'inline-flex';
+            } else if (usuario.rol === 'jefe') {
+                // Jefes NO pueden crear/editar/eliminar empleados, solo ver
+                console.log('ℹ️ Usuario jefe: solo lectura de empleados');
+            }
+            
+            cargarNombreEvaluador();
+        }
+
+        function cargarNombreEvaluador() {
+            try {
+                const usuarioStr = sessionStorage.getItem('usuario');
+                if (usuarioStr) {
+                    const usuario = JSON.parse(usuarioStr);
+                    const nombreEvaluador = usuario.nombres_completos || usuario.nombre || 'Usuario';
+                    document.getElementById('nombre-evaluador').textContent = nombreEvaluador;
+                } else {
+                    document.getElementById('nombre-evaluador').textContent = 'Sin información';
+                }
+            } catch (error) {
+                document.getElementById('nombre-evaluador').textContent = 'Error';
+            }
+        }
+
+        let API_URL = '/api'; // URL relativa para funcionar con ngrok
+        let empleados = [];
+        let empresas = [];
+        let cargos = [];
+        let centrosCosto = [];
+        let excelFileSeleccionado = null;
+        let excelListoParaRecarga = false;
+        let scrollSyncReady = false;
+        let tablasMaestrasLoaded = false;
+        let tablasMaestrasLoadingPromise = null;
+
+        // Fetch con reintento automático en caso de error de conexión (ej: reinicio del servidor)
+        async function fetchConReintento(url, opciones, maxIntentos = 3, esperaMs = 1500) {
+            for (let intento = 1; intento <= maxIntentos; intento++) {
+                try {
+                    return await fetch(url, opciones);
+                } catch (error) {
+                    if (intento === maxIntentos) throw error;
+                    console.warn(`⏳ Intento ${intento}/${maxIntentos} falló. Reintentando en ${esperaMs}ms...`);
+                    await new Promise(r => setTimeout(r, esperaMs));
+                }
+            }
+        }
+
+        function setupScrollSync() {
+            if (scrollSyncReady) {
+                return;
+            }
+
+            const topScroll = document.getElementById('empleadosScrollTop');
+            const tableWrapper = document.querySelector('.empleados-table');
+
+            if (!topScroll || !tableWrapper) {
+                return;
+            }
+
+            let syncingFromTop = false;
+            let syncingFromTable = false;
+
+            topScroll.addEventListener('scroll', () => {
+                if (syncingFromTable) {
+                    return;
+                }
+                syncingFromTop = true;
+                tableWrapper.scrollLeft = topScroll.scrollLeft;
+                syncingFromTop = false;
+            });
+
+            tableWrapper.addEventListener('scroll', () => {
+                if (syncingFromTop) {
+                    return;
+                }
+                syncingFromTable = true;
+                topScroll.scrollLeft = tableWrapper.scrollLeft;
+                syncingFromTable = false;
+            });
+
+            scrollSyncReady = true;
+        }
+
+        function updateScrollSyncWidth() {
+            const table = document.getElementById('empleadosTable');
+            const inner = document.getElementById('empleadosScrollTopInner');
+
+            if (!table || !inner) {
+                return;
+            }
+
+            inner.style.width = `${table.scrollWidth}px`;
+        }
+
+        // Obtener token del localStorage
+        function getToken() {
+            const token = sessionStorage.getItem('token');
+            console.log('Token recuperado:', token ? '✓ Existe' : '✗ No existe');
+            if (!token) {
+                console.error('❌ No hay token. Redirigiendo a login...');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 500);
+                return null;
+            }
+            return token;
+        }
+
+        // Obtener headers con autenticación
+        function getHeaders() {
+            const token = getToken();
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+            console.log('Headers:', headers);
+            return headers;
+        }
+
+        function getAuthHeadersOnly() {
+            const token = getToken();
+            return {
+                'Authorization': `Bearer ${token}`
+            };
+        }
+
+        function seleccionarExcelParaAnalisis() {
+            const input = document.getElementById('excelFileInput');
+            if (!input) return;
+            input.click();
+        }
+
+        async function analizarExcelSeleccionado(archivo) {
+            const panel = document.getElementById('excelAnalisisPanel');
+            const btnRecargar = document.getElementById('btnRecargarExcel');
+
+            if (!archivo) return;
+
+            panel.style.display = 'block';
+            panel.innerHTML = '⏳ Analizando archivo...';
+            btnRecargar.disabled = true;
+            excelListoParaRecarga = false;
+
+            const formData = new FormData();
+            formData.append('archivo', archivo);
+
+            try {
+                const response = await fetch(`${API_URL}/empleados/excel/analizar`, {
+                    method: 'POST',
+                    headers: getAuthHeadersOnly(),
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (!response.ok) {
+                    panel.innerHTML = `❌ ${result.error || 'No se pudo analizar el archivo.'}`;
+                    return;
+                }
+
+                renderAnalisisExcel(result);
+                excelFileSeleccionado = archivo;
+                excelListoParaRecarga = Boolean(result.listo_para_cargar);
+                btnRecargar.disabled = !excelListoParaRecarga;
+            } catch (error) {
+                console.error('Error analizando Excel:', error);
+                panel.innerHTML = '❌ Error de conexión durante el análisis del archivo.';
+            }
+        }
+
+        function renderAnalisisExcel(reporte) {
+            const panel = document.getElementById('excelAnalisisPanel');
+            const sugerencias = (reporte.sugerencias || []).map(s => `<li>${s}</li>`).join('');
+            const faltantes = (reporte.columnas_requeridas_faltantes || []).join(', ');
+
+            panel.innerHTML = `
+                <div style="display:flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <strong>📄 ${reporte.archivo || 'Archivo Excel'}</strong>
+                    <span style="font-weight: 600; color: ${reporte.listo_para_cargar ? '#198754' : '#dc3545'};">
+                        ${reporte.listo_para_cargar ? 'Listo para recargar' : 'Revisión requerida'}
+                    </span>
+                </div>
+                <div style="margin-top: 8px; font-size: 0.95em;">
+                    <div>Filas detectadas: <strong>${reporte.total_filas ?? 0}</strong></div>
+                    <div>Columnas faltantes: <strong>${faltantes || 'Ninguna'}</strong></div>
+                </div>
+                <div style="margin-top: 8px; font-size: 0.95em;">
+                    <div>Sin nombre: ${reporte.calidad_datos?.filas_sin_nombre ?? 0}</div>
+                    <div>Sin cédula: ${reporte.calidad_datos?.filas_sin_cedula ?? 0}</div>
+                    <div>Sin correo corporativo: ${reporte.calidad_datos?.filas_sin_correo_corporativo ?? 0}</div>
+                    <div>Fechas inválidas: ${reporte.calidad_datos?.fechas_invalidas ?? 0}</div>
+                </div>
+                <div style="margin-top: 8px;">
+                    <strong>Sugerencias:</strong>
+                    <ul style="margin: 5px 0 0 18px;">${sugerencias}</ul>
+                </div>
+            `;
+        }
+
+        async function recargarDesdeExcel() {
+            if (!excelFileSeleccionado) {
+                alert('❌ Primero debes analizar un archivo Excel.');
+                return;
+            }
+
+            if (!excelListoParaRecarga) {
+                alert('❌ El análisis detectó columnas requeridas faltantes. Corrige el archivo y vuelve a analizar antes de recargar.');
+                return;
+            }
+
+            if (!confirm('¿Confirmas cargar empleados desde el archivo analizado? Solo se agregarán nuevos y se saltarán los ya existentes.')) {
+                return;
+            }
+
+            const btnRecargar = document.getElementById('btnRecargarExcel');
+            const panel = document.getElementById('excelAnalisisPanel');
+            const textoOriginal = btnRecargar.textContent;
+
+            btnRecargar.disabled = true;
+            btnRecargar.textContent = '⏳ Recargando...';
+
+            const formData = new FormData();
+            formData.append('archivo', excelFileSeleccionado);
+
+            try {
+                const response = await fetch(`${API_URL}/empleados/excel/recargar`, {
+                    method: 'POST',
+                    headers: getAuthHeadersOnly(),
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (!response.ok || !result.success) {
+                    alert(`❌ ${result.error || result.message || 'No se pudo recargar el archivo.'}`);
+                    return;
+                }
+
+                panel.style.display = 'block';
+                const saltadosHTML = result.saltados_existentes > 0 ? `⏭️ Saltados (ya existían): <strong>${result.saltados_existentes}</strong> | ` : '';
+                panel.innerHTML = `✅ ${result.message}<br>Insertados: <strong>${result.insertados}</strong> | ${saltadosHTML}Errores: <strong>${result.errores}</strong> | Total BD: <strong>${result.total_bd}</strong>`;
+                alert(`✅ Recarga completada.\nInsertados: ${result.insertados}\nSaltados (ya existían): ${result.saltados_existentes || 0}\nErrores: ${result.errores}`);
+                await loadEmpleados();
+                await loadTablasMaestras();
+            } catch (error) {
+                console.error('Error recargando Excel:', error);
+                alert('❌ Error de conexión durante la recarga desde Excel.');
+            } finally {
+                btnRecargar.textContent = textoOriginal;
+                btnRecargar.disabled = false;
+            }
+        }
+
+        async function asignarContrasenasExistentes() {
+            if (!confirm('¿Asignar contraseña inicial (cédula) a empleados que no tienen contraseña?')) {
+                return;
+            }
+
+            const btn = document.getElementById('btnAsignarContrasenas');
+            const textoOriginal = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = '⏳ Asignando...';
+
+            try {
+                const response = await fetch(`${API_URL}/empleados/asignar-contrasenas`, {
+                    method: 'POST',
+                    headers: getHeaders()
+                });
+
+                const result = await response.json();
+                if (!response.ok || !result.success) {
+                    alert(`❌ ${result.error || result.message || 'No se pudieron asignar contraseñas.'}`);
+                    return;
+                }
+
+                alert(`✅ ${result.message}\nActualizados: ${result.actualizados || 0}\nErrores: ${result.errores || 0}`);
+            } catch (error) {
+                console.error('Error asignando contraseñas:', error);
+                alert('❌ Error de conexión al asignar contraseñas.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = textoOriginal;
+            }
+        }
+
+        // Cargar empleados al iniciar
+        async function loadEmpleados() {
+            try {
+                console.log('🔄 Iniciando carga de empleados...');
+                const inicio = performance.now();
+                const token = getToken();
+                if (!token) {
+                    console.error('❌ No hay token disponible');
+                    return;
+                }
+
+                const tbody = document.getElementById('empleadosBody');
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #666;">Cargando empleados...</td></tr>';
+                }
+
+                console.log('📡 Enviando solicitud GET a:', `${API_URL}/empleados`);
+                const response = await fetch(`${API_URL}/empleados`, {
+                    method: 'GET',
+                    headers: getHeaders()
+                });
+                
+                console.log('📊 Respuesta status:', response.status);
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        // Token expirado
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('usuario');
+                        window.location.href = 'login.html';
+                        return;
+                    }
+                    throw new Error(`Error ${response.status}`);
+                }
+
+                empleados = await response.json();
+                renderEmpleados(empleados);
+                const duracionMs = Math.round(performance.now() - inicio);
+                console.log(`✅ Empleados cargados en ${duracionMs} ms`);
+            } catch (error) {
+                console.error('Error cargando empleados:', error);
+                document.getElementById('empleadosBody').innerHTML = `
+                    <tr><td colspan="10" style="text-align: center; color: red;">
+                        Error: No se pudo conectar con el servidor. Asegúrate de que el backend esté ejecutándose.
+                    </td></tr>
+                `;
+            }
+        }
+
+        // Cargar tablas maestras
+        async function loadTablasMaestras() {
+            if (tablasMaestrasLoaded) {
+                return;
+            }
+
+            if (tablasMaestrasLoadingPromise) {
+                await tablasMaestrasLoadingPromise;
+                return;
+            }
+
+            tablasMaestrasLoadingPromise = (async () => {
+            try {
+                const [respEmpresas, respCargos, respCentros] = await Promise.all([
+                    fetch(`${API_URL}/empresas`, {
+                        method: 'GET',
+                        headers: getHeaders()
+                    }),
+                    fetch(`${API_URL}/cargos`, {
+                        method: 'GET',
+                        headers: getHeaders()
+                    }),
+                    fetch(`${API_URL}/centros-costo`, {
+                        method: 'GET',
+                        headers: getHeaders()
+                    })
+                ]);
+
+                if (respEmpresas.ok) {
+                    empresas = await respEmpresas.json();
+                    llenarSelectEmpresas();
+                }
+                if (respCargos.ok) {
+                    cargos = await respCargos.json();
+                    llenarSelectCargos();
+                }
+                if (respCentros.ok) {
+                    centrosCosto = await respCentros.json();
+                    llenarSelectCentrosCosto();
+                }
+
+                tablasMaestrasLoaded = true;
+            } catch (error) {
+                console.error('Error cargando tablas maestras:', error);
+            } finally {
+                tablasMaestrasLoadingPromise = null;
+            }
+            })();
+
+            await tablasMaestrasLoadingPromise;
+        }
+
+        // Llenar select de empresas
+        function llenarSelectEmpresas() {
+            const select = document.getElementById('empresaId');
+            select.innerHTML = '<option value="">Seleccionar empresa...</option>';
+            empresas.forEach(emp => {
+                const option = document.createElement('option');
+                option.value = emp.id;
+                option.textContent = `${emp.razon_social} (${emp.nit})`;
+                select.appendChild(option);
+            });
+        }
+
+        // Llenar select de cargos
+        function llenarSelectCargos() {
+            const select = document.getElementById('cargoId');
+            select.innerHTML = '<option value="">Seleccionar cargo...</option>';
+            cargos.forEach(cargo => {
+                const option = document.createElement('option');
+                option.value = cargo.id;
+                option.textContent = cargo.nombre;
+                select.appendChild(option);
+            });
+        }
+
+        // Llenar select de centros de costo
+        function llenarSelectCentrosCosto() {
+            const select = document.getElementById('centroCostoId');
+            select.innerHTML = '<option value="">Seleccionar centro de costo...</option>';
+            centrosCosto.forEach(centro => {
+                const option = document.createElement('option');
+                option.value = centro.id;
+                option.textContent = centro.nombre;
+                select.appendChild(option);
+            });
+        }
+
+        // Renderizar tabla de empleados
+        function renderEmpleados(data) {
+            const tbody = document.getElementById('empleadosBody');
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center;">No hay empleados registrados</td></tr>';
+                return;
+            }
+
+            // Obtener rol del usuario actual
+            const usuarioStr = sessionStorage.getItem('usuario');
+            const usuarioActual = usuarioStr ? JSON.parse(usuarioStr) : null;
+            const esAdmin = usuarioActual && usuarioActual.rol === 'admin';
+
+            tbody.innerHTML = data.map(emp => {
+                const cedula = emp.cedula || '-';
+                const nombres = emp.nombres_completos || '-';
+                const correo = emp.correo_corporativo || '-';
+                const celular = emp.celular || '-';
+                const empresa = emp.empresa_nombre || '-';
+                const cargo = emp.cargo_nombre || emp.cargo || '-';
+                const nivelOcupacional = emp.nivel_ocupacional || '-';
+                const rol = (emp.rol || 'empleado').toUpperCase();
+                const fechaIngreso = formatDateDisplay(emp.fecha_ingreso);
+                
+                // Botones de editar y eliminar solo para admin
+                const botonesAdmin = esAdmin ? `
+                    <button onclick="editEmpleado(${emp.id})" class="btn-edit" title="Editar">✏️</button>
+                    <button onclick="resetPassword(${emp.id}, '${nombres.replace(/'/g, "\\'")}')" class="btn-edit" title="Resetear contraseña" style="background:#ff9800;color:#fff;">🔑</button>
+                    <button onclick="deleteEmpleado(${emp.id}, '${nombres.replace(/'/g, "\\'")}')" class="btn-delete" title="Eliminar">🗑️</button>
+                ` : '';
+                
+                return `
+                <tr>
+                    <td><strong>${cedula}</strong></td>
+                    <td><strong>${nombres}</strong></td>
+                    <td>${correo}</td>
+                    <td>${celular}</td>
+                    <td>${empresa}</td>
+                    <td>${cargo}</td>
+<!--                     <td>${nivelOcupacional}</td>
+                    <td>${rol}</td> -->
+                    <td>${fechaIngreso}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button onclick="viewEmpleado(${emp.id}, '${nombres.replace(/'/g, "\\'")}')" class="btn-view" title="Ver evaluaciones">👁️</button>
+                            ${botonesAdmin}
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+
+            updateScrollSyncWidth();
+            setupScrollSync();
+        }
+
+        function formatDateDisplay(dateValue) {
+            if (!dateValue) return '-';
+
+            const value = String(dateValue).trim();
+            if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) {
+                return value;
+            }
+
+            if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                const [yyyy, mm, dd] = value.split('-');
+                return `${dd}/${mm}/${yyyy}`;
+            }
+
+            const date = new Date(value);
+            if (!isNaN(date.getTime())) {
+                const dd = String(date.getDate()).padStart(2, '0');
+                const mm = String(date.getMonth() + 1).padStart(2, '0');
+                const yyyy = date.getFullYear();
+                return `${dd}/${mm}/${yyyy}`;
+            }
+
+            return value;
+        }
+
+        function parseDateToIso(fechaTexto) {
+            const value = (fechaTexto || '').trim();
+
+            if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                return value;
+            }
+
+            const match = value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+            if (!match) {
+                return null;
+            }
+
+            const [, dd, mm, yyyy] = match;
+            const iso = `${yyyy}-${mm}-${dd}`;
+            const date = new Date(iso);
+            if (isNaN(date.getTime())) {
+                return null;
+            }
+
+            return iso;
+        }
+
+        function normalizarNivelTexto(texto) {
+            return (texto || '')
+                .toString()
+                .trim()
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/\s+/g, ' ');
+        }
+
+        function obtenerNivelCanonical(nivelTexto) {
+            const nivel = normalizarNivelTexto(nivelTexto);
+            if (!nivel) return 'HACEMOS QUE LAS COSAS PASEN (Ejecutando)';
+
+            if (nivel.includes('gestores de experiencias') || nivel.includes('gestionando')) {
+                return 'GESTORES DE EXPERIENCIAS (Gestionando)';
+            }
+
+            if (nivel.includes('potenciando equipos') || nivel.includes('potenciando')) {
+                return 'POTENCIANDO EQUIPOS (Potenciando)';
+            }
+
+            if (nivel.includes('empoderando y fomentando') || nivel.includes('dando forma')) {
+                return 'EMPODERANDO Y FOMENTANDO (Dando forma)';
+            }
+
+            if (nivel.includes('liderazgo estrategico') || nivel.includes('liderando')) {
+                return 'LIDERAZGO ESTRATÉGICO (Liderando)';
+            }
+
+            return 'HACEMOS QUE LAS COSAS PASEN (Ejecutando)';
+        }
+
+        function setNivelOcupacionalFormulario(nivelTexto) {
+            const select = document.getElementById('nivelOcupacional');
+            if (!select) return;
+
+            const canonical = obtenerNivelCanonical(nivelTexto);
+            const optionExists = Array.from(select.options).some(opt => opt.value === canonical);
+
+            if (optionExists) {
+                select.value = canonical;
+                return;
+            }
+
+            const fallback = document.createElement('option');
+            fallback.value = canonical;
+            fallback.textContent = canonical;
+            select.appendChild(fallback);
+            select.value = canonical;
+        }
+
+        // Llenar select de jefes
+        function llenarSelectJefes(empleadoIdActual = null) {
+            const select = document.getElementById('jefeId');
+            select.innerHTML = '<option value="">Sin jefe asignado</option>';
+            
+            empleados.forEach(emp => {
+                // No incluir al empleado actual como opción de jefe
+                if (empleadoIdActual && emp.id == empleadoIdActual) return;
+
+                // Solo permitir jefes o administradores como jefe directo
+                const rol = (emp.rol || '').toLowerCase();
+                if (rol !== 'jefe' && rol !== 'admin') return;
+                
+                const option = document.createElement('option');
+                option.value = emp.id;
+                const nombre = emp.nombres_completos || '-';
+                const cargo = emp.cargo_nombre || emp.cargo || '';
+                option.textContent = `${nombre} - ${cargo}`;
+                select.appendChild(option);
+            });
+        }
+
+        // Abrir modal
+        async function openModal(empleadoId = null) {
+            const modal = document.getElementById('empleadoModal');
+            const form = document.getElementById('empleadoForm');
+            const title = document.getElementById('modalTitle');
+
+            await loadTablasMaestras();
+            
+            form.reset();
+            toggleCamposKpi(false);
+            llenarSelectJefes(empleadoId);
+            
+            if (empleadoId) {
+                title.textContent = 'Editar Empleado';
+                loadEmpleadoData(empleadoId);
+            } else {
+                title.textContent = 'Nuevo Empleado';
+                document.getElementById('empleadoId').value = '';
+                document.getElementById('rolEmpleado').value = 'empleado';
+                setNivelOcupacionalFormulario('HACEMOS QUE LAS COSAS PASEN (Ejecutando)');
+            }
+            actualizarRequiredJefe();
+            
+            modal.style.display = 'block';
+        }
+
+        // Cerrar modal
+        function closeModal() {
+            document.getElementById('empleadoModal').style.display = 'none';
+        }
+
+        function poblarFormularioEmpleado(empleado) {
+            if (!empleado) return;
+
+            document.getElementById('empleadoId').value = empleado.id || '';
+            document.getElementById('cedula').value = empleado.cedula || '';
+            document.getElementById('nombresCompletos').value = empleado.nombres_completos || '';
+            document.getElementById('correoPersonal').value = empleado.correo_personal || '';
+            document.getElementById('correoCorporativo').value = empleado.correo_corporativo || '';
+            document.getElementById('celular').value = empleado.celular || '';
+            document.getElementById('empresaId').value = empleado.empresa_id || '';
+            document.getElementById('cargoId').value = empleado.cargo_id || '';
+            document.getElementById('centroCostoId').value = empleado.centro_costo_id || '';
+            document.getElementById('jefeId').value = empleado.jefe_id || '';
+            document.getElementById('fechaIngreso').value = formatDateDisplay(empleado.fecha_ingreso) === '-' ? '' : formatDateDisplay(empleado.fecha_ingreso);
+            document.getElementById('rolEmpleado').value = empleado.rol || 'empleado';
+            actualizarRequiredJefe();
+            setNivelOcupacionalFormulario(empleado.nivel_ocupacional || 'HACEMOS QUE LAS COSAS PASEN (Ejecutando)');
+            document.getElementById('aplicaKpi').checked = Boolean(empleado.aplica_kpi);
+            document.getElementById('kpiItem1').value = empleado.kpi_item_1 || '';
+            document.getElementById('kpiItem2').value = empleado.kpi_item_2 || '';
+            document.getElementById('kpiItem3').value = empleado.kpi_item_3 || '';
+            toggleCamposKpi(Boolean(empleado.aplica_kpi));
+        }
+
+        function toggleCamposKpi(aplica) {
+            const contenedor = document.getElementById('kpiItemsContainer');
+            const item1 = document.getElementById('kpiItem1');
+            const item2 = document.getElementById('kpiItem2');
+            const item3 = document.getElementById('kpiItem3');
+            if (!contenedor || !item1 || !item2 || !item3) return;
+
+            contenedor.style.display = aplica ? 'block' : 'none';
+            item1.required = aplica;
+            item2.required = aplica;
+            item3.required = aplica;
+
+            if (!aplica) {
+                item1.value = '';
+                item2.value = '';
+                item3.value = '';
+            }
+        }
+
+        const aplicaKpiCheckbox = document.getElementById('aplicaKpi');
+        if (aplicaKpiCheckbox) {
+            aplicaKpiCheckbox.addEventListener('change', function() {
+                toggleCamposKpi(this.checked);
+            });
+        }
+
+        // Jefe Directo es obligatorio solo para rol 'empleado'
+        function actualizarRequiredJefe() {
+            const rol = document.getElementById('rolEmpleado').value;
+            const jefeSelect = document.getElementById('jefeId');
+            const jefeLabel = document.getElementById('jefeIdLabel');
+            const esEmpleado = (rol === 'empleado');
+            jefeSelect.required = esEmpleado;
+            jefeLabel.textContent = esEmpleado ? 'Jefe Directo *' : 'Jefe Directo';
+        }
+
+        const rolSelect = document.getElementById('rolEmpleado');
+        if (rolSelect) {
+            rolSelect.addEventListener('change', actualizarRequiredJefe);
+        }
+
+        // Cargar datos del empleado para edición
+        async function loadEmpleadoData(id) {
+            try {
+                const response = await fetch(`${API_URL}/empleados/${id}`, {
+                    method: 'GET',
+                    headers: getHeaders()
+                });
+
+                const empleado = await response.json();
+                if (!response.ok || empleado.error) {
+                    const empleadoLocal = empleados.find(e => String(e.id) === String(id));
+                    if (empleadoLocal) {
+                        poblarFormularioEmpleado(empleadoLocal);
+                        alert(`⚠️ No se pudo consultar el detalle completo del empleado (${empleado.error || response.status}). Se cargó la información disponible en la lista.`);
+                        return;
+                    }
+                    throw new Error(empleado.error || `HTTP ${response.status}`);
+                }
+
+                poblarFormularioEmpleado(empleado);
+            } catch (error) {
+                console.error('Error cargando empleado:', error);
+                alert('Error al cargar datos del empleado. Intenta recargar la página.');
+            }
+        }
+
+        // Guardar empleado (crear o actualizar)
+        document.getElementById('empleadoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const id = document.getElementById('empleadoId').value;
+            const jefeIdValue = document.getElementById('jefeId').value;
+            const fechaIngresoTexto = document.getElementById('fechaIngreso').value;
+            const fechaIngresoIso = parseDateToIso(fechaIngresoTexto);
+
+            if (!fechaIngresoIso) {
+                alert('❌ La fecha de ingreso debe tener formato dd/mm/aaaa');
+                return;
+            }
+
+            const data = {
+                cedula: document.getElementById('cedula').value.trim(),
+                nombres_completos: document.getElementById('nombresCompletos').value.trim(),
+                correo_personal: document.getElementById('correoPersonal').value.trim(),
+                correo_corporativo: document.getElementById('correoCorporativo').value.trim(),
+                celular: document.getElementById('celular').value.trim(),
+                empresa_id: parseInt(document.getElementById('empresaId').value),
+                cargo_id: parseInt(document.getElementById('cargoId').value),
+                centro_costo_id: parseInt(document.getElementById('centroCostoId').value),
+                jefe_id: jefeIdValue ? parseInt(jefeIdValue) : null,
+                fecha_ingreso: fechaIngresoIso,
+                rol: document.getElementById('rolEmpleado').value,
+                nivel_ocupacional: document.getElementById('nivelOcupacional').value,
+                aplica_kpi: document.getElementById('aplicaKpi').checked ? 1 : 0,
+                kpi_item_1: document.getElementById('kpiItem1').value.trim(),
+                kpi_item_2: document.getElementById('kpiItem2').value.trim(),
+                kpi_item_3: document.getElementById('kpiItem3').value.trim()
+            };
+
+            if (data.aplica_kpi && (!data.kpi_item_1 || !data.kpi_item_2 || !data.kpi_item_3)) {
+                alert('❌ Si aplica KPI, debe diligenciar los 3 ítems KPI');
+                return;
+            }
+
+            // Validación adicional (correo corporativo NO es obligatorio)
+            const faltantes = [];
+
+            if (!data.cedula) faltantes.push('Cédula');
+            if (!data.nombres_completos) faltantes.push('Nombres completos');
+            if (Number.isNaN(data.empresa_id)) faltantes.push('Empresa / Razón Social');
+            if (Number.isNaN(data.cargo_id)) faltantes.push('Cargo');
+            if (Number.isNaN(data.centro_costo_id)) faltantes.push('Centro de Costo');
+            if (!data.fecha_ingreso) faltantes.push('Fecha de Ingreso');
+            if (!data.rol) faltantes.push('Rol');
+            if (!data.nivel_ocupacional) faltantes.push('Nivel Ocupacional');
+
+            if (faltantes.length > 0) {
+                alert(`❌ Faltan campos obligatorios:\n- ${faltantes.join('\n- ')}`);
+                return;
+            }
+
+            try {
+                const url = id ? `${API_URL}/empleados/${id}` : `${API_URL}/empleados`;
+                const method = id ? 'PUT' : 'POST';
+                
+                console.log('Enviando datos:', data);
+                console.log('URL:', url);
+                console.log('Método:', method);
+                
+                const response = await fetchConReintento(url, {
+                    method: method,
+                    headers: getHeaders(),
+                    body: JSON.stringify(data)
+                });
+
+                console.log('Respuesta status:', response.status);
+
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(id ? '✅ Empleado actualizado exitosamente' : '✅ Empleado creado exitosamente');
+                    closeModal();
+                    loadEmpleados();
+                } else {
+                    const error = await response.json();
+                    console.error('Error del servidor:', error);
+                    alert('❌ Error: ' + (error.error || 'No se pudo guardar el empleado'));
+                }
+            } catch (error) {
+                console.error('Error completo:', error);
+                alert('❌ Error de conexión: No se pudo conectar con el servidor.\n\nVerifica que el backend esté en ejecución y que este equipo tenga acceso de red al servidor.');
+            }
+        });
+
+        // Editar empleado
+        function editEmpleado(id) {
+            openModal(id);
+        }
+
+        // Ver evaluaciones del empleado
+        function viewEmpleado(id, nombre = '') {
+            const nombreParam = nombre ? `&empleadoNombre=${encodeURIComponent(nombre)}` : '';
+            window.location.href = `historial.html?empleado=${id}${nombreParam}`;
+        }
+
+        // Resetear contraseña de empleado a su cédula
+        async function resetPassword(id, nombre) {
+            if (!confirm(`¿Resetear la contraseña de ${nombre} a su número de cédula?`)) {
+                return;
+            }
+            try {
+                const response = await fetch(`${API_URL}/empleados/${id}/reset-password`, {
+                    method: 'POST',
+                    headers: getHeaders()
+                });
+                const text = await response.text();
+                let result;
+                try { result = JSON.parse(text); } catch(e) { result = null; }
+                if (!response.ok) {
+                    const errorMsg = (result && result.error) ? result.error : `HTTP ${response.status}: ${text.substring(0, 200)}`;
+                    alert('❌ ' + errorMsg);
+                    return;
+                }
+                if (!result) { alert('❌ Respuesta inválida del servidor'); return; }
+                alert('✅ ' + result.message);
+            } catch (error) {
+                alert('❌ Error de conexión: ' + error.message);
+            }
+        }
+
+        // Eliminar empleado
+        async function deleteEmpleado(id, nombre) {
+            if (!confirm(`¿Está seguro de eliminar a ${nombre}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetchConReintento(`${API_URL}/empleados/${id}`, {
+                    method: 'DELETE',
+                    headers: getHeaders()
+                });
+
+                if (response.ok) {
+                    alert('Empleado eliminado exitosamente');
+                    loadEmpleados();
+                } else {
+                    alert('Error al eliminar empleado');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al eliminar empleado');
+            }
+        }
+
+        // Buscar empleados
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filtered = empleados.filter(emp => {
+                const nombres = (emp.nombres_completos || '').toLowerCase();
+                const correo = (emp.correo_corporativo || '').toLowerCase();
+                const cedula = (emp.cedula || '').toLowerCase();
+                const cargo = (emp.cargo_nombre || emp.cargo || '').toLowerCase();
+                const centro = (emp.centro_costo_nombre || emp.centro_costo || '').toLowerCase();
+                const nivel = (emp.nivel_ocupacional || '').toLowerCase();
+                  const rol = (emp.rol || '').toLowerCase();
+                  const fechaIngreso = formatDateDisplay(emp.fecha_ingreso).toLowerCase();
+                
+                return nombres.includes(searchTerm) ||
+                       correo.includes(searchTerm) ||
+                       cedula.includes(searchTerm) ||
+                       cargo.includes(searchTerm) ||
+                      centro.includes(searchTerm) ||
+                       nivel.includes(searchTerm) ||
+                      rol.includes(searchTerm) ||
+                      fechaIngreso.includes(searchTerm);
+            });
+            renderEmpleados(filtered);
+        });
+
+        // Modal NO se cierra al hacer clic fuera (evitar pérdida de datos del formulario)
+
+        // Verificar autenticación antes de cargar
+        loadEmpleados();
+
+        const excelInput = document.getElementById('excelFileInput');
+        if (excelInput) {
+            excelInput.addEventListener('change', async (e) => {
+                const archivo = e.target.files && e.target.files[0] ? e.target.files[0] : null;
+                await analizarExcelSeleccionado(archivo);
+            });
+        }
+
+        window.addEventListener('resize', () => {
+            updateScrollSyncWidth();
+        });
+
+        // Función logout
+        async function logout() {
+            try {
+                const token = sessionStorage.getItem('token');
+                if (token) {
+                    // Llamar al backend para cerrar sesión en la BD
+                    await fetch('/api/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                }
+            } catch (error) {
+                console.log('Error al cerrar sesión:', error);
+            } finally {
+                // Siempre limpiar sessionStorage y redirigir
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('usuario');
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+    <script src="keep-alive.js"></script>
+    <footer style="background: #f8f9fa; padding: 15px; text-align: center; color: #666; border-top: 1px solid #dee2e6; margin-top: 20px;">
+        <p>&copy; 2026 Bluedoors-Talentia. Desarrollado por Wilson Herrera.</p>
+    </footer>
+</body>
+</html>

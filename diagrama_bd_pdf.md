@@ -1,0 +1,38 @@
+# Diagrama ER - Talentia
+
+```mermaid
+erDiagram
+    EMPRESAS ||--o{ EMPLEADOS : empresa_id
+    CARGOS ||--o{ EMPLEADOS : cargo_id
+    CENTROS_COSTO ||--o{ EMPLEADOS : centro_costo_id
+    EMPLEADOS ||--o{ EMPLEADOS : jefe_id
+
+    EMPLEADOS ||--o{ EVALUACIONES : empleado_id
+    EMPLEADOS ||--o{ EVALUACIONES : evaluador_id
+
+    EVALUACIONES ||--o{ EVALUACIONES_COMPETENCIA : evaluacion_id
+    COMPETENCIAS ||--o{ EVALUACIONES_COMPETENCIA : competencia_id
+    DESCRIPTORES_COMPETENCIA ||--o{ EVALUACIONES_COMPETENCIA : descriptor_id
+
+    COMPETENCIAS ||--o{ DESCRIPTORES_COMPETENCIA : competencia_id
+    DESCRIPTORES_COMPETENCIA ||--o{ COMPORTAMIENTOS : descriptor_id
+
+    EVALUACIONES ||--o{ PLAN_FORMACION : evaluacion_id
+
+    EMPLEADOS ||--o{ CODIGOS_ACCESO : empleado_id
+    EMPLEADOS ||--o{ CODIGOS_ACCESO : generado_por
+```
+
+## Tablas clave
+
+- EMPLEADOS
+- EVALUACIONES
+- EVALUACIONES_COMPETENCIA
+- COMPETENCIAS
+- DESCRIPTORES_COMPETENCIA
+- COMPORTAMIENTOS
+- PLAN_FORMACION
+- CODIGOS_ACCESO
+- EMPRESAS
+- CARGOS
+- CENTROS_COSTO

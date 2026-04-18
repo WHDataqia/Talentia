@@ -1,0 +1,15 @@
+tabla_origen,columna_fk,tabla_destino,columna_pk,tipo_relacion,descripcion
+empleados,jefe_id,empleados,id,N:1 (self),Jerarquia jefe-subordinado
+empleados,empresa_id,empresas,id,N:1,Empleado pertenece a empresa
+empleados,cargo_id,cargos,id,N:1,Empleado asociado a cargo
+empleados,centro_costo_id,centros_costo,id,N:1,Empleado asociado a centro de costo
+evaluaciones,empleado_id,empleados,id,N:1,Empleado evaluado
+evaluaciones,evaluador_id,empleados,id,N:1,Evaluador (jefe)
+evaluaciones_competencia,evaluacion_id,evaluaciones,id,N:1,Detalle de competencias por evaluacion
+evaluaciones_competencia,competencia_id,competencias,id,N:1,Competencia evaluada
+evaluaciones_competencia,descriptor_id,descriptores_competencia,id,N:1,Descriptor evaluado
+plan_formacion,evaluacion_id,evaluaciones,id,N:1,Plan 70-20-10 por evaluacion
+codigos_acceso,empleado_id,empleados,id,N:1,Codigo de autoevaluacion por empleado
+codigos_acceso,generado_por,empleados,id,N:1,Empleado que genero el codigo
+descriptores_competencia,competencia_id,competencias,id,N:1,Descriptores de una competencia
+comportamientos,descriptor_id,descriptores_competencia,id,N:1,Comportamientos por descriptor

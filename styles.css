@@ -1,0 +1,925 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f5f5;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+@media print {
+    body {
+        background: white;
+        padding: 0;
+        margin: 0;
+        overflow: visible;
+    }
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+@media print {
+    .container {
+        max-width: 100%;
+        margin: 0;
+        background: white;
+        border-radius: 0;
+        box-shadow: none;
+        page-break-before: avoid;
+        overflow: visible;
+    }
+}
+
+header {
+    background: white;
+    color: #333;
+    padding: 50px 30px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+header .header-logo {
+    max-width: 293px;
+    height: auto;
+}
+
+@media print {
+    header {
+        padding: 10px 15px;
+        page-break-after: avoid;
+        background: white;
+        color: #333;
+        border-bottom: 2px solid #667eea;
+        margin-bottom: 10px;
+    }
+}
+
+header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+@media print {
+    header h1 {
+        font-size: 1.8em;
+        margin-bottom: 0px;
+    }
+}
+
+.subtitle {
+    font-size: 1.1em;
+    opacity: 0.9;
+}
+
+@media print {
+    .subtitle {
+        font-size: 0.9em;
+        opacity: 1;
+        margin: 0;
+        display: none;
+    }
+}
+
+.content {
+    padding: 30px;
+}
+
+@media print {
+    .content {
+        padding: 10px;
+        margin: 0;
+    }
+    
+    .employee-info,
+    .chart-section,
+    .competencies-table,
+    .plan-formacion-section,
+    .summary {
+        margin-bottom: 10px;
+        padding: 10px;
+        background: white;
+        box-shadow: none;
+        page-break-inside: avoid;
+    }
+}
+
+.employee-info,
+.chart-section,
+.competencies-table,
+.summary {
+    margin-bottom: 30px;
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    color: #667eea;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 10px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+@media print {
+    h2 {
+        color: #333;
+        margin-bottom: 8px;
+        margin-top: 0;
+        font-size: 1.3em;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 5px;
+        page-break-after: avoid;
+        page-break-before: avoid;
+    }
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-item label {
+    font-weight: bold;
+    color: #555;
+    font-size: 0.9em;
+}
+
+.info-item span,
+.info-item select {
+    padding: 10px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+.info-item select {
+    cursor: pointer;
+}
+
+@media print {
+    .info-grid {
+        grid-template-columns: repeat(4, minmax(160px, 1fr));
+        gap: 8px;
+    }
+
+    .info-item label {
+        font-size: 0.8em;
+        margin-bottom: 2px;
+    }
+
+    .info-item span,
+    .info-item select {
+        padding: 6px 8px;
+        font-size: 0.9em;
+    }
+}
+
+.chart-container {
+    position: relative;
+    height: 400px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+@media print {
+    .chart-container {
+        height: 350px;
+        padding: 10px;
+        page-break-inside: avoid;
+        margin-bottom: 15px;
+    }
+}
+
+/* Resultado Grid */
+.resultado-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+@media print {
+    .resultado-grid {
+        display: block;
+        page-break-inside: avoid;
+    }
+}
+
+/* Interpretación Card */
+.interpretacion-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+@media print {
+    .interpretacion-card {
+        background: white;
+        border: 1px solid #ddd;
+        padding: 12px;
+        box-shadow: none;
+        page-break-inside: avoid;
+        width: 100%;
+        margin-top: 20px;
+        margin-bottom: 0;
+    }
+    
+    .interpretacion-card h3 {
+        font-size: 1em;
+        color: #2d5fbf;
+        margin: 0 0 10px;
+        padding: 0;
+    }
+}
+
+.interpretacion-card h3 {
+    margin: 0 0 12px;
+    color: #2d5fbf;
+    font-size: 1.1em;
+    text-align: center;
+    font-weight: bold;
+}
+
+.interpretacion-item {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+@media print {
+    .interpretacion-item {
+        grid-template-columns: 140px 1fr;
+        margin-bottom: 10px;
+        page-break-inside: avoid;
+        display: grid;
+    }
+}
+
+.interpretacion-badge {
+    color: #fff;
+    font-weight: bold;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95em;
+    text-align: center;
+    word-wrap: break-word;
+    white-space: normal;
+    line-height: 1.2;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+@media print {
+    .interpretacion-badge {
+        font-size: 0.85em;
+        padding: 8px;
+        white-space: normal;
+        overflow-wrap: break-word;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
+.badge-alta { 
+    background: #c85a17;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.badge-moderada { 
+    background: #2d5a1f;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.badge-baja { 
+    background: #7cb342;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.badge-critica {
+    background: #820014;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.interpretacion-text {
+    background: #f5f5f5;
+    padding: 10px 12px;
+    font-size: 0.95em;
+    color: #333;
+    display: flex;
+    align-items: center;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+@media print {
+    .interpretacion-text {
+        background: #e8f5e9;
+        border: 1px solid #c8e6c9;
+        font-size: 0.85em;
+        padding: 8px;
+        word-wrap: break-word;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
+/* Calificación Box */
+.calificacion-box {
+    border: 2px dashed #6aa84f;
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-top: 16px;
+    background: #f7fbf3;
+}
+
+.calificacion-box h3 {
+    margin: 0 0 8px;
+    color: #2f6b1f;
+    font-size: 1.05em;
+    text-align: center;
+    font-weight: bold;
+}
+
+.calificacion-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.calificacion-list li {
+    margin: 6px 0;
+    font-weight: 600;
+    color: #2f4f2b;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+thead {
+    background: #667eea;
+    color: white;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+}
+
+tbody tr {
+    border-bottom: 1px solid #eee;
+    transition: background 0.3s;
+}
+
+tbody tr:hover {
+    background: #f0f0f0;
+}
+
+.level-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 0.9em;
+    font-weight: bold;
+    font-size: 1em;
+}
+
+/* Estilos para brechas */
+.level-brecha-baja {
+    background: #7cb342;
+    color: white;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.level-brecha-moderada {
+    background: #2d5a1f;
+    color: white;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.level-brecha-alta {
+    background: #c85a17;
+    color: white;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.level-brecha-critica {
+    background: #820014;
+    color: white;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+/* Estilos antiguos (por compatibilidad) */
+.level-excelente {
+    background: #28a745;
+    color: white;
+}
+
+.level-bueno {
+    background: #17a2b8;
+    color: white;
+}
+
+.level-satisfactorio {
+    background: #ffc107;
+    color: #333;
+}
+
+.level-mejora {
+    background: #dc3545;
+    color: white;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+}
+
+.summary-item {
+    background: white;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.summary-item label {
+    display: block;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 6px;
+    font-size: 0.85em;
+}
+
+.summary-item span {
+    color: #333;
+    font-size: 1em;
+}
+
+.score-value {
+    font-size: 1.4em !important;
+    font-weight: bold;
+    color: #667eea;
+}
+
+#goalTarget,
+#goalDifference,
+#goalStatus {
+    font-size: 1em !important;
+}
+
+#goalStatus {
+    padding: 4px 8px !important;
+    border-radius: 5px;
+}
+
+@media print {
+    .summary-grid {
+        grid-template-columns: repeat(4, minmax(160px, 1fr));
+        gap: 8px;
+    }
+
+    .summary-item {
+        padding: 8px 10px;
+        border-left: 3px solid #667eea;
+    }
+
+    .summary-item label {
+        margin-bottom: 4px;
+        font-size: 0.8em;
+    }
+
+    .summary-item span {
+        font-size: 0.95em;
+    }
+
+    .score-value {
+        font-size: 1.2em !important;
+    }
+
+    #goalTarget,
+    #goalDifference,
+    #goalStatus {
+        font-size: 0.95em !important;
+    }
+
+    #goalStatus {
+        padding: 3px 6px !important;
+    }
+}
+
+.actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+.btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-secondary {
+    background: #28a745;
+    color: white;
+}
+
+.btn-tertiary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+@media print {
+    body {
+        background: white;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .container {
+        box-shadow: none;
+        margin: 0;
+        max-width: 100%;
+    }
+    
+    .actions,
+    .action-buttons {
+        display: none;
+    }
+    
+    header {
+        page-break-after: avoid;
+    }
+    
+    h2 {
+        page-break-after: avoid;
+        page-break-before: avoid;
+    }
+    
+    .resultado-grid {
+        display: block;
+        gap: 0;
+    }
+    
+    .chart-container {
+        page-break-after: avoid;
+        margin-bottom: 20px;
+    }
+    
+    .interpretacion-card {
+        page-break-inside: avoid;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    
+    .interpretacion-card h3 {
+        margin-top: 0;
+    }
+    
+    .interpretacion-item {
+        page-break-inside: avoid;
+        margin-bottom: 8px;
+    }
+    
+    .calificacion-box {
+        page-break-inside: avoid;
+    }
+}
+
+/* Plan de Formación Styles */
+.plan-formacion-section {
+    margin-bottom: 30px;
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    page-break-inside: avoid;
+}
+
+.plan-formacion-section h2 {
+    color: #667eea;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 10px;
+}
+
+.plan-formacion-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    table-layout: fixed;
+}
+
+.plan-formacion-table thead {
+    background: #667eea;
+    color: white;
+}
+
+.plan-formacion-table th,
+.plan-formacion-table td {
+    padding: 15px;
+    text-align: left;
+    border: 1px solid #ddd;
+    word-wrap: break-word;
+}
+
+.plan-formacion-table th:nth-child(1),
+.plan-formacion-table td:nth-child(1) {
+    width: 30%;
+}
+
+.plan-formacion-table th:nth-child(2),
+.plan-formacion-table td:nth-child(2) {
+    width: 15%;
+    text-align: center;
+}
+
+.plan-formacion-table th:nth-child(3),
+.plan-formacion-table td:nth-child(3) {
+    width: 55%;
+}
+
+.plan-formacion-table tbody tr {
+    transition: background 0.3s;
+}
+
+.plan-formacion-table tbody tr:hover {
+    background: #f0f0f0;
+}
+
+.oportunidad-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1em;
+    resize: vertical;
+    min-height: 60px;
+    transition: border-color 0.3s;
+    box-sizing: border-box;
+}
+
+.oportunidad-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+}
+
+.oportunidad-input.saving {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.porcentaje-badge {
+    display: inline-block;
+    background: #667eea;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    min-width: 60px;
+    text-align: center;
+    font-size: 0.95em;
+}
+
+/* Estilos para impresión */
+@media print {
+    .plan-formacion-section {
+        background: white;
+        padding: 10px;
+        box-shadow: none;
+        page-break-inside: avoid;
+        border: 1px solid #ddd;
+    }
+    
+    .plan-formacion-section h2 {
+        color: #667eea;
+        font-size: 1.3em;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #667eea;
+    }
+    
+    .plan-formacion-table {
+        table-layout: fixed;
+        width: 100%;
+        font-size: 0.9em;
+    }
+    
+    .plan-formacion-table thead {
+        background: #667eea;
+        color: white;
+        display: table-header-group;
+    }
+    
+    .plan-formacion-table th {
+        padding: 10px;
+        border: 1px solid #333;
+        font-weight: bold;
+    }
+    
+    .plan-formacion-table td {
+        padding: 10px;
+        border: 1px solid #999;
+        vertical-align: top;
+    }
+    
+    .plan-formacion-table tbody tr {
+        page-break-inside: avoid;
+    }
+    
+    .oportunidad-input {
+        border: none;
+        background: white;
+        padding: 5px;
+        min-height: auto;
+        font-size: 0.85em;
+        width: 100%;
+        resize: none;
+    }
+    
+    .porcentaje-badge {
+        background: #667eea;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 0;
+        font-size: 0.85em;
+        display: inline-block;
+    }
+}
+
+/* Color exacto en impresión para interpretación */
+@media print {
+    .badge-alta {
+        background-color: #c85a17 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    .badge-moderada {
+        background-color: #2d5a1f !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    .badge-baja {
+        background-color: #7cb342 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    .level-brecha-alta {
+        background-color: #c85a17 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    .level-brecha-moderada {
+        background-color: #2d5a1f !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    .level-brecha-baja {
+        background-color: #7cb342 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    .level-brecha-critica {
+        background-color: #820014 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
+
+/* Fix: evita hoja inicial en blanco al imprimir/exportar PDF */
+@media print {
+    html,
+    body {
+        height: auto !important;
+        min-height: 0 !important;
+    }
+
+    header {
+        display: block !important;
+    }
+
+    header button {
+        display: none !important;
+    }
+
+    .container,
+    .content {
+        break-before: auto !important;
+        page-break-before: auto !important;
+    }
+}
+
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 1.8em;
+    }
+    
+    .resultado-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .chart-container {
+        height: 300px;
+    }
+    
+    .interpretacion-card {
+        padding: 12px;
+    }
+    
+    .interpretacion-item {
+        grid-template-columns: 90px 1fr;
+    }
+    
+    table {
+        font-size: 0.9em;
+    }
+    
+    th, td {
+        padding: 10px;
+    }
+}

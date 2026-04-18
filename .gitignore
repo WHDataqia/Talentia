@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Environment variables and secrets
+.env
+backend/.env
+
+# Logs
+*.log
+*_app_err.log
+*_app_out.log
+server_test.log
+
+# Databases and dumps
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.tar.gz
+*_backup_*.tar.gz
+full_temp.dump
+talentia_db.dump
+talentia_db_limpia.dump
+
+# IDE/editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node (if used for tooling)
+node_modules/
+
+# Test and cache artifacts
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/

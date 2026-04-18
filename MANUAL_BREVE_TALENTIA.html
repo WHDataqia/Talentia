@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Manual Funcional Completo - Talentia</title>
+  <style>
+    :root {
+      --bg: #f5f7f8;
+      --paper: #ffffff;
+      --ink: #1f2933;
+      --muted: #4f5f6f;
+      --line: #dbe3ea;
+      --brand: #0b6b53;
+      --brand-soft: #e8f5ef;
+      --warn: #7a5d00;
+      --warn-soft: #fff8db;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.45;
+      font-size: 12pt;
+    }
+
+    .page {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 30px 40px;
+    }
+
+    .cover {
+      background: linear-gradient(140deg, #f4fbf7 0%, #eef4ff 100%);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--brand-soft);
+      color: #0b5a44;
+      font-weight: 700;
+      font-size: 10.5pt;
+      margin-bottom: 10px;
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 10px;
+      line-height: 1.2;
+    }
+
+    h1 {
+      font-size: 30px;
+      color: #0f4f3d;
+      letter-spacing: 0.2px;
+    }
+
+    h2 {
+      font-size: 21px;
+      margin-top: 24px;
+      color: #123d30;
+      border-bottom: 2px solid var(--line);
+      padding-bottom: 6px;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin-top: 16px;
+      color: #1f3142;
+    }
+
+    p { margin: 0 0 10px; color: var(--muted); }
+
+    ul, ol {
+      margin: 8px 0 12px 22px;
+      color: var(--muted);
+    }
+
+    li { margin: 6px 0; }
+
+    .meta {
+      font-size: 10.5pt;
+      color: #3d586b;
+      margin-top: 8px;
+    }
+
+    .box {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--brand);
+      border-radius: 8px;
+      padding: 11px 13px;
+      margin: 10px 0 14px;
+    }
+
+    .warn {
+      border-left-color: #d8a700;
+      background: var(--warn-soft);
+      color: var(--warn);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0 14px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 9px 10px;
+      text-align: left;
+      border-bottom: 1px solid #e8eef3;
+      vertical-align: top;
+      font-size: 10.8pt;
+    }
+
+    th {
+      background: #f3f8fc;
+      color: #22384b;
+      font-weight: 700;
+      width: 25%;
+    }
+
+    tr:last-child td,
+    tr:last-child th { border-bottom: 0; }
+
+    .module {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px;
+      margin: 14px 0;
+    }
+
+    .module-title {
+      font-weight: 700;
+      color: #123d30;
+      margin-bottom: 8px;
+      font-size: 13pt;
+    }
+
+    .footer {
+      margin-top: 24px;
+      padding-top: 10px;
+      border-top: 1px dashed #b8c4ce;
+      color: #617383;
+      font-size: 10pt;
+    }
+
+    @media print {
+      @page { size: A4; margin: 12mm; }
+      body { background: #fff; }
+      .page { max-width: none; padding: 0; }
+      .module, h2, h3, table, .box { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="cover">
+      <div class="tag">Manual Funcional</div>
+      <h1>Talentia - Gestion de Competencias</h1>
+      <p>Guia funcional completa por modulo para operacion de produccion.</p>
+      <p class="meta"><strong>Version:</strong> 2.0 | <strong>Fecha:</strong> 18/03/2026 | <strong>Alcance:</strong> Formularios, campos, validaciones y recomendaciones</p>
+    </section>
+
+    <h2>1. Objetivo Del Manual</h2>
+    <p>
+      Este documento explica, modulo por modulo, como usar Talentia: que registra cada pantalla,
+      que campos se diligencian, que validaciones aplica el sistema y que buenas practicas seguir.
+    </p>
+
+    <h2>2. Flujo General Del Sistema</h2>
+    <ol>
+      <li>Ingreso por login.</li>
+      <li>Revision de indicadores en Inicio.</li>
+      <li>Administracion de empleados y datos maestros (rol admin).</li>
+      <li>Registro de evaluaciones (jefe/admin) o autoevaluacion (empleado).</li>
+      <li>Consulta en Historial, Detalle e Informe Comparativo.</li>
+      <li>Registro de plan de formacion 70-20-10 en el detalle de evaluacion.</li>
+    </ol>
+
+    <h2>3. Modulos Del Aplicativo</h2>
+
+    <section class="module">
+      <div class="module-title">3.1 Login</div>
+      <p><strong>Pantalla:</strong> Inicio de sesion para todos los perfiles.</p>
+      <h3>Campos del formulario</h3>
+      <table>
+        <tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripcion</th></tr>
+        <tr><td>Email</td><td>input email</td><td>Si</td><td>Usuario corporativo registrado.</td></tr>
+        <tr><td>Contrasena</td><td>input password</td><td>Si</td><td>Clave de acceso del usuario.</td></tr>
+      </table>
+      <h3>Recomendaciones</h3>
+      <ul>
+        <li>Validar email corporativo correcto antes de enviar.</li>
+        <li>No compartir credenciales entre usuarios.</li>
+        <li>Si falla acceso, validar primero rol y estado del usuario en administracion.</li>
+      </ul>
+    </section>
+
+    <section class="module">
+      <div class="module-title">3.2 Inicio (Dashboard)</div>
+      <p><strong>Pantalla:</strong> Resumen operativo y acceso rapido a modulos.</p>
+      <h3>Informacion mostrada</h3>
+      <ul>
+        <li>Total empleados.</li>
+        <li>Total evaluaciones.</li>
+        <li>Promedio general.</li>
+        <li>Ultima evaluacion.</li>
+        <li>Grafico de competencias y badge de tipo (Evaluacion/Autoevaluacion).</li>
+      </ul>
+      <h3>Recomendaciones</h3>
+      <ul>
+        <li>Usar esta vista para verificar rapidamente si la carga de evaluaciones esta activa.</li>
+        <li>Confirmar que el tipo de registro sea correcto antes de interpretar datos.</li>
+      </ul>
+    </section>
+
+    <section class="module">
+      <div class="module-title">3.3 Gestion de Empleados</div>
+      <p><strong>Pantalla:</strong> Alta, edicion, consulta y recarga masiva de empleados (segun rol).</p>
+      <h3>Formulario Nuevo/Editar Empleado</h3>
+      <table>
+        <tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripcion</th></tr>
+        <tr><td>Cedula</td><td>texto</td><td>Si</td><td>Identificacion unica del empleado.</td></tr>
+        <tr><td>Nombres completos</td><td>texto</td><td>Si</td><td>Nombre y apellidos del colaborador.</td></tr>
+        <tr><td>Correo personal</td><td>email</td><td>No</td><td>Correo no corporativo.</td></tr>
+        <tr><td>Correo corporativo</td><td>email</td><td>No</td><td>Correo de trabajo.</td></tr>
+        <tr><td>Celular</td><td>telefono</td><td>No</td><td>Numero de contacto.</td></tr>
+        <tr><td>Empresa / Razon social</td><td>select</td><td>Si</td><td>Empresa asociada (tabla maestra).</td></tr>
+        <tr><td>Cargo</td><td>select</td><td>Si</td><td>Cargo asociado (tabla maestra).</td></tr>
+        <tr><td>Centro de costo</td><td>select</td><td>Si</td><td>Centro asociado (tabla maestra).</td></tr>
+        <tr><td>Jefe directo</td><td>select</td><td>Si</td><td>Responsable evaluador principal.</td></tr>
+        <tr><td>Fecha ingreso</td><td>texto dd/mm/aaaa</td><td>Si</td><td>Fecha laboral de ingreso.</td></tr>
+        <tr><td>Rol</td><td>select</td><td>Si</td><td>empleado, jefe o admin.</td></tr>
+        <tr><td>Nivel ocupacional</td><td>select</td><td>Si</td><td>Nivel de competencias aplicable.</td></tr>
+        <tr><td>Aplica KPI</td><td>checkbox</td><td>No</td><td>Activa bloque de metas del cargo.</td></tr>
+        <tr><td>KPI 1, KPI 2, KPI 3</td><td>texto</td><td>Si (si aplica KPI)</td><td>Metas clave del cargo para medir resultados.</td></tr>
+      </table>
+      <h3>Funciones adicionales</h3>
+      <ul>
+        <li>Busqueda por texto en tabla de empleados.</li>
+        <li>Analisis y recarga desde archivo Excel.</li>
+        <li>Asignacion de contrasenas iniciales (segun configuracion y rol).</li>
+      </ul>
+      <div class="box warn">
+        Recomendacion: mantener cedula y correo corporativo depurados para evitar duplicados en autenticacion y autoevaluacion.
+      </div>
+    </section>
+
+    <section class="module">
+      <div class="module-title">3.4 Evaluacion de Competencias (Jefe/Admin)</div>
+      <p><strong>Pantalla:</strong> Registro de evaluacion formal del colaborador.</p>
+      <h3>Campos principales</h3>
+      <table>
+        <tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripcion</th></tr>
+        <tr><td>Seleccionar empleado</td><td>select</td><td>Si</td><td>Empleado a evaluar.</td></tr>
+        <tr><td>Jefe directo</td><td>texto solo lectura</td><td>Auto</td><td>Se completa al seleccionar empleado.</td></tr>
+        <tr><td>Periodo de evaluacion</td><td>texto + hidden</td><td>Auto</td><td>Periodo anual calculado por sistema.</td></tr>
+        <tr><td>Nivel ocupacional</td><td>texto solo lectura + hidden</td><td>Auto</td><td>Nivel tomado de ficha del empleado.</td></tr>
+      </table>
+      <h3>Registro de calificaciones</h3>
+      <ul>
+        <li>Escala utilizada: 1 a 5 por comportamiento.</li>
+        <li>Incluye resumen: total calificaciones y promedio general.</li>
+        <li>Al guardar se bloquea el formulario y se habilita boton para ver detalle.</li>
+      </ul>
+      <h3>Reglas y recomendaciones</h3>
+      <ul>
+        <li>No crear duplicados para el mismo empleado, periodo y tipo de evaluacion.</li>
+        <li>Evaluar solo con evidencia observada, no con percepcion general.</li>
+        <li>Completar todos los comportamientos antes de guardar.</li>
+      </ul>
+    </section>
+
+    <section class="module">
+      <div class="module-title">3.5 Autoevaluacion (Empleado)</div>
+      <p><strong>Pantalla:</strong> Acceso de colaborador para autoevaluar sus competencias.</p>
+      <h3>Acceso al formulario</h3>
+      <table>
+        <tr><th>Campo</th><th>Tipo</th><th>Obligatorio</th><th>Descripcion</th></tr>
+        <tr><td>Cedula</td><td>texto</td><td>Si</td><td>Identificacion del empleado.</td></tr>
+        <tr><td>Contrasena</td><td>password</td><td>Si</td><td>Contrasena de acceso de autoevaluacion.</td></tr>
+      </table>
+      <h3>Datos precargados</h3>
+      <ul>
+        <li>Empleado (solo lectura).</li>
+        <li>Periodo anual (solo lectura).</li>
+        <li>Nivel ocupacional (solo lectura).</li>
+      </ul>
+      <h3>Registro</h3>
+      <ul>
+        <li>Escala de 1 a 5 por comportamiento, igual a evaluacion formal.</li>
+        <li>Boton Guardar Autoevaluacion al finalizar.</li>
+      </ul>
+      <div class="box">
+        Recomendacion: explicar al colaborador que esta autoevaluacion debe reflejar desempeno real y evidencia puntual del periodo.
+      </div>
+    </section>
+
+    <section class="module">
+      <div class="module-title">3.6 Historial De Evaluaciones</div>
+      <p><strong>Pantalla:</strong> Consulta historica, filtros y accesos a detalle/comparativo.</p>
+      <h3>Filtros disponibles</h3>
+      <table>
+        <tr><th>Filtro</th><th>Tipo</th><th>Uso</th></tr>
+        <tr><td>Empleado</td><td>select</td><td>Ver evaluaciones de una persona puntual.</td></tr>
+        <tr><td>Centro de costo</td><td>select</td><td>Segmentar por area o unidad.</td></tr>
+        <tr><td>Periodo</td><td>select</td><td>Filtrar por periodo de evaluacion.</td></tr>
+        <tr><td>Anio</td><td>select</td><td>Analisis por anualidad.</td></tr>
+      </table>
+      <h3>Acciones por registro</h3>
+      <ul>
+        <li>Ver Detalle de evaluacion.</li>
+        <li>Ver Informe Comparativo (evaluacion vs autoevaluacion del mismo periodo).</li>
+        <li>Eliminar evaluacion (segun permisos).</li>
+      </ul>
+    </section>
+
+    <section class="module">
+      <div class="module-title">3.7 Detalle De Evaluacion Y Plan 70-20-10</div>
+      <p><strong>Pantalla:</strong> Analisis completo de una evaluacion guardada.</p>
+      <h3>Informacion incluida</h3>
+      <ul>
+        <li>Datos del empleado y evaluacion.</li>
+        <li>Grafico radar de competencias.</li>
+        <li>Tabla de competencias, puntuacion, nivel y observaciones.</li>
+        <li>Resumen (promedio, diferencia, estado).</li>
+        <li>Bloque de metas del cargo (si aplica KPI).</li>
+      </ul>
+      <h3>Plan de formacion 70-20-10</h3>
+      <p>Incluye tres filas de trabajo:</p>
+      <ul>
+        <li>Experiencia (70%).</li>
+        <li>Exposicion (20%).</li>
+        <li>Estudio (10%).</li>
+      </ul>
+      <p>Campo editable: <strong>Oportunidad de desarrollo</strong> por cada fila. El guardado ocurre al salir del textarea (evento blur).</p>
+      <div class="box warn">
+        Recomendacion: registrar oportunidades concretas, con accion y contexto (ejemplo: "liderar comite mensual", "curso de negociacion", "mentoria quincenal").
+      </div>
+    </section>
+
+    <section class="module">
+      <div class="module-title">3.8 Informe Comparativo</div>
+      <p><strong>Pantalla:</strong> Contrasta evaluacion de jefe frente a autoevaluacion del empleado.</p>
+      <h3>Elementos clave</h3>
+      <ul>
+        <li>Panel dual: evaluacion y autoevaluacion.</li>
+        <li>Tabla de competencias con diferencia por competencia.</li>
+        <li>Resumen comparativo de brechas.</li>
+      </ul>
+      <h3>Interpretacion recomendada</h3>
+      <ul>
+        <li>Diferencia baja: alta alineacion de percepcion.</li>
+        <li>Diferencia moderada: revisar ejemplos y retroalimentacion conjunta.</li>
+        <li>Diferencia alta: plan de cierre de brecha con compromisos y seguimiento.</li>
+      </ul>
+    </section>
+
+    <section class="module">
+      <div class="module-title">3.9 Panel De Administracion</div>
+      <p><strong>Pantalla:</strong> Seguridad de acceso y administracion de credenciales.</p>
+      <h3>Funciones principales</h3>
+      <ul>
+        <li>Asignar nueva contrasena a evaluadores (jefes/admin).</li>
+        <li>Generar codigo de acceso para autoevaluacion por empleado.</li>
+        <li>Copiar codigo y compartirlo de forma controlada.</li>
+      </ul>
+      <h3>Campos relevantes</h3>
+      <table>
+        <tr><th>Funcion</th><th>Campo</th><th>Descripcion</th></tr>
+        <tr><td>Asignar contrasena</td><td>Nueva contrasena</td><td>Entrada de password por empleado (minimo 6 caracteres).</td></tr>
+        <tr><td>Generar codigo</td><td>Seleccionar empleado</td><td>Picklist para emitir codigo de autoevaluacion.</td></tr>
+        <tr><td>Resultado</td><td>Codigo generado</td><td>Campo de solo lectura con opcion de copiar.</td></tr>
+      </table>
+    </section>
+
+    <section class="module">
+      <div class="module-title">3.10 Tablas Maestras</div>
+      <p><strong>Pantalla:</strong> Catalogos base para parametrizar la operacion de RRHH.</p>
+      <h3>Submodulos y campos</h3>
+      <table>
+        <tr><th>Submodulo</th><th>Campos</th><th>Uso</th></tr>
+        <tr><td>Empresas</td><td>Razon social, NIT, ciudad</td><td>Catalogo de empresas habilitadas.</td></tr>
+        <tr><td>Cargos</td><td>Nombre, descripcion</td><td>Catalogo de posiciones laborales.</td></tr>
+        <tr><td>Centros de costo</td><td>Nombre, descripcion</td><td>Segmentacion administrativa.</td></tr>
+      </table>
+      <p>Cada submodulo permite crear, editar y eliminar registros segun permisos.</p>
+    </section>
+
+    <section class="module">
+      <div class="module-title">3.11 Modulo Alterno: Nueva Evaluacion (legacy)</div>
+      <p>
+        Existe una pantalla adicional de registro (crear-evaluacion) con campos similares al flujo de competencias.
+        Puede usarse para soporte o continuidad operativa segun configuracion del proceso.
+      </p>
+    </section>
+
+    <h2>4. Recomendaciones Operativas Globales</h2>
+    <ul>
+      <li>Definir un calendario anual de evaluacion y usar el mismo criterio para toda la organizacion.</li>
+      <li>No dejar evaluaciones parcialmente diligenciadas durante cierre de periodo.</li>
+      <li>Registrar observaciones especificas, medibles y accionables.</li>
+      <li>En comparativos con brecha alta, documentar plan de conversacion jefe-colaborador.</li>
+      <li>Restringir funciones administrativas a perfiles autorizados.</li>
+    </ul>
+
+    <h2>5. Checklist Rapido De Calidad De Datos</h2>
+    <table>
+      <tr><th>Control</th><th>Validacion recomendada</th></tr>
+      <tr><td>Empleados</td><td>Sin duplicados por cedula y correo corporativo.</td></tr>
+      <tr><td>Roles</td><td>Rol correcto por perfil (empleado/jefe/admin).</td></tr>
+      <tr><td>Evaluaciones</td><td>Sin duplicados por empleado + periodo + tipo.</td></tr>
+      <tr><td>Plan 70-20-10</td><td>Con oportunidades de desarrollo diligenciadas en las tres lineas.</td></tr>
+      <tr><td>KPIs</td><td>Si aplica KPI, validar 3 items definidos y claros.</td></tr>
+    </table>
+
+    <p class="footer">
+      Documento interno de uso operativo. Actualizar cuando cambie algun formulario, campo o flujo de aprobacion.
+    </p>
+  </main>
+</body>
+</html>

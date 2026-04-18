@@ -1,0 +1,409 @@
+/* Estilos para evaluación de competencias */
+
+/* Estilos de bloqueo global */
+input[type="radio"]:disabled,
+textarea:disabled,
+select:disabled {
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+}
+
+input[type="radio"]:disabled + span {
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+    color: #ccc !important;
+    background: #f5f5f5 !important;
+}
+
+.radio-opcion[style*="pointer-events: none"] {
+    pointer-events: none !important;
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+}
+
+.competencia-evaluacion {
+    background: white;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 24px;
+}
+
+.competencia-header {
+    margin-bottom: 32px;
+    border-bottom: 3px solid #0066cc;
+    padding-bottom: 16px;
+}
+
+.competencia-header h2 {
+    color: #002855;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+.competencia-descripcion {
+    color: #555;
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 8px 0;
+}
+
+.nivel-aplicacion {
+    display: inline-block;
+    background: #e6f2ff;
+    color: #0066cc;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 8px;
+}
+
+.descriptores-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.descriptor-card {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 16px;
+    background: #f9f9f9;
+}
+
+.descriptor-header {
+    margin-bottom: 16px;
+    border-left: 4px solid #0066cc;
+    padding-left: 12px;
+}
+
+.descriptor-header h3 {
+    color: #002855;
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.comportamientos {
+    margin-bottom: 16px;
+}
+
+.comportamiento-item {
+    margin-bottom: 16px;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background: #fafafa;
+}
+
+.comportamiento-texto {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.comportamiento-numero {
+    font-weight: 600;
+    color: #0066cc;
+    min-width: 20px;
+    font-size: 14px;
+}
+
+.checkbox-label {
+    flex: 1;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.comportamiento-calificacion {
+    padding-left: 26px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.comportamiento-calificacion > label {
+    font-size: 13px;
+    color: #666;
+    font-weight: 600;
+    min-width: 80px;
+}
+
+.puntuacion-inline {
+    display: flex;
+    gap: 8px;
+}
+
+.radio-opcion {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    transition: all 0.2s;
+}
+
+.radio-opcion:hover {
+    background: #e6f2ff;
+    border-color: #0066cc;
+}
+
+.radio-opcion input[type="radio"] {
+    display: none;
+}
+
+.radio-opcion span {
+    display: inline-block;
+    padding: 6px 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #555;
+}
+
+.radio-opcion input[type="radio"]:checked + span {
+    color: white;
+    background: #0066cc;
+    border-radius: 5px;
+}
+
+.radio-opcion input[type="radio"]:disabled + span {
+    color: #ccc;
+    background: #f5f5f5;
+    cursor: not-allowed;
+}
+
+.radio-opcion input[type="radio"]:disabled {
+    cursor: not-allowed;
+}
+
+.radio-opcion:has(input[type="radio"]:disabled) {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.evaluacion-descriptor {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #ddd;
+}
+
+.evaluacion-descriptor label {
+    display: block;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.evaluacion-general {
+    margin-top: 20px;
+    padding: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.comentarios-generales label {
+    display: block;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.comentarios-generales textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    resize: vertical;
+}
+
+.escala-puntuacion {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.escala-opcion {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+    font-size: 14px;
+}
+
+.escala-opcion:hover {
+    background: #e6f2ff;
+}
+
+.escala-opcion input[type="radio"] {
+    cursor: pointer;
+    accent-color: #0066cc;
+}
+
+.escala-opcion .valor {
+    min-width: 20px;
+    font-weight: 600;
+    color: #0066cc;
+}
+
+.escala-opcion .descripcion {
+    color: #666;
+    flex: 1;
+}
+
+.observaciones-descriptor {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+    color: #333;
+}
+
+.observaciones-descriptor:focus {
+    outline: none;
+    border-color: #0066cc;
+    box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
+}
+
+.evaluacion-general {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid #ddd;
+}
+
+.btn-guardar {
+    background: #0066cc;
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-guardar:hover {
+    background: #0052a3;
+}
+
+.btn-guardar:active {
+    background: #003d7a;
+}
+
+/* Resumen de evaluación */
+.resumen-competencia {
+    background: #f0f8ff;
+    border-left: 4px solid #0066cc;
+    padding: 16px;
+    border-radius: 4px;
+    margin-top: 16px;
+}
+
+.resumen-competencia h4 {
+    color: #0066cc;
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.resumen-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+}
+
+.resumen-item:last-child {
+    border-bottom: none;
+}
+
+.resumen-label {
+    color: #333;
+    font-weight: 500;
+}
+
+.resumen-valor {
+    color: #0066cc;
+    font-weight: 600;
+}
+
+.nivel-ocupacional-botones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.nivel-btn {
+    border: 1px solid #d0d7e2;
+    background: #f5f7fb;
+    color: #344563;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.nivel-btn:hover {
+    border-color: #0066cc;
+    background: #e6f2ff;
+    color: #0066cc;
+}
+
+.nivel-btn.active {
+    background: #0066cc;
+    color: #fff;
+    border-color: #0066cc;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .competencia-evaluacion {
+        padding: 16px;
+    }
+
+    .competencia-header h2 {
+        font-size: 20px;
+    }
+
+    .comportamientos-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .escala-opcion {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .comportamientos-grid {
+        grid-template-columns: 1fr;
+    }
+}

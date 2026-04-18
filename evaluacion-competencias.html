@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación de Competencias</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="competencia-estilos.css">
+    <style>
+        .nav-link {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-link.active {
+            background: #28a745;
+        }
+
+        .navigation {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .instructions-box {
+            background: #f3efe3;
+            border: 1px solid #ded6c0;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 1em;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .instructions-box p {
+            margin: 0 0 8px;
+        }
+
+        .instructions-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .instructions-box .scale-item {
+            margin: 4px 0;
+            font-weight: bold;
+        }
+
+        /* Encabezado compacto como en empleados */
+        header {
+            padding: 24px 24px 18px;
+            gap: 8px;
+            min-height: auto;
+        }
+
+        header h1 {
+            font-size: 2.1em;
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 900px) {
+            header {
+                padding: 20px 16px 14px;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Gestion de Competencias</h1>
+            <p class="subtitle">Evaluación de Competencias</p>
+            <p style="margin-top: 5px; color: #666; font-size: 0.95em;">
+                Usuario: <span id="nombre-evaluador" style="font-weight: bold; color: #333;">Cargando...</span>
+            </p>
+            <button onclick="logout()" style="position: absolute; top: 20px; right: 20px; padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: 500;">🚪 Salir</button>
+        </header>
+
+        <div class="content">
+            <div class="navigation">
+                <button class="nav-link" onclick="window.location.href='index.html'">🏠 Inicio</button>
+                <button class="nav-link" onclick="window.location.href='empleados.html'">👥 Empleados</button>
+<!--                 <button class="nav-link active" onclick="window.location.href='evaluacion-competencias.html'">🎯 Evalua tu equipo</button> -->
+                <button class="nav-link" onclick="window.location.href='historial.html'">📜 Historial</button>
+            </div>
+
+            <div class="employee-info">
+                <h2>Evaluación de Competencias</h2>
+
+                <div style="margin-bottom: 20px;">
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="empleado-select" style="display: block; margin-bottom: 5px; font-weight: bold;">Seleccionar Empleado:</label>
+                        <select id="empleado-select" onchange="cargarEmpleado()" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1.05em;">
+                            <option value="">-- Seleccione un empleado --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="jefe-directo" style="display: block; margin-bottom: 5px; font-weight: bold;">Jefe Directo:</label>
+                        <input type="text" id="jefe-directo" readonly placeholder="Se cargará automáticamente" 
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1.05em; background-color: #f0f0f0; cursor: not-allowed;">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="periodo-texto" style="display: block; margin-bottom: 5px; font-weight: bold;">Período de Evaluación (Anual):</label>
+                        <input type="text" id="periodo-texto" readonly 
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1.05em; background-color: #f5f5f5; cursor: default;">
+                        <input type="hidden" id="periodo-select">
+                        <div id="validacion-periodo" style="display: none; margin-top: 6px; color: #b00020; font-weight: 600;"></div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="nivel-ocupacional-texto" style="display: block; margin-bottom: 5px; font-weight: bold;">Nivel ocupacional:</label>
+                        <input type="text" id="nivel-ocupacional-texto" readonly placeholder="Se cargará automáticamente"
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1.05em; background-color: #f0f0f0; cursor: not-allowed;">
+                        <input type="hidden" id="nivel-ocupacional" value="0">
+                    </div>
+                </div>
+
+                <div class="instructions-box">
+                    <p><strong>Instrucciones:</strong> Por favor, complete la totalidad del presente formulario. Recuerde mantener un criterio objetivo durante la evaluación, ya que los resultados obtenidos serán utilizados para la elaboración de planes de desarrollo individual.</p>
+                    <p>Evalúe al colaborador según la evidencia observada de los siguientes comportamientos, utilizando la siguiente escala:</p>
+                    <p class="scale-item"><strong>1:</strong> El comportamiento no se evidencia</p>
+                    <p class="scale-item"><strong>2:</strong> El comportamiento se evidencia en pocas ocasiones</p>
+                    <p class="scale-item"><strong>3:</strong> El comportamiento se evidencia siempre</p>
+                    <p class="scale-item"><strong>4:</strong> El comportamiento es sobresaliente</p>
+                    <p class="scale-item"><strong>5:</strong> El comportamiento excede las expectativas</p>
+                    <p>Seleccione la calificación que mejor represente el desempeño del colaborador en cada criterio.</p>
+                </div>
+
+                <!-- Competencia a evaluar -->
+                <div id="competencia-container">
+                    <div class="placeholder">
+                        <p>Seleccione un empleado para comenzar la evaluación</p>
+                    </div>
+                </div>
+
+                <!-- Resumen de evaluación -->
+                <div id="resumen-container" style="display: none;">
+                    <div class="summary">
+                        <h3>Resumen de Evaluación</h3>
+                        <div class="info-grid" style="margin-top: 10px;">
+                            <div class="info-item">
+                                <label>Total de calificaciones:</label>
+                                <span id="totalCalificaciones" style="font-size: 1.2em; color: #667eea;">0</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Promedio general:</label>
+                                <span id="promedioGeneralNivel" style="font-size: 1.2em; color: #667eea;">0.0</span>
+                            </div>
+                        </div>
+                        <div id="resumen-contenido" style="margin-top: 10px;"></div>
+                        <div style="margin-top: 15px;">
+                            <button id="verDetalleEvaluacion" class="btn-guardar" style="display: none; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: bold;">
+                                👁️ Ver detalle de la evaluación
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="guardarEvaluacionCompleta()" class="btn-guardar" style="display: none; margin-top: 20px; padding: 12px 30px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1.05em; font-weight: bold;">
+                    💾 Guardar Evaluación
+                </button>
+
+            </div>
+        </div>
+
+        <footer style="background: #f8f9fa; padding: 20px; text-align: center; color: #666; border-top: 1px solid #dee2e6;">
+            <p>&copy; 2026 Bluedoors-Talentia. Desarrollado por Wilson Herrera.</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="competencia-evaluador.js"></script>
+    <script>
+        // Verificación INMEDIATA de autenticación (antes de cualquier otra cosa)
+        if (!sessionStorage.getItem('token')) {
+            console.log('❌ No hay token. Redirigiendo a login...');
+            window.location.href = 'login.html';
+        }
+
+        // Verificar rol: solo jefe y admin pueden acceder
+        function obtenerUsuarioSesion() {
+            try {
+                const usuarioRaw = sessionStorage.getItem('usuario');
+                if (!usuarioRaw) return null;
+                return JSON.parse(usuarioRaw);
+            } catch (error) {
+                console.error('❌ Sesión de usuario inválida:', error);
+                return null;
+            }
+        }
+
+        const usuarioSesion = obtenerUsuarioSesion();
+        if (usuarioSesion && usuarioSesion.rol === 'empleado') {
+            console.log('❌ Empleados no pueden acceder a evaluaciones.');
+            setTimeout(() => {
+                alert('❌ Solo jefes y administradores pueden crear evaluaciones.');
+                window.location.href = 'index.html';
+            }, 100);
+        }
+
+        window.AUTOEVALUACION = false;
+        window.EVALUACION_DUPLICADA = false;
+
+        // Funciones de autenticación JWT
+        function getToken() {
+            const token = sessionStorage.getItem('token');
+            console.log('Token recuperado:', token ? '✓ Existe' : '✗ No existe');
+            if (!token) {
+                console.error('❌ No hay token. Redirigiendo a login...');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 500);
+                return null;
+            }
+            return token;
+        }
+
+        // Obtener headers con autenticación
+        function getHeaders() {
+            const token = getToken();
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+            console.log('Headers:', headers);
+            return headers;
+        }
+
+        // Evita que localhost se quede esperando indefinidamente cuando una petición se cuelga.
+        function fetchWithTimeout(url, options = {}, timeoutMs = 30000) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+            return fetch(url, {
+                ...options,
+                signal: controller.signal
+            }).finally(() => clearTimeout(timeoutId));
+        }
+
+        async function fetchJsonConReintento(url, options = {}, cfg = {}) {
+            const retries = Number.isInteger(cfg.retries) ? cfg.retries : 2;
+            const timeoutMs = Number(cfg.timeoutMs) > 0 ? Number(cfg.timeoutMs) : 30000;
+
+            let ultimoError = null;
+            for (let intento = 0; intento <= retries; intento++) {
+                try {
+                    const response = await fetchWithTimeout(url, options, timeoutMs);
+                    let data = null;
+                    try {
+                        data = await response.json();
+                    } catch (_) {
+                        data = null;
+                    }
+
+                    if (!response.ok) {
+                        const mensaje = data?.error || `HTTP ${response.status}`;
+                        throw new Error(mensaje);
+                    }
+
+                    return data;
+                } catch (error) {
+                    ultimoError = error;
+                    if (intento >= retries) break;
+                    await new Promise(resolve => setTimeout(resolve, 400 * (intento + 1)));
+                }
+            }
+
+            throw ultimoError || new Error('Error de red');
+        }
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarNombreEvaluador();
+            cargarEmpleados();
+            cargarCompetencias();
+            cargarPeriodosEvaluacion();
+        });
+
+        // Cargar nombre del evaluador actual
+        function cargarNombreEvaluador() {
+            try {
+                const usuario = obtenerUsuarioSesion();
+                if (usuario) {
+                    const nombreEvaluador = usuario.nombres_completos || usuario.nombre || 'Usuario';
+                    document.getElementById('nombre-evaluador').textContent = nombreEvaluador;
+                    console.log('Evaluador cargado:', nombreEvaluador);
+                } else {
+                    document.getElementById('nombre-evaluador').textContent = 'Sesión no disponible';
+                }
+            } catch (error) {
+                console.error('Error al cargar nombre del evaluador:', error);
+                document.getElementById('nombre-evaluador').textContent = 'Error';
+            }
+        }
+
+        function cargarPeriodosEvaluacion() {
+            const selectHidden = document.getElementById('periodo-select');
+            const inputTexto = document.getElementById('periodo-texto');
+            if (!selectHidden || !inputTexto) return;
+
+            const year = new Date().getFullYear();
+            const monthName = new Date().toLocaleString('es-ES', { month: 'long' });
+            const monthLabel = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
+            // Solo evaluación anual - período del mes actual
+            const periodoActual = `${monthLabel} ${year}`;
+
+            // Establecer valor en ambos campos
+            selectHidden.value = periodoActual;
+            inputTexto.value = periodoActual;
+            
+            // Validar el período automáticamente
+            validarPeriodoEmpleado();
+        }
+
+        // Cargar lista de empleados
+        let empleadosData = []; // Variable global para almacenar datos de empleados
+        let empleadoActual = null; // Empleado seleccionado actualmente
+
+        function construirCompetenciaKpi(empleado) {
+            if (!empleado || !empleado.aplica_kpi) return null;
+
+            const item1 = (empleado.kpi_item_1 || '').trim();
+            const item2 = (empleado.kpi_item_2 || '').trim();
+            const item3 = (empleado.kpi_item_3 || '').trim();
+
+            if (!item1 || !item2 || !item3) return null;
+
+            const comportamientos = [item1, item2, item3];
+            const niveles = [
+                'HACEMOS QUE LAS COSAS PASEN (Ejecutando)',
+                'GESTORES DE EXPERIENCIAS (Gestionando)',
+                'POTENCIANDO EQUIPOS (Potenciando)',
+                'EMPODERANDO Y FOMENTANDO (Dando forma)',
+                'LIDERAZGO ESTRATÉGICO (Liderando)'
+            ];
+
+            return {
+                id: 7,
+                nombre: '7. METAS DEL CARGO (KPIs) (si aplica)',
+                descripcion: 'Evalúe las metas del cargo definidas para este colaborador.',
+                descriptores: niveles.map((rol, index) => ({
+                    id: index + 1,
+                    rol,
+                    comportamientos: [...comportamientos]
+                }))
+            };
+        }
+        
+        function cargarEmpleados() {
+            // Agregar parámetro directo=true para obtener SOLO subordinados directos (para evaluación)
+            fetchJsonConReintento('/api/empleados?directo=true', { headers: getHeaders() }, { retries: 2, timeoutMs: 30000 })
+                .then(data => {
+                    if (!Array.isArray(data)) {
+                        throw new Error('Respuesta inválida de empleados');
+                    }
+                    empleadosData = data; // Guardar datos completos
+                    const select = document.getElementById('empleado-select');
+                    if (!select) return;
+
+                    select.innerHTML = '<option value="">-- Seleccione un empleado --</option>';
+                    console.log(`📋 Empleados cargados para evaluación: ${data.length}`);
+                    data.forEach(emp => {
+                        const option = document.createElement('option');
+                        option.value = emp.id;
+                        option.textContent = `${emp.nombres_completos} - ${emp.cargo || 'Sin cargo'}`;
+                        select.appendChild(option);
+                    });
+
+                    if (data.length === 0) {
+                        const option = document.createElement('option');
+                        option.value = '';
+                        option.textContent = '-- No tiene empleados directos para evaluar --';
+                        select.appendChild(option);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error cargando empleados:', error);
+                    const select = document.getElementById('empleado-select');
+                    if (select) {
+                        select.innerHTML = '<option value="">-- Error cargando empleados (reintente) --</option>';
+                        const optionRetry = document.createElement('option');
+                        optionRetry.value = '__retry__';
+                        optionRetry.textContent = '↻ Reintentar carga de empleados';
+                        select.appendChild(optionRetry);
+                    }
+                });
+        }
+
+        // Cargar datos del empleado
+        function cargarEmpleado() {
+            const empleadoId = document.getElementById('empleado-select').value;
+            const jefeInput = document.getElementById('jefe-directo');
+            const nivelInputTexto = document.getElementById('nivel-ocupacional-texto');
+            const nivelInputHidden = document.getElementById('nivel-ocupacional');
+            
+            if (!empleadoId) {
+                jefeInput.value = '';
+                nivelInputTexto.value = '';
+                nivelInputHidden.value = '0';
+                empleadoActual = null;
+                cargarCompetencias();
+                setEstadoValidacion(false, '');
+                return;
+            }
+
+            if (empleadoId === '__retry__') {
+                cargarEmpleados();
+                return;
+            }
+
+            // Actualizar jefe directo y nivel ocupacional
+            empleadoActual = empleadosData.find(emp => emp.id == empleadoId);
+            if (empleadoActual) {
+                console.log('📊 Datos del empleado:', empleadoActual);
+                console.log('📊 Nivel ocupacional del empleado:', empleadoActual.nivel_ocupacional);
+                
+                jefeInput.value = empleadoActual.jefe_nombre || 'Sistema';
+                
+                // Actualizar nivel ocupacional (ahora readonly)
+                let indiceNivel = 0; // Valor por defecto
+                let textoNivel = 'Hacemos que las cosas pasen (Ejecutando)';
+                
+                if (empleadoActual.nivel_ocupacional) {
+                    indiceNivel = obtenerIndiceNivelOcupacional(empleadoActual.nivel_ocupacional);
+                    console.log('📊 Índice de nivel calculado:', indiceNivel);
+                    
+                    if (indiceNivel !== -1) {
+                        const niveles = [
+                            'Hacemos que las cosas pasen (Ejecutando)',
+                            'Gestores de experiencias (Gestionando)',
+                            'Potenciando equipos (Potenciando)',
+                            'Empoderando y fomentando (Dando forma)',
+                            'Liderazgo estratégico (Liderando)'
+                        ];
+                        textoNivel = niveles[indiceNivel];
+                        console.log('✓ Nivel asignado:', textoNivel);
+                    } else {
+                        indiceNivel = 0; // Si no se encuentra, usar nivel 0
+                    }
+                } else {
+                    console.warn('⚠️ Empleado no tiene nivel_ocupacional definido');
+                }
+                
+                // Actualizar ambos campos (texto visible y valor oculto)
+                nivelInputTexto.value = textoNivel;
+                nivelInputHidden.value = indiceNivel;
+                
+                // IMPORTANTE: Guardar el nivel para aplicarlo después de cargar las competencias
+                window.nivelPendiente = indiceNivel;
+            }
+
+            console.log('Empleado seleccionado:', empleadoId);
+            
+            // Cargar competencias Y LUEGO aplicar el nivel
+            cargarCompetencias();
+            validarPeriodoEmpleado();
+        }
+        
+        // Función para mapear nivel ocupacional texto a índice
+        function obtenerIndiceNivelOcupacional(nivelTexto) {
+            if (!nivelTexto) return -1;
+            
+            const niveles = [
+                'Hacemos que las cosas pasen (Ejecutando)',
+                'Gestores de experiencias (Gestionando)',
+                'Potenciando equipos (Potenciando)',
+                'Empoderando y fomentando (Dando forma)',
+                'Liderazgo estratégico (Liderando)'
+            ];
+            
+            // Buscar coincidencia exacta
+            const indice = niveles.findIndex(nivel => nivel === nivelTexto);
+            if (indice !== -1) return indice;
+            
+            // Buscar coincidencia parcial (por si el formato cambió)
+            const nivelLower = nivelTexto.toLowerCase();
+            if (nivelLower.includes('ejecutando')) return 0;
+            if (nivelLower.includes('gestionando')) return 1;
+            if (nivelLower.includes('potenciando')) return 2;
+            if (nivelLower.includes('dando forma')) return 3;
+            if (nivelLower.includes('liderando')) return 4;
+            
+            return -1;
+        }
+
+        function setEstadoValidacion(duplicada, mensaje) {
+            const aviso = document.getElementById('validacion-periodo');
+            const botonGuardar = document.getElementById('btnGuardarEvaluacion');
+
+            window.EVALUACION_DUPLICADA = duplicada;
+
+            if (aviso) {
+                aviso.style.display = duplicada ? 'block' : 'none';
+                aviso.textContent = duplicada ? mensaje : '';
+            }
+
+            // Bloquear/desbloquear campo de período (solo estilo visual ya que es readonly)
+            const periodoTexto = document.getElementById('periodo-texto');
+            if (periodoTexto) {
+                periodoTexto.style.opacity = duplicada ? '0.6' : '1';
+            }
+
+            // Mantener selector de empleado SIEMPRE habilitado para permitir cambiar de persona
+            const empleadoSelect = document.getElementById('empleado-select');
+            if (empleadoSelect) {
+                empleadoSelect.disabled = false;
+                empleadoSelect.style.opacity = '1';
+                empleadoSelect.style.cursor = 'pointer';
+            }
+
+            const nivelOcupacional = document.getElementById('nivel-ocupacional');
+            if (nivelOcupacional) {
+                nivelOcupacional.disabled = duplicada;
+                nivelOcupacional.style.opacity = duplicada ? '0.6' : '1';
+                nivelOcupacional.style.cursor = duplicada ? 'not-allowed' : 'pointer';
+            }
+
+            // Bloquear/desbloquear botón de guardar
+            if (botonGuardar) {
+                botonGuardar.disabled = duplicada;
+                botonGuardar.style.opacity = duplicada ? '0.6' : '1';
+                botonGuardar.style.cursor = duplicada ? 'not-allowed' : 'pointer';
+                if (duplicada) {
+                    botonGuardar.title = mensaje;
+                } else {
+                    botonGuardar.removeAttribute('title');
+                }
+            }
+
+            // Bloquear/desbloquear botón alternativo
+            const btnGuardarAlternativo = document.querySelector('button[onclick="guardarEvaluacionCompleta()"]');
+            if (btnGuardarAlternativo) {
+                btnGuardarAlternativo.disabled = duplicada;
+                btnGuardarAlternativo.style.opacity = duplicada ? '0.6' : '1';
+                btnGuardarAlternativo.style.cursor = duplicada ? 'not-allowed' : 'pointer';
+            }
+
+            // Bloquear/desbloquear todos los radio buttons de calificación
+            const radioButtons = document.querySelectorAll('input[type="radio"][name^="calif-"]');
+            radioButtons.forEach(radio => {
+                radio.disabled = duplicada;
+                if (duplicada) {
+                    radio.style.cursor = 'not-allowed';
+                } else {
+                    radio.style.cursor = 'pointer';
+                }
+            });
+
+            // Bloquear/desbloquear campos de observaciones
+            const observaciones = document.querySelectorAll('textarea[id^="observaciones-"]');
+            observaciones.forEach(textarea => {
+                textarea.disabled = duplicada;
+                textarea.style.opacity = duplicada ? '0.6' : '1';
+                textarea.style.cursor = duplicada ? 'not-allowed' : 'text';
+            });
+
+            // Bloquear/desbloquear comentarios generales
+            const comentariosGenerales = document.getElementById('comentariosGenerales');
+            if (comentariosGenerales) {
+                comentariosGenerales.disabled = duplicada;
+                comentariosGenerales.style.opacity = duplicada ? '0.6' : '1';
+                comentariosGenerales.style.cursor = duplicada ? 'not-allowed' : 'text';
+            }
+        }
+
+        function validarPeriodoEmpleado() {
+            const empleadoId = document.getElementById('empleado-select')?.value;
+            const periodo = document.getElementById('periodo-select')?.value;
+
+            if (!empleadoId || !periodo) {
+                setEstadoValidacion(false, '');
+                return;
+            }
+
+            fetchWithTimeout(`/api/evaluaciones/empleado/${empleadoId}`, { headers: getHeaders() })
+                .then(response => response.json())
+                .then(evaluaciones => {
+                    const esAutoevaluacion = typeof window !== 'undefined' && window.AUTOEVALUACION === true;
+                    const existe = evaluaciones.some(ev =>
+                        ev.periodo === periodo &&
+                        Boolean(ev.autoevaluacion) === Boolean(esAutoevaluacion)
+                    );
+
+                    if (existe) {
+                        const mensaje = esAutoevaluacion
+                            ? `Ya existe una autoevaluación para el período ${periodo}.`
+                            : `Ya existe una evaluación para el período ${periodo}.`;
+                        setEstadoValidacion(true, mensaje);
+                    } else {
+                        setEstadoValidacion(false, '');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error validando período:', error);
+                    setEstadoValidacion(false, '');
+                });
+        }
+
+        // Cargar todas las competencias
+        function cargarCompetencias() {
+            fetchWithTimeout('/api/competencias')
+                .then(response => response.json())
+                .then(competencias => {
+                    const competenciasSinKpi = (competencias || []).filter(comp => comp.id !== 7);
+                    const solicitudes = competenciasSinKpi.map(comp =>
+                        fetchWithTimeout(`/api/competencias/${comp.id}`).then(r => r.json())
+                    );
+                    return Promise.all(solicitudes);
+                })
+                .then(competenciasCompletas => {
+                    const listaFinal = [...competenciasCompletas].sort((a, b) => (a.id || 99) - (b.id || 99));
+                    const competenciaKpi = construirCompetenciaKpi(empleadoActual);
+                    if (competenciaKpi) {
+                        listaFinal.push(competenciaKpi);
+                    }
+                    
+                    // Inicializar competencias
+                    competenciaEvaluador.inicializarCompetencias(listaFinal);
+                    
+                    // CRÍTICO: Si hay un nivel pendiente, aplicarlo AHORA
+                    if (typeof window.nivelPendiente !== 'undefined') {
+                        console.log('🎯 Aplicando nivel pendiente:', window.nivelPendiente);
+                        competenciaEvaluador.setNivelOcupacional(window.nivelPendiente);
+                        window.nivelPendiente = undefined; // Limpiar
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al cargar competencias:', error);
+                    document.getElementById('competencia-container').innerHTML =
+                        '<div class="error">Error al cargar competencias. Reintentar.</div>';
+                });
+        }
+
+        // El nivel ocupacional ahora es de solo lectura (se setea automáticamente al seleccionar empleado)
+
+        // Guardar evaluación completa
+        function guardarEvaluacionCompleta() {
+            const empleadoId = document.getElementById('empleado-select').value;
+            const periodo = document.getElementById('periodo-select').value;
+
+            if (!empleadoId || !periodo) {
+                alert('Por favor seleccione empleado y período');
+                return;
+            }
+
+            if (window.EVALUACION_DUPLICADA) {
+                alert('Ya existe una evaluación para este período. Seleccione otro período.');
+                return;
+            }
+
+            // Validar que todas las calificaciones estén completas
+            const validacion = competenciaEvaluador.validarCalificacionesCompletas();
+            if (!validacion.valido) {
+                alert(validacion.mensaje);
+                return;
+            }
+
+            const datos = competenciaEvaluador.obtenerDatosEvaluacion();
+            if (!datos || datos.competencias.length === 0) {
+                alert('Por favor complete la evaluación');
+                return;
+            }
+
+            // Llamar a la función de guardado del objeto competenciaEvaluador
+            competenciaEvaluador.guardarEvaluacion();
+        }
+
+        // Función logout
+        async function logout() {
+            try {
+                const token = sessionStorage.getItem('token');
+                if (token) {
+                    // Llamar al backend para cerrar sesión en la BD
+                    await fetch('/api/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                }
+            } catch (error) {
+                console.log('Error al cerrar sesión:', error);
+            } finally {
+                // Siempre limpiar sessionStorage y redirigir
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('usuario');
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+    <script src="keep-alive.js"></script>
+</body>
+</html>

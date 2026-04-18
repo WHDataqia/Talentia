@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Tablas Maestras</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab:hover {
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-add {
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+
+        .btn-add:hover {
+            background: #218838;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .btn-edit, .btn-delete {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .btn-edit {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #138496;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .close-modal {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .btn-save {
+            padding: 10px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .btn-cancel {
+            padding: 10px 24px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .navigation {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .nav-link {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-link.active {
+            background: #764ba2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Gestión de Tablas Maestras</h1>
+            <p class="subtitle">Administración de Empresas, Cargos y Centros de Costo</p>
+            <button onclick="logout()" style="position: absolute; top: 20px; right: 20px; padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: 500;">🚪 Salir</button>
+        </header>
+
+        <div class="content">
+            <div class="navigation">
+                <button class="nav-link" onclick="window.location.href='index.html'">🏠 Inicio</button>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('empresas')">🏢 Empresas</button>
+                <button class="tab" onclick="showTab('cargos')">💼 Cargos</button>
+                <button class="tab" onclick="showTab('centros')">🏬 Centros de Costo</button>
+            </div>
+
+            <!-- Tab Empresas -->
+            <div id="tab-empresas" class="tab-content active">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>Empresas</h2>
+                        <button class="btn-add" onclick="openModalEmpresa()">➕ Nueva Empresa</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Razón Social</th>
+                                <th>NIT</th>
+                                <th>Ciudad</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="empresasBody">
+                            <tr>
+                                <td colspan="4" style="text-align: center;">Cargando...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab Cargos -->
+            <div id="tab-cargos" class="tab-content">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>Cargos</h2>
+                        <button class="btn-add" onclick="openModalCargo()">➕ Nuevo Cargo</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cargosBody">
+                            <tr>
+                                <td colspan="3" style="text-align: center;">Cargando...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab Centros de Costo -->
+            <div id="tab-centros" class="tab-content">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>Centros de Costo</h2>
+                        <button class="btn-add" onclick="openModalCentro()">➕ Nuevo Centro de Costo</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="centrosBody">
+                            <tr>
+                                <td colspan="3" style="text-align: center;">Cargando...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Empresa -->
+    <div id="modalEmpresa" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('modalEmpresa')">&times;</span>
+            <h2 id="tituloModalEmpresa">Nueva Empresa</h2>
+            <form id="formEmpresa">
+                <input type="hidden" id="empresaId">
+                <div class="form-group">
+                    <label for="razonSocial">Razón Social *</label>
+                    <input type="text" id="razonSocial" required
+                           maxlength="150" title="Máximo 150 caracteres">
+                </div>
+                <div class="form-group">
+                    <label for="nit">NIT *</label>
+                    <input type="text" id="nit" required
+                           maxlength="12" pattern="[0-9]{6,10}-[0-9]"
+                           placeholder="xxxxxxxxx-x"
+                           title="Formato: dígitos-dígito verificador (ej: 900123456-7)"
+                           oninput="this.value=this.value.replace(/[^0-9-]/g,'')">
+                </div>
+                <div class="form-group">
+                    <label for="ciudad">Ciudad</label>
+                    <input type="text" id="ciudad" maxlength="80">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal('modalEmpresa')">Cancelar</button>
+                    <button type="submit" class="btn-save">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Cargo -->
+    <div id="modalCargo" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('modalCargo')">&times;</span>
+            <h2 id="tituloModalCargo">Nuevo Cargo</h2>
+            <form id="formCargo">
+                <input type="hidden" id="cargoId">
+                <div class="form-group">
+                    <label for="cargoNombre">Nombre *</label>
+                    <input type="text" id="cargoNombre" required
+                           maxlength="100" title="Máximo 100 caracteres">
+                </div>
+                <div class="form-group">
+                    <label for="cargoDescripcion">Descripción</label>
+                    <textarea id="cargoDescripcion" maxlength="300"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal('modalCargo')">Cancelar</button>
+                    <button type="submit" class="btn-save">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Centro de Costo -->
+    <div id="modalCentro" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('modalCentro')">&times;</span>
+            <h2 id="tituloModalCentro">Nuevo Centro de Costo</h2>
+            <form id="formCentro">
+                <input type="hidden" id="centroId">
+                <div class="form-group">
+                    <label for="centroNombre">Nombre *</label>
+                    <input type="text" id="centroNombre" required
+                           maxlength="100" title="Máximo 100 caracteres">
+                </div>
+                <div class="form-group">
+                    <label for="centroDescripcion">Descripción</label>
+                    <textarea id="centroDescripcion" maxlength="300"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal('modalCentro')">Cancelar</button>
+                    <button type="submit" class="btn-save">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '/api';
+
+        // Verificar autenticación
+        if (!sessionStorage.getItem('token')) {
+            window.location.href = 'login.html';
+        }
+
+        // Verificar que sea admin
+        const usuarioStr = sessionStorage.getItem('usuario');
+        if (usuarioStr) {
+            const usuario = JSON.parse(usuarioStr);
+            if (usuario.rol !== 'admin') {
+                alert('❌ Solo administradores pueden acceder a esta página.');
+                window.location.href = 'index.html';
+            }
+        }
+
+        function getToken() {
+            return sessionStorage.getItem('token');
+        }
+
+        function getHeaders() {
+            return {
+                'Authorization': `Bearer ${getToken()}`,
+                'Content-Type': 'application/json'
+            };
+        }
+
+        // Manejar sesión expirada (después de 1 hora de inactividad)
+        function handleSessionExpired() {
+            const mensajeExpiracion = `
+╔════════════════════════════════════════╗
+║     SESIÓN EXPIRADA                    ║
+╠════════════════════════════════════════╣
+║ Tu sesión ha caducado por inactividad  ║
+║ durante más de 1 hora.                 ║
+║                                        ║
+║ Por favor, inicia sesión nuevamente.   ║
+╚════════════════════════════════════════╝
+            `;
+            console.warn(mensajeExpiracion);
+            
+            // Limpiar datos de sesión
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('usuario');
+            
+            // Mostrar alerta al usuario
+            alert('Tu sesión ha expirado.\n\nPor favor, inicia sesión nuevamente.');
+            
+            // Redirigir a login
+            window.location.href = 'login.html';
+        }
+        
+        // Función para chequear respuesta y manejar 401
+        async function fetchConValidacionSesion(url, options = {}) {
+            const response = await fetch(url, options);
+            
+            // Si es 401 (Unauthorized), la sesión expiró
+            if (response.status === 401) {
+                handleSessionExpired();
+                return null;
+            }
+            
+            return response;
+        }
+
+        function logout() {
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('usuario');
+            window.location.href = 'login.html';
+        }
+
+        // Tabs
+        function showTab(tabName) {
+            // Ocultar todos los tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Mostrar tab seleccionado
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // ==================== EMPRESAS ====================
+
+        async function loadEmpresas() {
+            try {
+                const response = await fetchConValidacionSesion(`${API_URL}/empresas`, {
+                    headers: getHeaders()
+                });
+                if (!response) return; // Si fetchConValidacionSesion retorna null, handleSessionExpired() ya redirigió
+                const empresas = await response.json();
+                renderEmpresas(empresas);
+            } catch (error) {
+                console.error('Error cargando empresas:', error);
+            }
+        }
+
+        function renderEmpresas(empresas) {
+            const tbody = document.getElementById('empresasBody');
+            if (empresas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No hay empresas registradas</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = empresas.map(emp => `
+                <tr>
+                    <td>${emp.razon_social}</td>
+                    <td>${emp.nit}</td>
+                    <td>${emp.ciudad || '-'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-edit" onclick="editarEmpresa(${emp.id})">✏️ Editar</button>
+                            <button class="btn-delete" onclick="eliminarEmpresa(${emp.id}, '${emp.razon_social}')">🗑️ Eliminar</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openModalEmpresa(id = null) {
+            document.getElementById('modalEmpresa').style.display = 'block';
+            document.getElementById('formEmpresa').reset();
+            document.getElementById('empresaId').value = '';
+            document.getElementById('tituloModalEmpresa').textContent = 'Nueva Empresa';
+        }
+
+        async function editarEmpresa(id) {
+            try {
+                const response = await fetch(`${API_URL}/empresas/${id}`, {
+                    headers: getHeaders()
+                });
+                const empresa = await response.json();
+
+                document.getElementById('empresaId').value = empresa.id;
+                document.getElementById('razonSocial').value = empresa.razon_social;
+                document.getElementById('nit').value = empresa.nit;
+                document.getElementById('ciudad').value = empresa.ciudad || '';
+                document.getElementById('tituloModalEmpresa').textContent = 'Editar Empresa';
+                document.getElementById('modalEmpresa').style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar empresa');
+            }
+        }
+
+        document.getElementById('formEmpresa').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('empresaId').value;
+            const data = {
+                razon_social: document.getElementById('razonSocial').value,
+                nit: document.getElementById('nit').value,
+                ciudad: document.getElementById('ciudad').value
+            };
+
+            try {
+                const url = id ? `${API_URL}/empresas/${id}` : `${API_URL}/empresas`;
+                const method = id ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: getHeaders(),
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('✅ Empresa guardada exitosamente');
+                    closeModal('modalEmpresa');
+                    loadEmpresas();
+                } else {
+                    const error = await response.json();
+                    alert('❌ Error: ' + error.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al guardar empresa');
+            }
+        });
+
+        async function eliminarEmpresa(id, nombre) {
+            if (!confirm(`¿Estás seguro de eliminar la empresa "${nombre}"?`)) return;
+
+            try {
+                const response = await fetch(`${API_URL}/empresas/${id}`, {
+                    method: 'DELETE',
+                    headers: getHeaders()
+                });
+
+                if (response.ok) {
+                    alert('✅ Empresa eliminada');
+                    loadEmpresas();
+                } else {
+                    alert('❌ Error al eliminar empresa');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al eliminar empresa');
+            }
+        }
+
+        // ==================== CARGOS ====================
+
+        async function loadCargos() {
+            try {
+                const response = await fetchConValidacionSesion(`${API_URL}/cargos`, {
+                    headers: getHeaders()
+                });
+                if (!response) return; // Si fetchConValidacionSesion retorna null, handleSessionExpired() ya redirigió
+                const cargos = await response.json();
+                renderCargos(cargos);
+            } catch (error) {
+                console.error('Error cargando cargos:', error);
+            }
+        }
+
+        function renderCargos(cargos) {
+            const tbody = document.getElementById('cargosBody');
+            if (cargos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">No hay cargos registrados</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = cargos.map(cargo => `
+                <tr>
+                    <td>${cargo.nombre}</td>
+                    <td>${cargo.descripcion || '-'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-edit" onclick="editarCargo(${cargo.id})">✏️ Editar</button>
+                            <button class="btn-delete" onclick="eliminarCargo(${cargo.id}, '${cargo.nombre}')">🗑️ Eliminar</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openModalCargo() {
+            document.getElementById('modalCargo').style.display = 'block';
+            document.getElementById('formCargo').reset();
+            document.getElementById('cargoId').value = '';
+            document.getElementById('tituloModalCargo').textContent = 'Nuevo Cargo';
+        }
+
+        async function editarCargo(id) {
+            try {
+                const response = await fetch(`${API_URL}/cargos/${id}`, {
+                    headers: getHeaders()
+                });
+                const cargo = await response.json();
+
+                document.getElementById('cargoId').value = cargo.id;
+                document.getElementById('cargoNombre').value = cargo.nombre;
+                document.getElementById('cargoDescripcion').value = cargo.descripcion || '';
+                document.getElementById('tituloModalCargo').textContent = 'Editar Cargo';
+                document.getElementById('modalCargo').style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar cargo');
+            }
+        }
+
+        document.getElementById('formCargo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('cargoId').value;
+            const data = {
+                nombre: document.getElementById('cargoNombre').value,
+                descripcion: document.getElementById('cargoDescripcion').value
+            };
+
+            try {
+                const url = id ? `${API_URL}/cargos/${id}` : `${API_URL}/cargos`;
+                const method = id ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: getHeaders(),
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('✅ Cargo guardado exitosamente');
+                    closeModal('modalCargo');
+                    loadCargos();
+                } else {
+                    const error = await response.json();
+                    alert('❌ Error: ' + error.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al guardar cargo');
+            }
+        });
+
+        async function eliminarCargo(id, nombre) {
+            if (!confirm(`¿Estás seguro de eliminar el cargo "${nombre}"?`)) return;
+
+            try {
+                const response = await fetch(`${API_URL}/cargos/${id}`, {
+                    method: 'DELETE',
+                    headers: getHeaders()
+                });
+
+                if (response.ok) {
+                    alert('✅ Cargo eliminado');
+                    loadCargos();
+                } else {
+                    alert('❌ Error al eliminar cargo');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al eliminar cargo');
+            }
+        }
+
+        // ==================== CENTROS DE COSTO ====================
+
+        async function loadCentros() {
+            try {
+                const response = await fetchConValidacionSesion(`${API_URL}/centros-costo`, {
+                    headers: getHeaders()
+                });
+                if (!response) return; // Si fetchConValidacionSesion retorna null, handleSessionExpired() ya redirigió
+                const centros = await response.json();
+                renderCentros(centros);
+            } catch (error) {
+                console.error('Error cargando centros:', error);
+            }
+        }
+
+        function renderCentros(centros) {
+            const tbody = document.getElementById('centrosBody');
+            if (centros.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">No hay centros de costo registrados</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = centros.map(centro => `
+                <tr>
+                    <td>${centro.nombre}</td>
+                    <td>${centro.descripcion || '-'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-edit" onclick="editarCentro(${centro.id})">✏️ Editar</button>
+                            <button class="btn-delete" onclick="eliminarCentro(${centro.id}, '${centro.nombre}')">🗑️ Eliminar</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openModalCentro() {
+            document.getElementById('modalCentro').style.display = 'block';
+            document.getElementById('formCentro').reset();
+            document.getElementById('centroId').value = '';
+            document.getElementById('tituloModalCentro').textContent = 'Nuevo Centro de Costo';
+        }
+
+        async function editarCentro(id) {
+            try {
+                const response = await fetch(`${API_URL}/centros-costo/${id}`, {
+                    headers: getHeaders()
+                });
+                const centro = await response.json();
+
+                document.getElementById('centroId').value = centro.id;
+                document.getElementById('centroNombre').value = centro.nombre;
+                document.getElementById('centroDescripcion').value = centro.descripcion || '';
+                document.getElementById('tituloModalCentro').textContent = 'Editar Centro de Costo';
+                document.getElementById('modalCentro').style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar centro de costo');
+            }
+        }
+
+        document.getElementById('formCentro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('centroId').value;
+            const data = {
+                nombre: document.getElementById('centroNombre').value,
+                descripcion: document.getElementById('centroDescripcion').value
+            };
+
+            try {
+                const url = id ? `${API_URL}/centros-costo/${id}` : `${API_URL}/centros-costo`;
+                const method = id ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: getHeaders(),
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('✅ Centro de costo guardado exitosamente');
+                    closeModal('modalCentro');
+                    loadCentros();
+                } else {
+                    const error = await response.json();
+                    alert('❌ Error: ' + error.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al guardar centro de costo');
+            }
+        });
+
+        async function eliminarCentro(id, nombre) {
+            if (!confirm(`¿Estás seguro de eliminar el centro de costo "${nombre}"?`)) return;
+
+            try {
+                const response = await fetch(`${API_URL}/centros-costo/${id}`, {
+                    method: 'DELETE',
+                    headers: getHeaders()
+                });
+
+                if (response.ok) {
+                    alert('✅ Centro de costo eliminado');
+                    loadCentros();
+                } else {
+                    alert('❌ Error al eliminar centro de costo');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al eliminar centro de costo');
+            }
+        }
+
+        // Modal close
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Cargar datos al inicio
+        loadEmpresas();
+        loadCargos();
+        loadCentros();
+    </script>
+    <script src="keep-alive.js"></script>
+    <footer style="background: #f8f9fa; padding: 15px; text-align: center; color: #666; border-top: 1px solid #dee2e6; margin-top: 20px;">
+        <p>&copy; 2026 Bluedoors-Talentia. Desarrollado por Wilson Herrera.</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe Comparativo de Evaluación - Talentia</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .comparativo-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1200px) {
+            .comparativo-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .evaluacion-panel {
+            border: 2px solid #667eea;
+            padding: 20px;
+            border-radius: 10px;
+            background: #f9f9ff;
+        }
+
+        .evaluacion-panel.autoevaluacion {
+            border-color: #28a745;
+            background: #f9fff9;
+        }
+
+        .evaluacion-panel h3 {
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid;
+            margin-bottom: 15px;
+        }
+
+        .evaluacion-panel.autoevaluacion h3 {
+            border-bottom-color: #28a745;
+            color: #28a745;
+        }
+
+        .evaluacion-panel h3::before {
+            content: "👨‍💼 ";
+        }
+
+        .evaluacion-panel.autoevaluacion h3::before {
+            content: "🧍 ";
+        }
+
+        .info-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .info-item {
+            display: inline-flex;
+            align-items: baseline;
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
+
+        .info-item label {
+            font-weight: bold;
+            color: #555;
+            margin-right: 8px;
+            font-size: 0.95em;
+            white-space: nowrap;
+        }
+
+        .info-item span {
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        .score-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .score-badge.excelente {
+            background: #10b981;
+        }
+
+        .score-badge.bueno {
+            background: #3b82f6;
+        }
+
+        .score-badge.satisfactorio {
+            background: #f59e0b;
+        }
+
+        .score-badge.mejora {
+            background: #ef4444;
+        }
+
+        .competencias-comparativo {
+            margin-top: 30px;
+        }
+
+        .competencias-comparativo table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .competencias-comparativo th,
+        .competencias-comparativo td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .competencias-comparativo th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .competencias-comparativo tr:hover {
+            background: #f5f5f5;
+        }
+
+        .puntuacion {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .diferencia {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .diferencia.positiva {
+            color: #10b981;
+        }
+
+        .diferencia.negativa {
+            color: #ef4444;
+        }
+
+        .diferencia.equilibrada {
+            color: #667eea;
+        }
+
+        .resumen-comparativo {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .resumen-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .resumen-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .resumen-item label {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .resumen-item .valor {
+            font-size: 1.4em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .no-data {
+            padding: 20px;
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .action-buttons {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #764ba2;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-tertiary {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-tertiary:hover {
+            background: #c82333;
+        }
+
+        /* Estilos para el gráfico y resultados */
+        .chart-section {
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+
+        .resultado-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 900px;
+            min-height: 600px;
+            position: relative;
+        }
+
+        .chart-container canvas {
+            max-height: 600px;
+        }
+
+        .interpretacion-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .interpretacion-card h3 {
+            margin: 0 0 15px;
+            color: #2d5fbf;
+            font-size: 1.15em;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .interpretacion-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .interpretacion-item {
+            display: flex;
+            flex-direction: column;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .interpretacion-badge {
+            color: #fff;
+            font-weight: bold;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95em;
+            text-align: center;
+            word-wrap: break-word;
+            white-space: normal;
+            line-height: 1.3;
+            min-height: 50px;
+            -webkit-print-color-adjust: exact;
+            color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .interpretacion-badge.badge-alta {
+            background: #c85a17;
+            -webkit-print-color-adjust: exact;
+            color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .interpretacion-badge.badge-moderada {
+            background: #2d5a1f;
+            -webkit-print-color-adjust: exact;
+            color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .interpretacion-badge.badge-baja {
+            background: #7cb342;
+            -webkit-print-color-adjust: exact;
+            color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .interpretacion-text {
+            background: #f5f5f5;
+            padding: 12px;
+            font-size: 0.92em;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            min-height: 60px;
+            -webkit-print-color-adjust: exact;
+            color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        @media (max-width: 900px) {
+            .interpretacion-container {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+
+        @media print {
+            .action-buttons {
+                display: none;
+            }
+            header button {
+                display: none;
+            }
+            .employee-info {
+                padding: 10px;
+                margin-bottom: 15px;
+            }
+            .employee-info h2 {
+                margin-bottom: 8px;
+                font-size: 1.1em;
+            }
+            .info-grid {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            .info-item {
+                display: inline-flex;
+                align-items: baseline;
+                margin-right: 0;
+                margin-bottom: 0;
+                padding: 0;
+                border: none;
+                min-width: 200px;
+            }
+            .info-item label {
+                font-size: 0.85em;
+                font-weight: bold;
+                margin-right: 5px;
+                white-space: nowrap;
+            }
+            .info-item span {
+                font-size: 0.95em;
+            }
+            .chart-section {
+                margin-top: 20px;
+                margin-bottom: 10px;
+                page-break-inside: avoid;
+            }
+            .resultado-grid {
+                display: block;
+            }
+            .chart-container {
+                height: 540px;
+                min-height: 540px;
+                margin-bottom: 5px;
+                padding: 8px;
+                page-break-after: avoid;
+            }
+            .chart-container canvas {
+                display: block;
+                width: 100% !important;
+                height: 500px !important;
+                max-height: 500px !important;
+            }
+            .interpretacion-card {
+                background: white;
+                border: 1px solid #ddd;
+                padding: 10px;
+                box-shadow: none;
+                page-break-inside: avoid;
+                page-break-before: always;
+                width: 100%;
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+            .interpretacion-card h3 {
+                font-size: 0.95em;
+                color: #2d5fbf;
+                margin: 0 0 8px;
+                padding: 0;
+            }
+            .interpretacion-container {
+                display: flex;
+                flex-direction: row;
+                gap: 10px;
+            }
+            .interpretacion-item {
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 0;
+                page-break-inside: avoid;
+                flex: 1;
+            }
+            .interpretacion-badge {
+                font-size: 0.8em;
+                padding: 6px;
+                white-space: normal;
+                overflow-wrap: break-word;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .interpretacion-text {
+                background: #e8f5e9;
+                border: 1px solid #c8e6c9;
+                font-size: 0.8em;
+                padding: 6px;
+                word-wrap: break-word;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Informe Comparativo de Evaluación</h1>
+            <p class="subtitle">Evaluación vs Autoevaluación</p>
+            <button onclick="logout()" style="position: absolute; top: 20px; right: 20px; padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: 500;">🚪 Salir</button>
+        </header>
+
+        <div class="content">
+            <div class="action-buttons">
+                <a href="index.html" class="btn btn-primary" style="text-decoration: none;">🏠 Inicio</a>
+                <button onclick="window.history.back()" class="btn btn-secondary">← Volver</button>
+                <button onclick="window.print()" class="btn btn-tertiary">🖨️ Imprimir</button>
+            </div>
+
+            <div id="loading" style="text-align: center; padding: 40px;">
+                <p>⏳ Cargando informe comparativo...</p>
+            </div>
+
+            <div id="content" style="display: none;">
+                <!-- Información del Empleado -->
+                <div class="employee-info" id="employeeInfo">
+                    <h2>Información del Empleado</h2>
+                    <div class="info-grid" id="infoGrid">
+                        <p>Cargando...</p>
+                    </div>
+                </div>
+
+                <!-- Grafico comparativo (araña) -->
+                <div class="chart-section">
+                    <h2>Resultado de la Evaluación de Desempeño (Comparativo)</h2>
+                    <div class="resultado-grid">
+                        <div class="chart-container">
+                            <canvas id="spiderChartComparativo"></canvas>
+                        </div>
+                        <div class="interpretacion-card">
+                            <h3>Interpretación de Resultados</h3>
+                            <div class="interpretacion-container">
+                                <div class="interpretacion-item">
+                                    <div class="interpretacion-badge badge-alta">Brecha Alta</div>
+                                    <div class="interpretacion-text">Cumple con el perfil del cargo entre un 50% y un 80%</div>
+                                </div>
+                                <div class="interpretacion-item">
+                                    <div class="interpretacion-badge badge-moderada">Brecha Moderada</div>
+                                    <div class="interpretacion-text">Cumple con el perfil del cargo entre un 81% y un 90%</div>
+                                </div>
+                                <div class="interpretacion-item">
+                                    <div class="interpretacion-badge badge-baja">Brecha Baja</div>
+                                    <div class="interpretacion-text">Cumple con el perfil con más del 90%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Plan de Formación (solo evaluación) -->
+                <div class="plan-formacion-section">
+                    <h2>Plan de Formación 70-20-10 (Evaluación)</h2>
+                    <table class="plan-formacion-table">
+                        <thead>
+                            <tr>
+                                <th>Tipo de Formación</th>
+                                <th>Porcentaje</th>
+                                <th>Oportunidad de Desarrollo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="planFormacionBodyEval">
+                            <tr><td colspan="3" style="text-align: center;">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Tabla Comparativa de Competencias -->
+                <div class="competencias-comparativo" id="competenciasComparativo">
+                    <h2>Comparación de Competencias</h2>
+                    <table id="competenciasTable">
+                        <thead>
+                            <tr>
+                                <th>Competencia</th>
+                                <th style="text-align: center;">Puntuación Eval.</th>
+                                <th style="text-align: center;">Nivel Eval.</th>
+                                <th>Observaciones Eval.</th>
+                                <th style="text-align: center;">Puntuación Auto</th>
+                                <th style="text-align: center;">Nivel Auto</th>
+                                <th>Observaciones Auto</th>
+                                <th style="text-align: center;">Diferencia</th>
+                            </tr>
+                        </thead>
+                        <tbody id="competenciasBody">
+                            <tr><td colspan="8" style="text-align: center;">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Resumen Comparativo -->
+                <div class="resumen-comparativo">
+                    <h2>Resumen Comparativo</h2>
+                    <div class="resumen-grid">
+                        <div class="resumen-item">
+                            <label>Promedio Evaluación:</label>
+                            <div class="valor" id="promedioEvaluacion">-</div>
+                        </div>
+                        <div class="resumen-item">
+                            <label>Promedio Autoevaluación:</label>
+                            <div class="valor" id="promedioAutoevaluacion">-</div>
+                        </div>
+                        <div class="resumen-item">
+                            <label>Diferencia de Promedios:</label>
+                            <div class="valor" id="diferenciaProm">-</div>
+                        </div>
+                        <div class="resumen-item">
+                            <label>Análisis:</label>
+                            <div class="valor" id="analisisText" style="font-size: 0.95em; color: #666;">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comentarios Generales (Evaluación y Autoevaluación) -->
+                <div class="resumen-comparativo" id="comentariosComparativoSection" style="display: none;">
+                    <h2>Comentarios Generales</h2>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div id="comentariosEvalBox" style="background: #f0f7ff; padding: 15px; border-radius: 8px; border-left: 4px solid #667eea;">
+                            <label style="font-weight: 600; color: #333; display: block; margin-bottom: 8px;">Evaluación del Jefe:</label>
+                            <p id="comentariosEval" style="color: #555; line-height: 1.6; margin: 0;">Sin comentarios</p>
+                        </div>
+                        <div id="comentariosAutoBox" style="background: #f0fff4; padding: 15px; border-radius: 8px; border-left: 4px solid #10b981;">
+                            <label style="font-weight: 600; color: #333; display: block; margin-bottom: 8px;">Autoevaluación:</label>
+                            <p id="comentariosAuto" style="color: #555; line-height: 1.6; margin: 0;">Sin comentarios</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary" id="goalsSectionComparativo" style="display: none;">
+                    <h2>Resultado de Metas</h2>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <label>Meta General:</label>
+                            <span id="goalTarget" style="font-size: 1.3em; color: #28a745; font-weight: bold;">5.0</span>
+                        </div>
+                        <div class="summary-item">
+                            <label>Promedio Alcanzado:</label>
+                            <span id="goalAchieved" class="score-value">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <label>Diferencia:</label>
+                            <span id="goalDifference" style="font-size: 1.3em; font-weight: bold;">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <label>Estado:</label>
+                            <span id="goalStatus" style="font-size: 1.2em; font-weight: bold; padding: 5px 10px; border-radius: 5px; display: inline-block;">-</span>
+                        </div>
+                    </div>
+
+                    <div id="kpiSection" style="display: none; margin-top: 20px; padding: 15px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px;">
+                        <h3 style="margin: 0 0 15px 0; color: #333; font-size: 1.1em;">
+                            ✓ KPIs del Cargo
+                        </h3>
+                        <p id="kpiScore" style="margin: 0 0 12px 0; color: #2d3748; font-weight: 600; font-size: 1rem;">Calificación KPI: <span style="display: inline-block; margin-left: 6px; padding: 4px 12px; border-radius: 999px; background: #6b7280; color: #fff; font-size: 1.25rem; font-weight: 800; letter-spacing: 0.2px;">-</span></p>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+                            <div style="background: white; border-radius: 8px; padding: 10px 12px; border: 1px solid #eceff3;">
+                                <label id="kpiLabel1" style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">KPI 1:</label>
+                                <p id="kpiItem1" style="margin: 0; font-size: 1.1em; font-weight: 700; color: #1f2d3d;">-</p>
+                            </div>
+                            <div style="background: white; border-radius: 8px; padding: 10px 12px; border: 1px solid #eceff3;">
+                                <label id="kpiLabel2" style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">KPI 2:</label>
+                                <p id="kpiItem2" style="margin: 0; font-size: 1.1em; font-weight: 700; color: #1f2d3d;">-</p>
+                            </div>
+                            <div style="background: white; border-radius: 8px; padding: 10px 12px; border: 1px solid #eceff3;">
+                                <label id="kpiLabel3" style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">KPI 3:</label>
+                                <p id="kpiItem3" style="margin: 0; font-size: 1.1em; font-weight: 700; color: #1f2d3d;">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Verificación de autenticación
+        if (!sessionStorage.getItem('token')) {
+            window.location.href = 'login.html';
+        }
+
+        const API_URL = '/api';
+        let currentChart = null;
+
+        function getToken() {
+            return sessionStorage.getItem('token');
+        }
+
+        function getHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getToken()}`
+            };
+        }
+
+        function getURLParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                empleado_id: params.get('empleado_id'),
+                periodo: params.get('periodo'),
+                evaluacion_id: params.get('evaluacion_id'),
+                autoevaluacion_id: params.get('autoevaluacion_id')
+            };
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        function getScoreBadge(score) {
+            if (score >= 4.5) return 'excelente';
+            if (score >= 3.5) return 'bueno';
+            if (score >= 2.5) return 'satisfactorio';
+            return 'mejora';
+        }
+
+        function getLevel(score) {
+            const percentage = Math.round((score / 5) * 100);
+            if (percentage >= 90) {
+                return { text: 'Brecha Baja', class: 'brecha-baja', percentage: percentage };
+            } else if (percentage >= 81) {
+                return { text: 'Brecha Moderada', class: 'brecha-moderada', percentage: percentage };
+            } else if (percentage >= 50) {
+                return { text: 'Brecha Alta', class: 'brecha-alta', percentage: percentage };
+            } else {
+                return { text: 'Brecha Crítica', class: 'brecha-critica', percentage: percentage };
+            }
+        }
+
+        function getKpiBadgeColorByScore(score) {
+            const level = getLevel(score);
+            switch (level.class) {
+                case 'brecha-baja':
+                    return '#7cb342';
+                case 'brecha-moderada':
+                    return '#2d5a1f';
+                case 'brecha-alta':
+                    return '#c85a17';
+                default:
+                    return '#820014';
+            }
+        }
+
+        function normalizarNombreKpi(valor, fallback) {
+            const text = String(valor || '').trim();
+            return text || fallback;
+        }
+
+        function buscarCompetenciaKpi(competencias) {
+            return (competencias || []).find(c =>
+                c?.competencia_id === 7 ||
+                (c?.competencia && c.competencia.toUpperCase().includes('METAS DEL CARGO'))
+            );
+        }
+
+        function parsearKpiDetalleDesdeObservaciones(observacionesRaw) {
+            if (typeof observacionesRaw !== 'string' || !observacionesRaw.trim().startsWith('{')) {
+                return [];
+            }
+            try {
+                const json = JSON.parse(observacionesRaw);
+                if (Array.isArray(json?.kpi_detalle)) {
+                    return json.kpi_detalle;
+                }
+            } catch (e) {
+                // Mantener flujo sin romper vista si observaciones no viene en JSON.
+            }
+            return [];
+        }
+
+        function renderResultadoMetasComparativo(data) {
+            const goalsSection = document.getElementById('goalsSectionComparativo');
+            const kpiSection = document.getElementById('kpiSection');
+            if (!goalsSection || !kpiSection) return;
+
+            const compEval = buscarCompetenciaKpi(data?.evaluacion?.competencias);
+            const compAuto = buscarCompetenciaKpi(data?.autoevaluacion?.competencias);
+            const compFuente = compEval || compAuto;
+
+            if (!compFuente || compFuente.puntuacion == null) {
+                goalsSection.style.display = 'none';
+                goalsSection.style.visibility = 'hidden';
+                return;
+            }
+
+            const promedio = Number(compFuente.puntuacion);
+            const goalTarget = 5.0;
+            const difference = promedio - goalTarget;
+            const goalStatus = document.getElementById('goalStatus');
+
+            document.getElementById('goalAchieved').textContent = Number.isFinite(promedio) ? promedio.toFixed(1) : '0.0';
+            document.getElementById('goalDifference').textContent = Number.isFinite(difference) ? difference.toFixed(2) : '-';
+
+            if (Number.isFinite(promedio) && promedio >= goalTarget) {
+                goalStatus.textContent = '✓ Meta Alcanzada';
+                goalStatus.style.background = '#28a745';
+                goalStatus.style.color = 'white';
+            } else {
+                const faltante = Number.isFinite(difference) ? (goalTarget - promedio).toFixed(2) : '-';
+                goalStatus.textContent = `⚠ Falta ${faltante}`;
+                goalStatus.style.background = '#ffc107';
+                goalStatus.style.color = '#333';
+            }
+
+            goalsSection.style.display = 'block';
+            goalsSection.style.visibility = 'visible';
+            kpiSection.style.display = 'block';
+
+            const toPercent = (value) => {
+                const num = Number(value);
+                if (!Number.isFinite(num)) return 'N/A';
+                return `${((num / 5) * 100).toFixed(1)}%`;
+            };
+
+            const toScoreRaw = (value) => {
+                const num = Number(value);
+                if (!Number.isFinite(num)) return 'N/A';
+                return `${num.toFixed(2).replace(/\.?0+$/, '')} / 5.0`;
+            };
+
+            const nombre1 = normalizarNombreKpi(data?.empleado?.kpi_item_1, 'KPI 1');
+            const nombre2 = normalizarNombreKpi(data?.empleado?.kpi_item_2, 'KPI 2');
+            const nombre3 = normalizarNombreKpi(data?.empleado?.kpi_item_3, 'KPI 3');
+
+            document.getElementById('kpiLabel1').textContent = `${nombre1}:`;
+            document.getElementById('kpiLabel2').textContent = `${nombre2}:`;
+            document.getElementById('kpiLabel3').textContent = `${nombre3}:`;
+
+            const scoreText = `${toScoreRaw(compFuente.puntuacion)} (${toPercent(compFuente.puntuacion)})`;
+            const kpiBadgeColor = getKpiBadgeColorByScore(compFuente.puntuacion);
+            const kpiScore = document.getElementById('kpiScore');
+            kpiScore.innerHTML = `Calificación KPI: <span style="display: inline-block; margin-left: 6px; padding: 4px 12px; border-radius: 999px; background: ${kpiBadgeColor}; color: #fff; font-size: 1.25rem; font-weight: 800; letter-spacing: 0.2px;">${scoreText}</span>`;
+
+            const kpiDetalle = parsearKpiDetalleDesdeObservaciones(compFuente.observaciones);
+            const normalizar = (v) => String(v || '').trim().toLowerCase();
+            const buscarDetallePorNombre = (nombre, idx) => {
+                const encontrado = kpiDetalle.find(item => normalizar(item?.texto) === normalizar(nombre));
+                if (encontrado && encontrado.calificacion != null) {
+                    return toScoreRaw(encontrado.calificacion);
+                }
+                const porIndice = kpiDetalle[idx];
+                if (porIndice && porIndice.calificacion != null) {
+                    return toScoreRaw(porIndice.calificacion);
+                }
+                return toScoreRaw(compFuente.puntuacion);
+            };
+
+            document.getElementById('kpiItem1').textContent = buscarDetallePorNombre(nombre1, 0);
+            document.getElementById('kpiItem2').textContent = buscarDetallePorNombre(nombre2, 1);
+            document.getElementById('kpiItem3').textContent = buscarDetallePorNombre(nombre3, 2);
+        }
+
+        function formatObservations(obsText, competencia) {
+            if (!obsText || !obsText.trim()) return '-';
+            
+            // Si contiene "kpi_detalle", intentar parsear como JSON
+            if (obsText.includes('kpi_detalle')) {
+                try {
+                    const data = JSON.parse(obsText);
+                    const parts = [];
+                    // Mostrar comentario general de la competencia KPI
+                    if (data.comentario && data.comentario.trim()) {
+                        parts.push(data.comentario.trim());
+                    }
+                    if (data.kpi_detalle && Array.isArray(data.kpi_detalle) && data.kpi_detalle.length > 0) {
+                        // Campo correcto es 'texto' (así lo guarda el backend)
+                        const kpiTexts = data.kpi_detalle
+                            .filter(kpi => (kpi.texto && kpi.texto.trim()) || (kpi.observaciones && kpi.observaciones.trim()))
+                            .map(kpi => (kpi.texto || kpi.observaciones).trim())
+                            .join(' | ');
+                        if (kpiTexts) parts.push(kpiTexts);
+                    }
+                    return parts.length > 0 ? parts.join(' — ') : '-';
+                } catch (e) {
+                    // Si falla el parse, devolver el texto original
+                    return obsText.trim() || '-';
+                }
+            }
+            
+            return obsText.trim() || '-';
+        }
+
+        function getClaveCompetenciaCanonica(comp) {
+            if (Number(comp?.competencia_id) === 7) {
+                return 'METAS_KPI';
+            }
+
+            const text = String(comp?.competencia || '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/^\s*\d+\s*[\.)-]?\s*/, '')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .toUpperCase();
+
+            if (text.includes('GESTION OPERATIVA')) return 'C1_GESTION_OPERATIVA';
+            if (text.includes('INNOVACION') && text.includes('MEJORA CONTINUA')) return 'C2_INNOVACION_MEJORA';
+            if (text.includes('FOCO EN EL CLIENTE')) return 'C3_FOCO_CLIENTE';
+            if (text.includes('ORIENTACION AL RESULTADO')) return 'C4_ORIENTACION_RESULTADO';
+            if (text.includes('CONSTRUYENDO') && text.includes('RELACIONES')) return 'C5_RELACIONES_SOLIDAS';
+            if (text.includes('EQUIPOS GANADORES')) return 'C6_EQUIPOS_GANADORES';
+            if (text.includes('METAS') || text.includes('KPI')) return 'METAS_KPI';
+
+            return text;
+        }
+
+        async function cargarInforme() {
+            const params = getURLParams();
+            
+            if (!params.empleado_id || !params.periodo) {
+                document.getElementById('loading').innerHTML = '<p>❌ Parámetros faltantes</p>';
+                return;
+            }
+
+            try {
+                const query = new URLSearchParams();
+                if (params.evaluacion_id) query.set('evaluacion_id', params.evaluacion_id);
+                if (params.autoevaluacion_id) query.set('autoevaluacion_id', params.autoevaluacion_id);
+                const queryStr = query.toString();
+
+                const response = await fetch(
+                    `${API_URL}/evaluaciones/comparativo/${params.empleado_id}/${encodeURIComponent(params.periodo)}${queryStr ? `?${queryStr}` : ''}`,
+                    { headers: getHeaders() }
+                );
+
+                if (response.status === 403) {
+                    document.getElementById('loading').innerHTML = '<p>⛔ No tienes permiso para ver este informe comparativo</p>';
+                    setTimeout(() => window.location.href = 'historial.html', 2000);
+                    return;
+                }
+                
+                if (response.status === 404) {
+                    document.getElementById('loading').innerHTML = '<p>❌ No se encontraron evaluaciones para este empleado y período</p>';
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error('Error al cargar el informe comparativo');
+                }
+
+                const data = await response.json();
+                mostrarInforme(data);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('loading').innerHTML = `<p>❌ Error: ${error.message}</p>`;
+            }
+        }
+
+        function mostrarInforme(data) {
+            // Información del empleado
+            const infoGrid = document.getElementById('infoGrid');
+            const emp = data.empleado;
+            infoGrid.innerHTML = `
+                <div class="info-item">
+                    <label>Nombre:</label>
+                    <span>${emp.nombres_completos} ${emp.apellidos || ''}</span>
+                </div>
+                <div class="info-item">
+                    <label>Identificación:</label>
+                    <span>${emp.identificacion || emp.cedula || '-'}</span>
+                </div>
+                <div class="info-item">
+                    <label>Cargo:</label>
+                    <span>${emp.cargo || emp.cargo_nombre || '-'}</span>
+                </div>
+                <div class="info-item">
+                    <label>Período:</label>
+                    <span>${data.periodo}</span>
+                </div>
+                <div class="info-item">
+                    <label>Evaluado por:</label>
+                    <span>${data.evaluacion?.nombre_evaluador || data.evaluacion?.evaluador || 'No especificado'}</span>
+                </div>
+            `;
+
+            // Tabla comparativa de competencias
+            construirTablaComparativa(data);
+
+            // Grafico comparativo
+            construirGraficoComparativo(data);
+
+            // Resultado de metas + detalle KPI (si aplica)
+            renderResultadoMetasComparativo(data);
+
+            // Plan de formación (solo evaluación)
+            if (data.evaluacion?.id) {
+                loadPlanFormacion(data.evaluacion.id, 'planFormacionBodyEval');
+            } else {
+                renderPlanFormacion([], 'planFormacionBodyEval');
+            }
+
+            // Comentarios generales
+            mostrarComentariosGenerales(data);
+
+            // Resumen comparativo
+            construirResumenComparativo(data);
+
+            // Mostrar contenido
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+        }
+
+        function construirTablaComparativa(data) {
+            const tbody = document.getElementById('competenciasBody');
+            
+            if (!data.evaluacion?.competencias && !data.autoevaluacion?.competencias) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No hay datos de competencias</td></tr>';
+                return;
+            }
+
+            // Consolidar competencias de ambas evaluaciones
+            const competenciasMap = new Map();
+
+            
+            if (data.evaluacion?.competencias) {
+                data.evaluacion.competencias.forEach(c => {
+                    const key = getClaveCompetenciaCanonica(c);
+                    if (competenciasMap.has(key)) return;
+                    competenciasMap.set(key, {
+                        nombre: c.competencia,
+                        puntuacion_evaluacion: c.puntuacion,
+                        observaciones_evaluacion: c.observaciones || ''
+                    });
+                });
+            }
+
+            if (data.autoevaluacion?.competencias) {
+                data.autoevaluacion.competencias.forEach(c => {
+                    const key = getClaveCompetenciaCanonica(c);
+                    if (competenciasMap.has(key)) {
+                        const item = competenciasMap.get(key);
+                        item.puntuacion_autoevaluacion = c.puntuacion;
+                        item.observaciones_autoevaluacion = c.observaciones || '';
+                    } else {
+                        competenciasMap.set(key, {
+                            nombre: c.competencia,
+                            puntuacion_autoevaluacion: c.puntuacion,
+                            observaciones_autoevaluacion: c.observaciones || ''
+                        });
+                    }
+                });
+            }
+
+            // Ordenar competencias por número (C1, C2, ... C6, METAS_KPI al final)
+            const competenciasOrdenadas = Array.from(competenciasMap.entries())
+                .sort(([keyA], [keyB]) => {
+                    const orden = { C1_GESTION_OPERATIVA: 1, C2_INNOVACION_MEJORA: 2, C3_FOCO_CLIENTE: 3, C4_ORIENTACION_RESULTADO: 4, C5_RELACIONES_SOLIDAS: 5, C6_EQUIPOS_GANADORES: 6, METAS_KPI: 99 };
+                    return (orden[keyA] || 50) - (orden[keyB] || 50);
+                })
+                .map(([, val]) => val);
+
+            // Construir filas
+            tbody.innerHTML = competenciasOrdenadas.map(comp => {
+                const puntEval = comp.puntuacion_evaluacion ?? null;
+                const puntAuto = comp.puntuacion_autoevaluacion ?? null;
+                const obsEval = formatObservations(comp.observaciones_evaluacion, comp.nombre);
+                const obsAuto = formatObservations(comp.observaciones_autoevaluacion, comp.nombre);
+                const levelEval = puntEval !== null ? getLevel(puntEval) : null;
+                const levelAuto = puntAuto !== null ? getLevel(puntAuto) : null;
+                const diferencia = puntAuto - puntEval;
+                const claseDif = diferencia > 0 ? 'positiva' : diferencia < 0 ? 'negativa' : 'equilibrada';
+                const textoAbs = isNaN(diferencia) ? '-' : Math.abs(diferencia).toFixed(1);
+
+                return `
+                    <tr>
+                        <td>${comp.nombre}</td>
+                        <td class="puntuacion">${puntEval !== null ? `${levelEval.percentage}%` : '-'}</td>
+                        <td>${levelEval ? `<span class="level-badge level-${levelEval.class}">${levelEval.text}</span>` : '-'}</td>
+                        <td>${obsEval}</td>
+                        <td class="puntuacion">${puntAuto !== null ? `${levelAuto.percentage}%` : '-'}</td>
+                        <td>${levelAuto ? `<span class="level-badge level-${levelAuto.class}">${levelAuto.text}</span>` : '-'}</td>
+                        <td>${obsAuto}</td>
+                        <td class="diferencia ${isNaN(diferencia) ? 'equilibrada' : claseDif}">${isNaN(diferencia) ? '-' : `${diferencia > 0 ? '+' : ''}${textoAbs}`}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function construirGraficoComparativo(data) {
+            const evalComps = data.evaluacion?.competencias || [];
+            const autoComps = data.autoevaluacion?.competencias || [];
+
+            const competenciasMap = new Map();
+
+            evalComps.forEach(c => {
+                const key = getClaveCompetenciaCanonica(c);
+                if (competenciasMap.has(key)) return;
+                competenciasMap.set(key, { nombre: c.competencia, eval: c.puntuacion, auto: null });
+            });
+            autoComps.forEach(c => {
+                const key = getClaveCompetenciaCanonica(c);
+                if (competenciasMap.has(key)) {
+                    competenciasMap.get(key).auto = c.puntuacion;
+                } else {
+                    competenciasMap.set(key, { nombre: c.competencia, eval: null, auto: c.puntuacion });
+                }
+            });
+
+            // Ordenar competencias por número para el gráfico
+            const chartOrdenado = Array.from(competenciasMap.entries())
+                .sort(([keyA], [keyB]) => {
+                    const orden = { C1_GESTION_OPERATIVA: 1, C2_INNOVACION_MEJORA: 2, C3_FOCO_CLIENTE: 3, C4_ORIENTACION_RESULTADO: 4, C5_RELACIONES_SOLIDAS: 5, C6_EQUIPOS_GANADORES: 6, METAS_KPI: 99 };
+                    return (orden[keyA] || 50) - (orden[keyB] || 50);
+                })
+                .map(([, val]) => val);
+
+            const labels = chartOrdenado.map(c => c.nombre);
+            const evalScores = chartOrdenado.map(c => c.eval ?? null);
+            const autoScores = chartOrdenado.map(c => c.auto ?? null);
+
+            const canvas = document.getElementById('spiderChartComparativo');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            currentChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Evaluación',
+                            data: evalScores,
+                            fill: true,
+                            backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                            borderColor: 'rgb(102, 126, 234)',
+                            pointBackgroundColor: 'rgb(102, 126, 234)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(102, 126, 234)',
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        },
+                        {
+                            label: 'Autoevaluación',
+                            data: autoScores,
+                            fill: true,
+                            backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                            borderColor: 'rgb(40, 167, 69)',
+                            pointBackgroundColor: 'rgb(40, 167, 69)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(40, 167, 69)',
+                            pointRadius: 5,
+                            pointHoverRadius: 7
+                        },
+                        {
+                            label: 'Meta (5)',
+                            data: labels.map(() => 5),
+                            fill: true,
+                            backgroundColor: 'rgba(102, 126, 234, 0.05)',
+                            borderColor: 'rgba(102, 126, 234, 0.4)',
+                            borderDash: [5, 5],
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            top: 50,
+                            right: 80,
+                            bottom: 50,
+                            left: 80
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 5,
+                            ticks: {
+                                stepSize: 1,
+                                font: { size: 12 }
+                            },
+                            pointLabels: {
+                                font: { size: 12, weight: 'bold' },
+                                padding: 15
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { font: { size: 14 }, padding: 20 }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Fuerza redibujado del radar al abrir vista de impresión/PDF
+        function refrescarGraficoParaImpresion() {
+            if (!currentChart) return;
+            currentChart.resize();
+            currentChart.update('none');
+        }
+
+        window.addEventListener('beforeprint', refrescarGraficoParaImpresion);
+
+        async function loadPlanFormacion(evaluacionId, bodyId) {
+            try {
+                const response = await fetch(`${API_URL}/evaluaciones/${evaluacionId}/plan-formacion`, { headers: getHeaders() });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                const plans = await response.json();
+
+                if (!plans || plans.length === 0) {
+                    await createDefaultPlanFormacion(evaluacionId, bodyId);
+                    return;
+                }
+
+                renderPlanFormacion(plans, bodyId);
+            } catch (error) {
+                await createDefaultPlanFormacion(evaluacionId, bodyId);
+            }
+        }
+
+        async function createDefaultPlanFormacion(evaluacionId, bodyId) {
+            try {
+                const defaultPlans = [
+                    { tipo_formacion: 'EXPERIENCIA', porcentaje: 70, oportunidad_desarrollo: '' },
+                    { tipo_formacion: 'EXPOSICIÓN', porcentaje: 20, oportunidad_desarrollo: '' },
+                    { tipo_formacion: 'ESTUDIO', porcentaje: 10, oportunidad_desarrollo: '' }
+                ];
+
+                const response = await fetch(`${API_URL}/evaluaciones/${evaluacionId}/plan-formacion`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify(defaultPlans)
+                });
+
+                if (!response.ok) {
+                    renderPlanFormacion(defaultPlans, bodyId);
+                    return;
+                }
+
+                renderPlanFormacion(defaultPlans, bodyId);
+            } catch (error) {
+                renderPlanFormacion([
+                    { tipo_formacion: 'EXPERIENCIA', porcentaje: 70, oportunidad_desarrollo: '' },
+                    { tipo_formacion: 'EXPOSICIÓN', porcentaje: 20, oportunidad_desarrollo: '' },
+                    { tipo_formacion: 'ESTUDIO', porcentaje: 10, oportunidad_desarrollo: '' }
+                ], bodyId);
+            }
+        }
+
+        function renderPlanFormacion(plans, bodyId) {
+            const tbody = document.getElementById(bodyId);
+            if (!plans || plans.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">Sin datos</td></tr>';
+                return;
+            }
+
+            const sortedPlans = plans.sort((a, b) => b.porcentaje - a.porcentaje);
+            tbody.innerHTML = sortedPlans.map(plan => `
+                <tr>
+                    <td>${plan.tipo_formacion}</td>
+                    <td><span class="badge-percentage">${plan.porcentaje}%</span></td>
+                    <td>${plan.oportunidad_desarrollo || ''}</td>
+                </tr>
+            `).join('');
+        }
+
+        function mostrarComentariosGenerales(data) {
+            const comentarioEval = data.evaluacion?.comentarios_generales || '';
+            const comentarioAuto = data.autoevaluacion?.comentarios_generales || '';
+            
+            // Solo mostrar sección si hay al menos un comentario
+            if (comentarioEval.trim() || comentarioAuto.trim()) {
+                document.getElementById('comentariosComparativoSection').style.display = '';
+                document.getElementById('comentariosEval').textContent = comentarioEval.trim() || 'Sin comentarios';
+                document.getElementById('comentariosAuto').textContent = comentarioAuto.trim() || 'Sin comentarios';
+            }
+        }
+
+        function construirResumenComparativo(data) {
+            const prom_eval = data.evaluacion?.promedio_general || 0;
+            const prom_auto = data.autoevaluacion?.promedio_general || 0;
+            const diferencia = prom_auto - prom_eval;
+            
+            document.getElementById('promedioEvaluacion').textContent = 
+                data.evaluacion ? prom_eval.toFixed(2) : '-';
+            document.getElementById('promedioAutoevaluacion').textContent = 
+                data.autoevaluacion ? prom_auto.toFixed(2) : '-';
+            
+            if (data.evaluacion && data.autoevaluacion) {
+                const claseDif = diferencia > 0 ? 'positiva' : diferencia < 0 ? 'negativa' : 'equilibrada';
+                document.getElementById('diferenciaProm').innerHTML = 
+                    `<span style="color: ${claseDif === 'positiva' ? '#10b981' : claseDif === 'negativa' ? '#ef4444' : '#667eea'}">${diferencia > 0 ? '+' : ''}${diferencia.toFixed(2)}</span>`;
+                
+                let analisis = '';
+                if (Math.abs(diferencia) < 0.5) {
+                    analisis = '✓ Coincidencia: La autoevaluación es consistente con la evaluación del jefe.';
+                } else if (diferencia > 0.5) {
+                    analisis = '⚠️ Autoevaluación más alta: El empleado se autoevalúa más favorablemente que la evaluación del jefe.';
+                } else {
+                    analisis = '⚠️ Autoevaluación más baja: El empleado es más crítico consigo mismo que lo que evalúa el jefe.';
+                }
+                document.getElementById('analisisText').textContent = analisis;
+            } else {
+                document.getElementById('diferenciaProm').textContent = '-';
+                document.getElementById('analisisText').textContent = 'No hay ambas evaluaciones para comparar.';
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('usuario');
+            window.location.href = 'login.html';
+        }
+
+        // Cargar informe al inicializar
+        document.addEventListener('DOMContentLoaded', cargarInforme);
+    </script>
+    <script src="keep-alive.js"></script>
+    <footer style="background: #f8f9fa; padding: 15px; text-align: center; color: #666; border-top: 1px solid #dee2e6; margin-top: 20px;">
+        <p>&copy; 2026 Bluedoors-Talentia. Desarrollado por Wilson Herrera.</p>
+    </footer>
+</body>
+</html>

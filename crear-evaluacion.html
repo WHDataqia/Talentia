@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Evaluación - Sistema de Desempeño</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .evaluation-form {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        .form-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .form-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            font-family: inherit;
+        }
+
+        .competency-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .competency-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .competency-name {
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .instructions-box {
+            background: #f3efe3;
+            border: 1px solid #ded6c0;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .instructions-box p {
+            margin: 0 0 8px;
+        }
+
+        .instructions-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .instructions-box .scale-item {
+            margin: 4px 0;
+            font-style: italic;
+        }
+
+        .score-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .score-slider {
+            flex: 1;
+            height: 8px;
+        }
+
+        .score-value {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.2em;
+            min-width: 45px;
+        }
+
+        .navigation {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .nav-link {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .nav-link:hover {
+            background: #764ba2;
+        }
+
+        .preview-section {
+            background: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+        }
+
+        .required {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Nueva Evaluación de Desempeño</h1>
+            <p class="subtitle">Registro de Evaluación de Competencias</p>
+            <button onclick="logout()" style="position: absolute; top: 20px; right: 20px; padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: 500;">🚪 Salir</button>
+        </header>
+
+        <div class="content">
+            <div class="navigation">
+                <a href="index.html" class="nav-link">🏠 Inicio</a>
+                <a href="empleados.html" class="nav-link">👥 Empleados</a>
+                <a href="crear-evaluacion.html" class="nav-link">➕ Nueva Evaluación</a>
+                <a href="evaluacion-competencias.html" class="nav-link" style="background: #28a745;">🎯 Competencias</a>
+                <a href="historial.html" class="nav-link">📜 Historial</a>
+            </div>
+
+            <form id="evaluacionForm" class="evaluation-form">
+                <!-- Información General -->
+                <div class="form-section">
+                    <h3>📋 Información General</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Empleado <span class="required">*</span></label>
+                            <select id="empleadoId" required onchange="actualizarJefe()">
+                                <option value="">Seleccionar empleado...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Jefe Directo</label>
+                            <input type="text" id="jefeNombre" readonly placeholder="Se cargará automáticamente" 
+                                   style="background-color: #f0f0f0; cursor: not-allowed;">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Evaluador <span class="required">*</span></label>
+                            <input type="text" id="evaluador" required placeholder="Nombre del evaluador">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Puesto del Empleado</label>
+                            <input type="text" id="puestoEmpleado" readonly placeholder="Se cargará automáticamente"
+                                   style="background-color: #f0f0f0; cursor: not-allowed;">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Período (Anual) <span class="required">*</span></label>
+                            <input type="text" id="periodo-texto" readonly required
+                                   style="background-color: #f5f5f5; cursor: default;">
+                            <input type="hidden" id="periodo">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Fecha de Evaluación <span class="required">*</span></label>
+                            <input type="date" id="fechaEvaluacion" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Evaluación de Competencias -->
+                <div class="form-section">
+                    <h3>⭐ Evaluación de Competencias (1-5)</h3>
+
+                    <div class="instructions-box">
+                        <p><strong>Instrucciones:</strong> Por favor, complete la totalidad del presente formulario. Recuerde mantener un criterio objetivo durante la evaluacion, ya que los resultados obtenidos seran utilizados para la elaboracion de planes de desarrollo individual.</p>
+                        <p>Evalua al colaborador segun la evidencia observada de los siguientes comportamientos, utilizando la siguiente escala:</p>
+                        <p class="scale-item"><strong>1:</strong> El comportamiento no se evidencia</p>
+                        <p class="scale-item"><strong>2:</strong> El comportamiento se evidencia en pocas ocasiones</p>
+                        <p class="scale-item"><strong>3:</strong> El comportamiento se evidencia con frecuencia</p>
+                        <p class="scale-item"><strong>4:</strong> El comportamiento es sobresaliente</p>
+                        <p class="scale-item"><strong>5:</strong> El comportamiento excede las expectativas</p>
+                        <p>Seleccione la calificacion que mejor represente el desempeno del colaborador en cada criterio.</p>
+                    </div>
+                    
+                    <div id="competenciasContainer">
+                        <!-- Las competencias se generarán dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Comentarios Generales -->
+                <div class="form-section">
+                    <h3>💬 Comentarios Generales</h3>
+                    <div class="form-group">
+                        <textarea id="comentariosGenerales" rows="4" 
+                                  placeholder="Observaciones generales sobre el desempeño del empleado..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Vista Previa del Promedio -->
+                <div class="preview-section">
+                    <h3 style="color: #667eea; margin-bottom: 10px;">📊 Promedio General</h3>
+                    <div style="font-size: 2em; font-weight: bold; color: #667eea;" id="promedioPreview">0</div>
+                    <p style="color: #666; margin-top: 10px;">El promedio se calcula automáticamente</p>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="actions" style="margin-top: 30px;">
+                    <button type="button" onclick="window.location.href='historial.html'" class="btn btn-tertiary">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        💾 Guardar Evaluación
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Verificación INMEDIATA de autenticación (antes de cualquier otra cosa)
+        if (!sessionStorage.getItem('token')) {
+            console.log('❌ No hay token. Redirigiendo a login...');
+            window.location.href = 'login.html';
+        }
+
+        // Verificar rol: solo jefe y admin pueden acceder
+        const usuarioStr = sessionStorage.getItem('usuario');
+        if (usuarioStr) {
+            const usuario = JSON.parse(usuarioStr);
+            if (usuario.rol === 'empleado') {
+                console.log('❌ Empleados no pueden acceder a evaluaciones.');
+                setTimeout(() => {
+                    alert('❌ Solo jefes y administradores pueden crear evaluaciones.');
+                    window.location.href = 'index.html';
+                }, 100);
+            }
+        }
+
+        let API_URL = '/api'; // URL relativa para funcionar con ngrok
+        let empleadosData = []; // Almacenar datos de empleados
+        let competencias = []; // Se cargarán desde la API
+
+        // Funciones de autenticación JWT
+        function getToken() {
+            const token = sessionStorage.getItem('token');
+            console.log('Token recuperado:', token ? '✓ Existe' : '✗ No existe');
+            if (!token) {
+                console.error('❌ No hay token. Redirigiendo a login...');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 500);
+                return null;
+            }
+            return token;
+        }
+
+        // Obtener headers con autenticación
+        function getHeaders() {
+            const token = getToken();
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+            console.log('Headers:', headers);
+            return headers;
+        }
+
+        // Inicializar formulario
+        async function init() {
+            // Establecer fecha actual
+            document.getElementById('fechaEvaluacion').valueAsDate = new Date();
+
+            // Cargar períodos según el año actual
+            cargarPeriodosCrear();
+
+            // Cargar empleados
+            await loadEmpleados();
+
+            // Cargar competencias desde la API
+            await cargarCompetencias();
+
+            // Crear campos de competencias
+            createCompetencyFields();
+
+            // Actualizar promedio en tiempo real
+            setupLivePreview();
+        }
+
+        // Cargar competencias desde la API
+        async function cargarCompetencias() {
+            try {
+                const response = await fetch(`${API_URL}/competencias`, { headers: getHeaders() });
+                const data = await response.json();
+                // Extraer solo los nombres de las competencias, ordenados por número
+                competencias = data
+                    .sort((a, b) => (a.id || 99) - (b.id || 99))
+                    .map(c => c.nombre);
+            } catch (error) {
+                console.error('Error cargando competencias:', error);
+                // Fallback en caso de error
+                competencias = [
+                    '1. GESTIÓN OPERATIVA',
+                    '2. INNOVACIÓN Y MEJORA CONTINUA',
+                    '3. FOCO EN EL CLIENTE',
+                    '4. ORIENTACIÓN AL RESULTADO',
+                    '5. CONSTRUYENDO RELACIONES SOLIDAS',
+                    '6. EQUIPOS GANADORES - EXCELENCIA COLABORATIVA',
+                    '7. METAS DEL CARGO (KPIS) (SI APLICA)'
+                ];
+            }
+        }
+
+        function cargarPeriodosCrear() {
+            const selectHidden = document.getElementById('periodo');
+            const inputTexto = document.getElementById('periodo-texto');
+            if (!selectHidden || !inputTexto) return;
+
+            const year = new Date().getFullYear();
+            const monthName = new Date().toLocaleString('es-ES', { month: 'long' });
+            const monthLabel = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
+            // Solo evaluación anual - período del mes actual
+            const periodoActual = `${monthLabel} ${year}`;
+
+            // Establecer valor en ambos campos
+            selectHidden.value = periodoActual;
+            inputTexto.value = periodoActual;
+        }
+
+        // Cargar lista de empleados
+        async function loadEmpleados() {
+            try {
+                const response = await fetch(`${API_URL}/empleados`, { headers: getHeaders() });
+                empleadosData = await response.json();
+
+                const select = document.getElementById('empleadoId');
+                empleadosData.forEach(emp => {
+                    const option = document.createElement('option');
+                    option.value = emp.id;
+                    option.textContent = `${emp.nombres_completos} - ${emp.cargo || 'Sin cargo'}`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error cargando empleados:', error);
+                alert('Error: No se pudo conectar con el servidor');
+            }
+        }
+
+        // Actualizar información del jefe cuando se selecciona un empleado
+        function actualizarJefe() {
+            const empleadoId = document.getElementById('empleadoId').value;
+            const jefeInput = document.getElementById('jefeNombre');
+            const puestoInput = document.getElementById('puestoEmpleado');
+            
+            if (!empleadoId) {
+                jefeInput.value = '';
+                puestoInput.value = '';
+                return;
+            }
+
+            const empleado = empleadosData.find(emp => emp.id == empleadoId);
+            if (empleado) {
+                puestoInput.value = empleado.cargo || '-';
+                jefeInput.value = empleado.jefe_nombre || 'Sin jefe asignado';
+            }
+        }
+
+        // Crear campos de competencias
+        function createCompetencyFields() {
+            const container = document.getElementById('competenciasContainer');
+
+            competencias.forEach((comp, index) => {
+                const div = document.createElement('div');
+                div.className = 'competency-item';
+                div.innerHTML = `
+                    <div class="competency-header">
+                        <span class="competency-name">${comp}</span>
+                        <span class="score-value" id="score-${index}">3</span>
+                    </div>
+                    <div class="score-input">
+                        <input type="range" 
+                               class="score-slider" 
+                               id="slider-${index}" 
+                               min="1" 
+                               max="5" 
+                               value="3"
+                               oninput="updateScore(${index})">
+                    </div>
+                    <div class="form-group" style="margin-top: 10px;">
+                        <textarea id="obs-${index}" 
+                                  rows="2" 
+                                  placeholder="Observaciones sobre ${comp}..."></textarea>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Actualizar valor de score
+        function updateScore(index) {
+            const slider = document.getElementById(`slider-${index}`);
+            const scoreDisplay = document.getElementById(`score-${index}`);
+            scoreDisplay.textContent = slider.value;
+            updatePromedio();
+        }
+
+        // Configurar actualización en tiempo real del promedio
+        function setupLivePreview() {
+            const sliders = document.querySelectorAll('.score-slider');
+            sliders.forEach(slider => {
+                slider.addEventListener('input', updatePromedio);
+            });
+            updatePromedio();
+        }
+
+        // Actualizar promedio
+        function updatePromedio() {
+            const sliders = document.querySelectorAll('.score-slider');
+            let total = 0;
+            sliders.forEach(slider => {
+                total += parseInt(slider.value);
+            });
+            const promedio = (total / sliders.length).toFixed(1);
+            document.getElementById('promedioPreview').textContent = promedio;
+        }
+
+        // Enviar formulario
+        document.getElementById('evaluacionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Recopilar datos del formulario
+            const empleadoId = document.getElementById('empleadoId').value;
+            const evaluador = document.getElementById('evaluador').value;
+            const periodo = document.getElementById('periodo').value;
+            const fechaEvaluacion = document.getElementById('fechaEvaluacion').value;
+            const comentariosGenerales = document.getElementById('comentariosGenerales').value;
+
+            // Detectar frecuencia automáticamente según el período
+            // Frecuencia siempre anual (1 evaluación por año)
+            let frecuencia = 'anual';
+
+            // Recopilar competencias
+            const competenciasData = competencias.map((comp, index) => ({
+                competencia: comp,
+                puntuacion: parseInt(document.getElementById(`slider-${index}`).value),
+                observaciones: document.getElementById(`obs-${index}`).value
+            }));
+
+            const data = {
+                empleado_id: parseInt(empleadoId),
+                evaluador: evaluador,
+                periodo: periodo,
+                fecha_evaluacion: fechaEvaluacion,
+                comentarios_generales: comentariosGenerales,
+                frecuencia: frecuencia,
+                competencias: competenciasData
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/evaluaciones`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(`✅ Evaluación creada exitosamente!\nPromedio: ${result.promedio}`);
+                    window.location.href = 'historial.html';
+                } else {
+                    const error = await response.json();
+                    alert('❌ Error: ' + error.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al guardar la evaluación. Verifica que el servidor esté ejecutándose.');
+            }
+        });
+
+        // Inicializar
+        init();
+
+        // Función logout
+        function logout() {
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('usuario');
+            window.location.href = 'login.html';
+        }
+    </script>
+    <script src="keep-alive.js"></script>
+    <footer style="background: #f8f9fa; padding: 15px; text-align: center; color: #666; border-top: 1px solid #dee2e6; margin-top: 20px;">
+        <p>&copy; 2026 Bluedoors-Talentia. Desarrollado por Wilson Herrera.</p>
+    </footer>
+</body>
+</html>

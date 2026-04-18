@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autoevaluación de Competencias</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="competencia-estilos.css">
+    <style>
+        .nav-link {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-link.active {
+            background: #28a745;
+        }
+
+        .navigation {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .instructions-box {
+            background: #f3efe3;
+            border: 1px solid #ded6c0;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 1em;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .instructions-box p {
+            margin: 0 0 8px;
+        }
+
+        .instructions-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .instructions-box .scale-item {
+            margin: 4px 0;
+            font-style: bold;
+        }
+        .logo-container {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .logo-container img {
+            max-width: 300px;
+            height: auto;
+            border: 2px solid #5143ce;
+        }
+
+        .header-content {
+            position: relative;
+            width: 100%;
+        }
+
+        .header-text {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo-container">
+                    <img src="Logo/logo_talentia.jpeg" alt="Logo Talentia">
+                </div>
+                <div class="header-text">
+                    <h1>Talentia</h1>
+                    <p class="subtitle">Autoevaluación de Competencias</p>
+                    <p style="margin-top: 5px; color: #666; font-size: 0.95em;">
+                        Usuario: <span id="nombre-evaluador" style="font-weight: bold; color: #333;">Cargando...</span>
+                    </p>
+                </div>
+            </div>
+            <button id="btnLogoutAutoevaluacion" onclick="logout()" style="display: none; position: absolute; top: 20px; right: 20px; padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: 500;">🚪 Salir</button>
+        </header>
+
+        <div class="content">
+<!--             <div class="navigation" id="autoevalNav" style="display: none;">
+                <span role="status" aria-current="page" style="font-weight: 700; color: #2d3748; user-select: none;">🧍 Autoevaluación</span>
+            </div> -->
+
+            <div class="employee-info">
+                <h2>Autoevaluación de Competencias</h2>
+
+                <div style="margin-bottom: 20px; padding: 20px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px;">
+                    <h3 style="margin-top: 0;">Acceso a Autoevaluación</h3>
+                    <p style="margin-top: 0; color: #666; font-size: 0.95em;">Ingrese con su número de cédula y contraseña</p>
+                    
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="identificacion-input" style="display: block; margin-bottom: 5px; font-weight: bold;">📇 Cédula:</label>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <input type="text" id="identificacion-input" placeholder="Ingrese su cédula (solo números)"
+                                   maxlength="10" pattern="[0-9]+" inputmode="numeric"
+                                   title="Solo números, máximo 10 dígitos"
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+                                   style="flex: 1; min-width: 220px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em;" autocomplete="username">
+                        </div>
+                        <small id="identificacion-error" style="display: none; color: #dc3545; font-weight: bold; margin-top: 8px;"></small>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="codigo-input" style="display: block; margin-bottom: 5px; font-weight: bold;">🔑 Contraseña:</label>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <input type="password" id="codigo-input" placeholder="Ingrese su contraseña"
+                                   minlength="6" maxlength="50"
+                                   title="Mínimo 6 caracteres, máximo 50"
+                                   style="flex: 1; min-width: 220px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em;" autocomplete="current-password">
+                            <button type="button" id="btnValidarAcceso" class="btn-guardar" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95em; font-weight: bold;">
+                                🚪 Ingresar
+                            </button>
+                        </div>
+                        <small id="codigo-error" style="display: none; color: #dc3545; font-weight: bold; margin-top: 8px;"></small>
+                        <small style="display: block; margin-top: 8px; color: #666; font-size: 0.9em;">Contraseña inicial: su número de cédula</small>
+                    </div>
+                </div>
+
+                <div id="formulario-evaluacion" style="display: none;">
+                    <div class="form-group" style="margin-bottom: 15px;">
+                           <label for="empleado-nombre-texto" style="display: block; margin-bottom: 5px; font-weight: bold;">Empleado:</label>
+                           <input type="text" id="empleado-nombre-texto" readonly value="Cargando empleado..."
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em; background-color: #f0f0f0; cursor: not-allowed;">
+                        <input type="hidden" id="empleado-id" value="">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="periodo-texto" style="display: block; margin-bottom: 5px; font-weight: bold;">Período de Evaluación (Anual):</label>
+                        <input type="text" id="periodo-texto" readonly 
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em; background-color: #f5f5f5; cursor: default;">
+                        <input type="hidden" id="periodo-select">
+                        <div id="validacion-periodo" style="display: none; margin-top: 6px; color: #b00020; font-weight: 600;"></div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="nivel-ocupacional" style="display: block; margin-bottom: 5px; font-weight: bold;">Nivel ocupacional:</label>
+                        <input type="text" id="nivel-ocupacional-texto" readonly
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em; background-color: #f0f0f0; cursor: not-allowed;">
+                        <select id="nivel-ocupacional" style="display: none;">
+                            <option value="0">Hacemos que las cosas pasen (Ejecutando)</option>
+                            <option value="1">Gestores de experiencias (Gestionando)</option>
+                            <option value="2">Potenciando equipos (Potenciando)</option>
+                            <option value="3">Empoderando y fomentando (Dando forma)</option>
+                            <option value="4">Liderazgo estratégico (Liderando)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="instructions-box" id="instrucciones-evaluacion" style="display: none;">
+                    <p><strong>Instrucciones:</strong> Por favor, complete la totalidad del presente formulario. Recuerde mantener un criterio objetivo durante la evaluación, ya que los resultados obtenidos serán utilizados para la elaboración de planes de desarrollo individual.</p>
+                    <p>Evalúe al colaborador según la evidencia observada de los siguientes comportamientos, utilizando la siguiente escala:</p>
+                    <p class="scale-item"><strong>1:</strong> El comportamiento no se evidencia</p>
+                    <p class="scale-item"><strong>2:</strong> El comportamiento se evidencia en pocas ocasiones</p>
+                    <p class="scale-item"><strong>3:</strong> El comportamiento se evidencia siempre</p>
+                    <p class="scale-item"><strong>4:</strong> El comportamiento es sobresaliente</p>
+                    <p class="scale-item"><strong>5:</strong> El comportamiento excede las expectativas</p>
+                    <p>Seleccione la calificación que mejor represente el desempeño del colaborador en cada criterio.</p>
+                </div>
+
+                <!-- Competencia a evaluar -->
+                <div id="competencia-container">
+                    <div class="placeholder">
+                        <p>Seleccione un empleado para comenzar la autoevaluación</p>
+                    </div>
+                </div>
+
+                <!-- Resumen de evaluación -->
+                <div id="resumen-container" style="display: none;">
+                    <div class="summary">
+                        <h3>Resumen de Evaluación</h3>
+                        <div class="info-grid" style="margin-top: 10px;">
+                            <div class="info-item">
+                                <label>Total de calificaciones:</label>
+                                <span id="totalCalificaciones" style="font-size: 1.2em; color: #667eea;">0</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Promedio general:</label>
+                                <span id="promedioGeneralNivel" style="font-size: 1.2em; color: #667eea;">0.0</span>
+                            </div>
+                        </div>
+                        <div id="resumen-contenido" style="margin-top: 10px;"></div>
+                        <div style="margin-top: 15px;">
+                            <button id="verDetalleEvaluacion" class="btn-guardar" style="display: none; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95em; font-weight: bold;">
+                                👁️ Ver detalle de la evaluación
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="guardarEvaluacionCompleta()" class="btn-guardar" style="display: none; margin-top: 20px; padding: 12px 30px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: bold;">
+                    💾 Guardar Autoevaluación
+                </button>
+
+            </div>
+        </div>
+
+        <footer style="background: #f8f9fa; padding: 20px; text-align: center; color: #666; border-top: 1px solid #dee2e6;">
+            <p>&copy; 2026 Bluedoors-Talentia. Desarrollado por Wilson Herrera.</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="competencia-evaluador.js"></script>
+    <script>
+        // En autoevaluación NO requerimos login previo
+        // Los empleados acceden directamente con identificación + código
+        
+        // Pero si hay token (admin/jefe), usarlo
+        const tieneToken = !!sessionStorage.getItem('token');
+        
+        if (tieneToken) {
+            const usuarioStr = sessionStorage.getItem('usuario');
+            if (usuarioStr) {
+                const usuario = JSON.parse(usuarioStr);
+                if (usuario.rol === 'empleado') {
+                    alert('❌ Los empleados deben acceder a través de identificación y código.');
+                    window.location.href = 'index.html';
+                }
+            }
+        }
+
+        window.AUTOEVALUACION = true;
+        window.EVALUACION_DUPLICADA = false;
+
+        // Funciones de autenticación JWT
+        function getToken() {
+            const token = sessionStorage.getItem('token');
+            if (!token) {
+                // En autoevaluación sin JWT, retornar null (no es requierido)
+                return null;
+            }
+            return token;
+        }
+
+        // Obtener headers con autenticación
+        function getHeaders() {
+            const token = getToken();
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            return headers;
+        }
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarVisibilidadBotonSalir();
+            actualizarVisibilidadNavegacionAutoevaluacion();
+            cargarNombreEvaluador();
+            cargarEmpleadoDesdePortal();
+            cargarPeriodosEvaluacion();
+            configurarBusquedaIdentificacion();
+        });
+
+        function actualizarVisibilidadBotonSalir() {
+            const btnSalir = document.getElementById('btnLogoutAutoevaluacion');
+            if (!btnSalir) return;
+
+            // Mostrar "Salir" solo cuando existe sesión de autoevaluación (empleado autenticado).
+            const tieneSesionActiva = Boolean(sessionStorage.getItem('empleadoData'));
+            btnSalir.style.display = tieneSesionActiva ? 'inline-block' : 'none';
+        }
+
+        function actualizarVisibilidadNavegacionAutoevaluacion() {
+            const nav = document.getElementById('autoevalNav');
+            if (!nav) return;
+
+            const tieneSesionActiva = Boolean(sessionStorage.getItem('empleadoData'));
+            nav.style.display = tieneSesionActiva ? 'flex' : 'none';
+        }
+
+        // Cargar nombre del evaluador actual
+        function cargarNombreEvaluador() {
+            try {
+                const empleadoStr = sessionStorage.getItem('empleadoData');
+                const usuarioStr = sessionStorage.getItem('usuario');
+
+                if (empleadoStr) {
+                    const empleado = JSON.parse(empleadoStr);
+                    const nombreEvaluador = empleado.nombres_completos || empleado.nombre || 'Usuario';
+                    document.getElementById('nombre-evaluador').textContent = nombreEvaluador;
+                    console.log('Evaluador cargado (empleado):', nombreEvaluador);
+                } else if (usuarioStr) {
+                    const usuario = JSON.parse(usuarioStr);
+                    const nombreEvaluador = usuario.nombres_completos || usuario.nombre || 'Usuario';
+                    document.getElementById('nombre-evaluador').textContent = nombreEvaluador;
+                    console.log('Evaluador cargado:', nombreEvaluador);
+                } else {
+                    document.getElementById('nombre-evaluador').textContent = 'Sin información';
+                }
+            } catch (error) {
+                console.error('Error al cargar nombre del evaluador:', error);
+                document.getElementById('nombre-evaluador').textContent = 'Error';
+            }
+        }
+
+        function cargarPeriodosEvaluacion() {
+            const selectHidden = document.getElementById('periodo-select');
+            const inputTexto = document.getElementById('periodo-texto');
+            if (!selectHidden || !inputTexto) return;
+
+            const year = new Date().getFullYear();
+            const monthName = new Date().toLocaleString('es-ES', { month: 'long' });
+            const monthLabel = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
+            // Solo evaluación anual - período del mes actual
+            const periodoActual = `${monthLabel} ${year}`;
+
+            // Establecer valor en ambos campos
+            selectHidden.value = periodoActual;
+            inputTexto.value = periodoActual;
+            
+            // Validar el período automáticamente
+            validarPeriodoEmpleado();
+        }
+
+        let empleadoActual = null;
+
+        function construirCompetenciaKpi(empleado) {
+            if (!empleado || !empleado.aplica_kpi) return null;
+
+            const item1 = (empleado.kpi_item_1 || '').trim();
+            const item2 = (empleado.kpi_item_2 || '').trim();
+            const item3 = (empleado.kpi_item_3 || '').trim();
+
+            if (!item1 || !item2 || !item3) return null;
+
+            const comportamientos = [item1, item2, item3];
+            const niveles = [
+                'HACEMOS QUE LAS COSAS PASEN (Ejecutando)',
+                'GESTORES DE EXPERIENCIAS (Gestionando)',
+                'POTENCIANDO EQUIPOS (Potenciando)',
+                'EMPODERANDO Y FOMENTANDO (Dando forma)',
+                'LIDERAZGO ESTRATÉGICO (Liderando)'
+            ];
+
+            return {
+                id: 7,
+                nombre: '7. METAS DEL CARGO (KPIs) (si aplica)',
+                descripcion: 'Autoevalúe las metas del cargo definidas para usted.',
+                descriptores: niveles.map((rol, index) => ({
+                    id: index + 1,
+                    rol,
+                    comportamientos: [...comportamientos]
+                }))
+            };
+        }
+
+        function getEmpleadoIdFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('empleado_id');
+        }
+
+        function getEmpleadoNombreFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('nombre');
+        }
+
+        function normalizarTexto(texto) {
+            return (texto || '')
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function obtenerIndiceNivelDesdeTexto(nivelTexto) {
+            const nivel = normalizarTexto(nivelTexto);
+            if (!nivel) return 0;
+            if (nivel.includes('gestores de experiencias')) return 1;
+            if (nivel.includes('potenciando equipos')) return 2;
+            if (nivel.includes('empoderando y fomentando')) return 3;
+            if (nivel.includes('liderazgo estrategico')) return 4;
+            return 0;
+        }
+
+        function aplicarNivelOcupacionalEmpleado(nivelTexto) {
+            const selectNivel = document.getElementById('nivel-ocupacional');
+            const inputNivelTexto = document.getElementById('nivel-ocupacional-texto');
+            if (!selectNivel) return;
+            const indice = obtenerIndiceNivelDesdeTexto(nivelTexto);
+            selectNivel.value = String(indice);
+            const textoNivel = selectNivel.options[selectNivel.selectedIndex]?.text || '';
+            if (inputNivelTexto) {
+                inputNivelTexto.value = textoNivel;
+            }
+            if (typeof competenciaEvaluador !== 'undefined') {
+                competenciaEvaluador.setNivelOcupacional(indice);
+            }
+        }
+
+        function cargarEmpleadoDesdePortal() {
+            // En autoevaluación, siempre requerimos validación por código
+            // No cargar automáticamente desde URL
+            const container = document.getElementById('competencia-container');
+            if (container) {
+                container.innerHTML = '<div class="placeholder"><p>Ingrese su identificación y código para continuar.</p></div>';
+            }
+        }
+
+        function configurarBusquedaIdentificacion() {
+            const btnValidar = document.getElementById('btnValidarAcceso');
+            const inputId = document.getElementById('identificacion-input');
+            const inputPassword = document.getElementById('codigo-input');
+
+            if (btnValidar) {
+                btnValidar.addEventListener('click', validarAccesoAutoevaluacion);
+            }
+            if (inputId) {
+                inputId.addEventListener('keyup', (event) => {
+                    if (event.key === 'Enter') {
+                        inputPassword?.focus();
+                    }
+                });
+            }
+            if (inputPassword) {
+                inputPassword.addEventListener('keyup', (event) => {
+                    if (event.key === 'Enter') {
+                        validarAccesoAutoevaluacion();
+                    }
+                });
+            }
+        }
+
+        function validarAccesoAutoevaluacion() {
+            const inputId = document.getElementById('identificacion-input');
+            const inputPassword = document.getElementById('codigo-input');
+            const errorId = document.getElementById('identificacion-error');
+            const errorPassword = document.getElementById('codigo-error');
+            const btnValidar = document.getElementById('btnValidarAcceso');
+            const cedula = (inputId?.value || '').trim();
+            const contrasena = (inputPassword?.value || '').trim();
+
+            // Limpiar mensajes de error
+            if (errorId) errorId.style.display = 'none';
+            if (errorPassword) errorPassword.style.display = 'none';
+
+            // Validar campos
+            if (!cedula) {
+                if (errorId) {
+                    errorId.textContent = 'Ingrese su cédula.';
+                    errorId.style.display = 'block';
+                }
+                return;
+            }
+
+            if (!contrasena) {
+                if (errorPassword) {
+                    errorPassword.textContent = 'Ingrese su contraseña.';
+                    errorPassword.style.display = 'block';
+                }
+                return;
+            }
+
+            // Deshabilitar botón mientras se valida
+            if (btnValidar) {
+                btnValidar.disabled = true;
+                btnValidar.textContent = '⏳ Ingresando...';
+            }
+
+            console.log(`[DEBUG] Autenticando empleado con cédula: ${cedula}`);
+
+            // Crear controller para timeout en autenticación (15 segundos)
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+            // Autenticar empleado en backend
+            fetch('/api/auth/empleado', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    cedula: cedula,
+                    contrasena: contrasena
+                }),
+                signal: controller.signal
+            })
+            .then(response => {
+                clearTimeout(timeoutId);
+                console.log(`[DEBUG] Response status: ${response.status}`);
+                
+                // Verificar si la respuesta es JSON antes de parsear
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('El servidor no está respondiendo correctamente. Verifique que el backend esté activo.');
+                }
+                
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.error || `Error ${response.status}: ${response.statusText}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('[DEBUG] ✓ Autenticación exitosa', data);
+                
+                // Guardar token y datos del empleado
+                if (data.token) {
+                    sessionStorage.setItem('token', data.token);
+                    sessionStorage.setItem('empleadoData', JSON.stringify(data.usuario));
+                    cargarNombreEvaluador();
+                    actualizarVisibilidadBotonSalir();
+                    actualizarVisibilidadNavegacionAutoevaluacion();
+                    console.log('[DEBUG] Token y datos guardados en sessionStorage');
+                }
+
+                // Autenticación exitosa - cargar datos del empleado
+                const empleado = data.usuario;
+                const empleadoNombre = document.getElementById('empleado-nombre-texto');
+                const empleadoIdInput = document.getElementById('empleado-id');
+                const formulario = document.getElementById('formulario-evaluacion');
+                const instrucciones = document.getElementById('instrucciones-evaluacion');
+                const panelAcceso = document.querySelector('[style*="background: #f8f9fa"]');
+
+                // Crear controller para timeout en fetch de datos adicionales (15 segundos)
+                const controllerEmpleado = new AbortController();
+                const timeoutIdEmpleado = setTimeout(() => controllerEmpleado.abort(), 15000);
+
+                // Obtener información adicional del empleado desde la API
+                fetch(`/api/empleados/${empleado.id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${data.token}`
+                    },
+                    signal: controllerEmpleado.signal
+                })
+                .then(res => {
+                    clearTimeout(timeoutIdEmpleado);
+                    return res.json();
+                })
+                .then(empData => {
+                    empleadoActual = {
+                        id: empleado.id,
+                        nombres_completos: empleado.nombres_completos,
+                        cargo: empData.cargo || 'Sin cargo',
+                        nivel_ocupacional: empData.nivel_ocupacional || ''
+                    };
+
+                    if (empleadoNombre) {
+                        empleadoNombre.value = `${empleado.nombres_completos} - ${empData.cargo || 'Sin cargo'}`;
+                    }
+                    if (empleadoIdInput) {
+                        empleadoIdInput.value = empleado.id;
+                    }
+
+                    aplicarNivelOcupacionalEmpleado(empData.nivel_ocupacional);
+
+                    // Mostrar formulario e instrucciones, ocultar panel de acceso
+                    if (formulario) formulario.style.display = 'block';
+                    if (instrucciones) instrucciones.style.display = 'block';
+                    if (panelAcceso) panelAcceso.style.display = 'none';
+                    if (inputId) inputId.disabled = true;
+                    if (inputPassword) inputPassword.disabled = true;
+                    if (btnValidar) btnValidar.disabled = true;
+
+                    cargarCompetencias();
+                    validarPeriodoEmpleado();
+                })
+                .catch(err => {
+                    console.error('[ERROR] No se pudo cargar datos del empleado:', err);
+                    // Continuar con datos básicos
+                    empleadoActual = {
+                        id: empleado.id,
+                        nombres_completos: empleado.nombres_completos,
+                        cargo: 'Sin cargo',
+                        nivel_ocupacional: ''
+                    };
+
+                    if (empleadoNombre) {
+                        empleadoNombre.value = empleado.nombres_completos;
+                    }
+                    if (empleadoIdInput) {
+                        empleadoIdInput.value = empleado.id;
+                    }
+
+                    aplicarNivelOcupacionalEmpleado('');
+
+                    if (formulario) formulario.style.display = 'block';
+                    if (instrucciones) instrucciones.style.display = 'block';
+                    if (panelAcceso) panelAcceso.style.display = 'none';
+                    if (inputId) inputId.disabled = true;
+                    if (inputPassword) inputPassword.disabled = true;
+                    if (btnValidar) btnValidar.disabled = true;
+
+                    cargarCompetencias();
+                    validarPeriodoEmpleado();
+                });
+            })
+            .catch(error => {
+                console.error('[ERROR] Autenticación falló:', error);
+                
+                // Habilitar botón
+                if (btnValidar) {
+                    btnValidar.disabled = false;
+                    btnValidar.textContent = '🚪 Ingresar';
+                }
+
+                // Detectar timeout
+                if (error.name === 'AbortError') {
+                    const errorMsg = 'La solicitud tardó demasiado. Verifique su conexión e intente de nuevo.';
+                    if (errorPassword) {
+                        errorPassword.textContent = `⏱️ ${errorMsg}`;
+                        errorPassword.style.display = 'block';
+                    }
+                    return;
+                }
+
+                const errorMsg = error.message || 'Error de conexión con el servidor';
+                console.log(`[DEBUG] Mensaje de error: ${errorMsg}`);
+
+                if (errorMsg.includes('Cédula') || errorMsg.includes('contraseña') || errorMsg.includes('incorrectos')) {
+                    if (errorPassword) {
+                        errorPassword.textContent = '❌ Cédula o contraseña incorrectos.';
+                        errorPassword.style.display = 'block';
+                    }
+                } else {
+                    // Error genérico
+                    if (errorPassword) {
+                        errorPassword.textContent = `❌ ${errorMsg}`;
+                        errorPassword.style.display = 'block';
+                    }
+                }
+            });
+        }
+
+        function buscarEmpleadoPorIdentificacion() {
+            const input = document.getElementById('identificacion-input');
+            const errorLabel = document.getElementById('identificacion-error');
+            const identificacion = (input?.value || '').trim();
+
+            if (errorLabel) {
+                errorLabel.style.display = 'none';
+            }
+
+            if (!identificacion) {
+                if (errorLabel) {
+                    errorLabel.textContent = 'Ingrese su identificación.';
+                    errorLabel.style.display = 'block';
+                }
+                return;
+            }
+
+            fetch(`/api/empleados/identificacion/${encodeURIComponent(identificacion)}`, { headers: getHeaders() })
+                .then(response => response.json())
+                .then(emp => {
+                    if (emp?.error) {
+                        throw new Error(emp.error);
+                    }
+
+                    const empleadoNombre = document.getElementById('empleado-nombre-texto');
+                    const empleadoIdInput = document.getElementById('empleado-id');
+
+                    empleadoActual = emp;
+                    if (empleadoNombre) {
+                        empleadoNombre.value = `${emp.nombres_completos} - ${emp.cargo || 'Sin cargo'}`;
+                    }
+                    if (empleadoIdInput) {
+                        empleadoIdInput.value = emp.id;
+                    }
+
+                    aplicarNivelOcupacionalEmpleado(emp.nivel_ocupacional);
+
+                    cargarCompetencias();
+                    validarPeriodoEmpleado();
+                    validarPeriodoEmpleado();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    if (errorLabel) {
+                        errorLabel.textContent = 'Identificación no encontrada.';
+                        errorLabel.style.display = 'block';
+                    }
+                    const empleadoNombre = document.getElementById('empleado-nombre-texto');
+                    if (empleadoNombre) {
+                        empleadoNombre.value = '';
+                    }
+                    const container = document.getElementById('competencia-container');
+                    if (container) {
+                        container.innerHTML = '<div class="error">Empleado no encontrado.</div>';
+                    }
+                });
+        }
+
+        // Cargar todas las competencias (un solo request con todos los datos)
+        function cargarCompetencias() {
+            fetch('/api/competencias/completas', { headers: getHeaders(), timeoutMs: 20000, retries: 0 })
+                .then(response => response.json())
+                .then(competencias => {
+                    const listaFinal = (competencias || []).filter(comp => comp.id !== 7).sort((a, b) => (a.id || 99) - (b.id || 99));
+                    const competenciaKpi = construirCompetenciaKpi(empleadoActual);
+                    if (competenciaKpi) {
+                        listaFinal.push(competenciaKpi);
+                    }
+                    competenciaEvaluador.inicializarCompetencias(listaFinal);
+                })
+                .catch(error => {
+                    console.error('Error al cargar competencias:', error);
+                    document.getElementById('competencia-container').innerHTML =
+                        '<div class="error">Error al cargar competencias. Reintentar.</div>';
+                });
+        }
+
+        function cambiarNivelOcupacional() {
+            const select = document.getElementById('nivel-ocupacional');
+            const nivel = parseInt(select.value);
+            competenciaEvaluador.setNivelOcupacional(nivel);
+        }
+
+        function setEstadoValidacion(duplicada, mensaje) {
+            const aviso = document.getElementById('validacion-periodo');
+            const botonGuardar = document.getElementById('btnGuardarEvaluacion');
+
+            window.EVALUACION_DUPLICADA = duplicada;
+
+            if (aviso) {
+                aviso.style.display = duplicada ? 'block' : 'none';
+                aviso.textContent = duplicada ? mensaje : '';
+            }
+
+            // Bloquear/desbloquear campo de período (solo estilo visual ya que es readonly)
+            const periodoTexto = document.getElementById('periodo-texto');
+            if (periodoTexto) {
+                periodoTexto.style.opacity = duplicada ? '0.6' : '1';
+            }
+
+            // Bloquear/desbloquear campo de nivel ocupacional (readonly, solo visual)
+            const nivelOcupacionalTexto = document.getElementById('nivel-ocupacional-texto');
+            if (nivelOcupacionalTexto) {
+                nivelOcupacionalTexto.style.opacity = duplicada ? '0.6' : '1';
+            }
+
+            // Bloquear/desbloquear botón de guardar
+            if (botonGuardar) {
+                botonGuardar.disabled = duplicada;
+                botonGuardar.style.opacity = duplicada ? '0.6' : '1';
+                botonGuardar.style.cursor = duplicada ? 'not-allowed' : 'pointer';
+                if (duplicada) {
+                    botonGuardar.title = mensaje;
+                } else {
+                    botonGuardar.removeAttribute('title');
+                }
+            }
+
+            // Bloquear/desbloquear botón alternativo
+            const btnGuardarAlternativo = document.querySelector('button[onclick="guardarEvaluacionCompleta()"]');
+            if (btnGuardarAlternativo) {
+                btnGuardarAlternativo.disabled = duplicada;
+                btnGuardarAlternativo.style.opacity = duplicada ? '0.6' : '1';
+                btnGuardarAlternativo.style.cursor = duplicada ? 'not-allowed' : 'pointer';
+            }
+
+            // Bloquear/desbloquear todos los radio buttons de calificación
+            const radioButtons = document.querySelectorAll('input[type="radio"][name^="calif-"]');
+            radioButtons.forEach(radio => {
+                radio.disabled = duplicada;
+                if (duplicada) {
+                    radio.style.cursor = 'not-allowed';
+                } else {
+                    radio.style.cursor = 'pointer';
+                }
+            });
+
+            // Bloquear/desbloquear campos de observaciones
+            const observaciones = document.querySelectorAll('textarea[id^="observaciones-"]');
+            observaciones.forEach(textarea => {
+                textarea.disabled = duplicada;
+                textarea.style.opacity = duplicada ? '0.6' : '1';
+                textarea.style.cursor = duplicada ? 'not-allowed' : 'text';
+            });
+
+            // Bloquear/desbloquear comentarios generales
+            const comentariosGenerales = document.getElementById('comentariosGenerales');
+            if (comentariosGenerales) {
+                comentariosGenerales.disabled = duplicada;
+                comentariosGenerales.style.opacity = duplicada ? '0.6' : '1';
+                comentariosGenerales.style.cursor = duplicada ? 'not-allowed' : 'text';
+            }
+        }
+
+        function validarPeriodoEmpleado() {
+            const empleadoId = document.getElementById('empleado-id')?.value;
+            const periodo = document.getElementById('periodo-select')?.value;
+
+            if (!empleadoId || !periodo) {
+                setEstadoValidacion(false, '');
+                return;
+            }
+
+            fetch(`/api/evaluaciones/empleado/${empleadoId}`, { headers: getHeaders() })
+                .then(response => response.json())
+                .then(evaluaciones => {
+                    const esAutoevaluacion = typeof window !== 'undefined' && window.AUTOEVALUACION === true;
+                    const existe = evaluaciones.some(ev =>
+                        ev.periodo === periodo &&
+                        Boolean(ev.autoevaluacion) === Boolean(esAutoevaluacion)
+                    );
+
+                    if (existe) {
+                        const mensaje = `Ya existe una autoevaluación para el período ${periodo}.`;
+                        setEstadoValidacion(true, mensaje);
+                    } else {
+                        setEstadoValidacion(false, '');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error validando período:', error);
+                    setEstadoValidacion(false, '');
+                });
+        }
+
+        // Guardar evaluación completa
+        function guardarEvaluacionCompleta() {
+            const empleadoId = document.getElementById('empleado-id').value;
+            const periodo = document.getElementById('periodo-select').value;
+
+            if (!empleadoId || !periodo) {
+                alert('Por favor seleccione empleado y período');
+                return;
+            }
+
+            if (window.EVALUACION_DUPLICADA) {
+                alert('Ya existe una autoevaluación para este período. Seleccione otro período.');
+                return;
+            }
+
+            // Validar que todas las calificaciones estén completas
+            const validacion = competenciaEvaluador.validarCalificacionesCompletas();
+            if (!validacion.valido) {
+                alert(validacion.mensaje);
+                return;
+            }
+
+            const datos = competenciaEvaluador.obtenerDatosEvaluacion();
+            if (!datos || datos.competencias.length === 0) {
+                alert('Por favor complete la evaluación');
+                return;
+            }
+
+            competenciaEvaluador.guardarEvaluacion();
+        }
+
+        // Función logout
+        async function logout() {
+            try {
+                const token = sessionStorage.getItem('token');
+                if (token) {
+                    // Llamar al backend para cerrar sesión en la BD
+                    await fetch('/api/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                }
+            } catch (error) {
+                console.log('Error al cerrar sesión:', error);
+            } finally {
+                // Siempre limpiar sessionStorage y redirigir
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('usuario');
+                sessionStorage.removeItem('empleadoData');
+                actualizarVisibilidadBotonSalir();
+                actualizarVisibilidadNavegacionAutoevaluacion();
+                window.location.href = 'autoevaluacion.html';
+            }
+        }
+    </script>
+    <script src="keep-alive.js"></script>
+</body>
+</html>

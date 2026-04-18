@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .header {
+            background: white;
+            color: #333;
+            padding: 24px 24px 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            gap: 8px;
+            position: relative;
+        }
+        
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .header-logo {
+            max-width: 200px;
+            height: auto;
+        }
+        
+        .header h1 {
+            font-size: 2.1em;
+            color: #333;
+            margin-bottom: 2px;
+        }
+        
+        .header-right {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .user-info {
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .logout-btn {
+            background: #dc3545;
+            border: 1px solid #dc3545;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: #c82333;
+        }
+        
+        .container {
+            max-width: 100%;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px 10px;
+            box-sizing: border-box;
+        }
+        
+        .intro-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+        
+        .intro-card h2 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        
+        .intro-card p {
+            color: #666;
+            line-height: 1.5;
+            font-size: 0.95em;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            min-width: 0;
+        }
+        
+        .card-title {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95em;
+        }
+        
+        .card-content {
+            padding: 15px;
+        }
+        
+        .employee-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .employee-item {
+            padding: 20px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            margin-bottom: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            word-break: break-word;
+            background: #f9f9ff;
+        }
+        
+        .employee-item:last-child {
+            border-bottom: none;
+        }
+        
+        .employee-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .employee-name {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0;
+            font-size: 1.35em;
+            word-break: break-word;
+            line-height: 1.3;
+        }
+        
+        .employee-email {
+            font-size: 14px;
+            color: #999;
+            word-break: break-all;
+            margin-bottom: 2px;
+            font-weight: 500;
+        }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            align-self: flex-start;
+        }
+        
+        .role-admin {
+            background: #fee;
+            color: #c33;
+        }
+        
+        .role-jefe {
+            background: #eef;
+            color: #33c;
+        }
+        
+        .role-empleado {
+            background: #efe;
+            color: #3c3;
+        }
+        
+        .role-select {
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .change-btn {
+            padding: 5px 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+            width: auto;
+        }
+        
+        .change-btn:hover {
+            background: #5568d3;
+        }
+        
+        .change-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+            border-left: 4px solid #c33;
+            font-size: 0.9em;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .success-message {
+            background: #efe;
+            color: #3c3;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+            border-left: 4px solid #3c3;
+            font-size: 0.9em;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-size: 0.9em;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .role-section {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            width: 100%;
+            align-items: flex-start;
+        }
+        
+        .password-section {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            width: 100%;
+            padding: 14px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        
+        .password-input {
+            padding: 12px 16px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            max-width: 280px;
+            box-sizing: border-box;
+            font-weight: 500;
+        }
+        
+        .password-input:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .password-change-btn {
+            background: #28a745;
+            white-space: nowrap;
+            padding: 12px 20px;
+            width: auto;
+            flex-shrink: 0;
+            font-size: 15px;
+            font-weight: 700;
+        }
+        
+        .password-change-btn:hover {
+            background: #218838;
+        }
+
+        @media (max-width: 900px) {
+            .header {
+                padding: 20px 16px 14px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .header-right {
+                right: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h1>🔑 Panel de Administración</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-info">
+                <div id="userName">Administrador</div>
+                <div id="userEmail" style="font-size: 12px; opacity: 0.8;">admin@empresa.com</div>
+            </div>
+            <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="intro-card">
+            <h2>👋 Bienvenido al Panel de Administración</h2>
+            <p>
+                Aquí puedes gestionar accesos de autoevaluación y contraseñas de los empleados.
+                La asignación de <strong>rol</strong> ahora se realiza en el módulo de <strong>Empleados</strong>.
+            </p>
+        </div>
+        
+        <div class="content">
+            <!-- Lista de empleados -->
+            <div class="card">
+                <div class="card-title">👥 Gestionar Empleados</div>
+                <div class="card-content">
+                    <div class="error-message" id="errorMessage"></div>
+                    <div class="success-message" id="successMessage"></div>
+                    
+                    <div id="employeeContainer" class="loading">
+                        <div class="spinner"></div>
+                        <p>Cargando empleados...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Info de roles -->
+            <div class="card">
+                <div class="card-title">📋 Referencia de Roles</div>
+                <div class="card-content">
+                    <div style="margin-bottom: 20px;">
+                        <div class="role-badge role-admin">👑 ADMIN</div>
+                        <p style="margin-top: 8px; font-size: 15px; color: #666;">
+                            Acceso total al sistema. Puede crear, editar y eliminar empleados. Gestiona todas las evaluaciones.
+                        </p>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <div class="role-badge role-jefe">📊 JEFE</div>
+                        <p style="margin-top: 8px; font-size: 15px; color: #666;">
+                            Puede ver y evaluar a sus subordinados directos. Acceso limitado a su equipo.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <div class="role-badge role-empleado">👤 EMPLEADO</div>
+                        <p style="margin-top: 8px; font-size: 15px; color: #666;">
+                            Acceso básico. Solo ve su perfil y puede ser evaluado. Autoevaluación disponible.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Generar códigos de acceso -->
+            <div class="card">
+                <div class="card-title">🔑 Generar Código de Autoevaluación</div>
+                <div class="card-content">
+                    <div class="error-message" id="codigoErrorMessage"></div>
+                    <div class="success-message" id="codigoSuccessMessage"></div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                            Seleccionar Empleado:
+                        </label>
+                        <select id="empleadoSelectCodigo" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                            <option value="">-- Cargando empleados --</option>
+                        </select>
+                    </div>
+                    
+                    <button onclick="generarCodigoAcceso()" style="width: 100%; padding: 10px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 14px;">
+                        Generar Código
+                    </button>
+                    
+                    <div id="codigoResultado" style="display: none; margin-top: 15px; padding: 15px; background: #f0f8ff; border: 1px solid #667eea; border-radius: 4px;">
+                        <label style="display: block; font-weight: 600; color: #333; margin-bottom: 8px;">Código Generado:</label>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <input type="text" id="codigoGenerado" readonly style="flex: 1; padding: 8px; border: 1px solid #667eea; border-radius: 4px; font-size: 16px; font-weight: bold; background: white; text-align: center;">
+                            <button onclick="copiarCodigo()" style="padding: 8px 15px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                                📋 Copiar
+                            </button>
+                        </div>
+                        <small style="display: block; margin-top: 10px; color: #666;"># ⚠️ Comparte este código con el empleado. Puede usarse una sola vez.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Verificar autenticación
+        const token = sessionStorage.getItem('token');
+        const usuario = JSON.parse(sessionStorage.getItem('usuario'));
+        
+        if (!token || usuario.rol !== 'admin') {
+            window.location.href = 'login.html';
+        }
+        
+        document.getElementById('userName').textContent = `${usuario.nombre || ''} ${usuario.apellidos || ''}`.trim() || 'Administrador';
+        document.getElementById('userEmail').textContent = usuario.email || 'admin@empresa.com';
+        
+        // Manejar sesión expirada (después de 1 hora de inactividad)
+        function handleSessionExpired() {
+            const mensajeExpiracion = `
+╔════════════════════════════════════════╗
+║     SESIÓN EXPIRADA                    ║
+╠════════════════════════════════════════╣
+║ Tu sesión ha caducado por inactividad  ║
+║ durante más de 1 hora.                 ║
+║                                        ║
+║ Por favor, inicia sesión nuevamente.   ║
+╚════════════════════════════════════════╝
+            `;
+            console.warn(mensajeExpiracion);
+            
+            // Limpiar datos de sesión
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('usuario');
+            
+            // Mostrar alerta al usuario
+            alert('Tu sesión ha expirado.\n\nPor favor, inicia sesión nuevamente.');
+            
+            // Redirigir a login
+            window.location.href = 'login.html';
+        }
+        
+        // Función para chequear respuesta y manejar 401
+        async function fetchConValidacionSesion(url, options = {}) {
+            const response = await fetch(url, options);
+            
+            // Si es 401 (Unauthorized), la sesión expiró
+            if (response.status === 401) {
+                handleSessionExpired();
+                return null;
+            }
+            
+            return response;
+        }
+        
+        // Cargar empleados
+        async function loadEmployees() {
+            try {
+                const response = await fetchConValidacionSesion('/api/empleados', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response) return; // Si fetchConValidacionSesion retorna null, handleSessionExpired() ya redirigió
+                if (!response.ok) {
+                    throw new Error('Error al cargar empleados');
+                }
+                
+                const empleados = await response.json();
+                displayEmployees(empleados);
+                
+            } catch (error) {
+                showError('Error al cargar empleados: ' + error.message);
+                document.getElementById('employeeContainer').innerHTML = 
+                    '<p style="color: #c33; text-align: center;">Error al cargar empleados</p>';
+            }
+        }
+        
+        function displayEmployees(empleados) {
+            const container = document.getElementById('employeeContainer');
+            
+            // Filtrar solo evaluadores (jefes y administradores)
+            const evaluadores = empleados.filter(emp => 
+                emp.rol && emp.rol.toLowerCase() !== 'empleado'
+            );
+            
+            if (evaluadores.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999;">No hay evaluadores registrados</p>';
+                return;
+            }
+            
+            // Cargar también el select de códigos (con todos los empleados)
+            cargarEmpleadosEnSelectCodigo(empleados);
+            
+            let html = '<div class="employee-list">';
+            
+            evaluadores.forEach(emp => {
+                const rolClass = `role-${emp.rol}`;
+                const nombreCompleto = emp.nombres_completos || emp.correo_corporativo || 'Usuario';
+                const email = emp.correo_corporativo || emp.email || '';
+                html += `
+                    <div class="employee-item">
+                        <div class="employee-info">
+                            <div class="employee-name">${nombreCompleto}</div>
+                            ${email ? `<div class="employee-email">${email}</div>` : ''}
+                        </div>
+                        <span class="role-badge ${rolClass}">${emp.rol.toUpperCase()}</span>
+                        <div class="password-section">
+                            <input type="password" class="password-input" id="password-${emp.id}" placeholder="Nueva contraseña">
+                            <button class="change-btn password-change-btn" onclick="changePassword(${emp.id}, '${nombreCompleto}')">
+                                Asignar Contraseña
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function cargarEmpleadosEnSelectCodigo(empleados) {
+            const select = document.getElementById('empleadoSelectCodigo');
+            if (!select) return;
+
+            // Limpiar opciones excepto la primera
+            while (select.options.length > 1) {
+                select.remove(1);
+            }
+
+            // Agregar empleados
+            empleados.forEach(emp => {
+                const nombreCompleto = emp.nombres_completos || emp.correo_corporativo || 'Usuario';
+                const option = document.createElement('option');
+                option.value = emp.id;
+                option.textContent = `${nombreCompleto} (${emp.identificacion || 'sin ID'})`;
+                select.appendChild(option);
+            });
+
+            select.value = '';  // Reset a opción por defecto
+        }
+        
+        async function generarCodigoAcceso() {
+            const selectEmpleado = document.getElementById('empleadoSelectCodigo');
+            const empleadoId = selectEmpleado?.value;
+            const resultadoDiv = document.getElementById('codigoResultado');
+            const inputCodigo = document.getElementById('codigoGenerado');
+            const errorMsg = document.getElementById('codigoErrorMessage');
+            const successMsg = document.getElementById('codigoSuccessMessage');
+            
+            // Limpiar mensajes
+            if (errorMsg) errorMsg.style.display = 'none';
+            if (successMsg) successMsg.style.display = 'none';
+            
+            if (!empleadoId) {
+                if (errorMsg) {
+                    errorMsg.textContent = '❌ Por favor selecciona un empleado';
+                    errorMsg.style.display = 'block';
+                }
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/codigos-acceso/generar', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ empleado_id: parseInt(empleadoId) })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Error al generar código');
+                }
+                
+                // Mostrar código generado
+                if (inputCodigo) inputCodigo.value = data.codigo;
+                if (resultadoDiv) resultadoDiv.style.display = 'block';
+                
+                // Mostrar mensaje de éxito
+                if (successMsg) {
+                    successMsg.textContent = `✓ Código generado exitosamente para ${data.empleado_id}`;
+                    successMsg.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                if (errorMsg) {
+                    errorMsg.textContent = `❌ ${error.message}`;
+                    errorMsg.style.display = 'block';
+                }
+                if (resultadoDiv) resultadoDiv.style.display = 'none';
+            }
+        }
+        
+        function copiarCodigo() {
+            const inputCodigo = document.getElementById('codigoGenerado');
+            if (inputCodigo && inputCodigo.value) {
+                navigator.clipboard.writeText(inputCodigo.value).then(() => {
+                    alert('✓ Código copiado al portapapeles');
+                }).catch(() => {
+                    alert('Error al copiar código');
+                });
+            }
+        }
+        
+        async function changePassword(empleadoId, nombre) {
+            const passwordInput = document.getElementById(`password-${empleadoId}`);
+            const nuevaContrasena = passwordInput.value.trim();
+            
+            if (!nuevaContrasena) {
+                showError('❌ Por favor ingresa una contraseña');
+                return;
+            }
+            
+            if (nuevaContrasena.length < 6) {
+                showError('❌ La contraseña debe tener al menos 6 caracteres');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/usuarios/${empleadoId}/cambiar-contrasena`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ contrasena_nueva: nuevaContrasena })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showSuccess(`✓ Contraseña de ${nombre} asignada correctamente`);
+                    passwordInput.value = '';
+                    setTimeout(() => loadEmployees(), 1500);
+                } else {
+                    showError('❌ ' + (data.error || data.message || 'Error al asignar contraseña'));
+                }
+            } catch (error) {
+                showError('Error: ' + error.message);
+            }
+        }
+        
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+            setTimeout(() => errorEl.classList.remove('show'), 4000);
+        }
+        
+        function showSuccess(message) {
+            const successEl = document.getElementById('successMessage');
+            successEl.textContent = message;
+            successEl.classList.add('show');
+            setTimeout(() => successEl.classList.remove('show'), 4000);
+        }
+        
+        function logout() {
+            window.location.href = 'index.html';
+        }
+        
+        // ========== FUNCIONES PARA CÓDIGOS DE ACCESO ==========
+        
+        function cargarEmpleadosEnSelectCodigo(empleados) {
+            const select = document.getElementById('empleadoSelectCodigo');
+            let html = '<option value="">-- Seleccionar empleado --</option>';
+            
+            empleados.forEach(emp => {
+                const nombreCompleto = emp.nombres_completos || emp.correo_corporativo || 'Usuario';
+                html += `<option value="${emp.id}">${nombreCompleto}</option>`;
+            });
+            
+            select.innerHTML = html;
+        }
+        
+        async function generarCodigoAcceso() {
+            const select = document.getElementById('empleadoSelectCodigo');
+            const empleadoId = select.value;
+            
+            if (!empleadoId) {
+                mostrarErrorCodigo('❌ Por favor selecciona un empleado');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/codigos-acceso/generar', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ empleado_id: parseInt(empleadoId) })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.codigo) {
+                    document.getElementById('codigoGenerado').value = data.codigo;
+                    document.getElementById('codigoResultado').style.display = 'block';
+                    mostrarExitoCodigo(`✓ Código generado para ${select.options[select.selectedIndex].text}`);
+                } else {
+                    mostrarErrorCodigo('❌ ' + (data.error || 'Error al generar código'));
+                }
+            } catch (error) {
+                mostrarErrorCodigo('Error: ' + error.message);
+            }
+        }
+        
+        function copiarCodigo() {
+            const input = document.getElementById('codigoGenerado');
+            input.select();
+            document.execCommand('copy');
+            mostrarExitoCodigo('✓ Código copiado al portapapeles');
+        }
+        
+        function mostrarErrorCodigo(message) {
+            const errorEl = document.getElementById('codigoErrorMessage');
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+            setTimeout(() => errorEl.classList.remove('show'), 4000);
+        }
+        
+        function mostrarExitoCodigo(message) {
+            const successEl = document.getElementById('codigoSuccessMessage');
+            successEl.textContent = message;
+            successEl.classList.add('show');
+            setTimeout(() => successEl.classList.remove('show'), 4000);
+        }
+        
+        // ========== FIN FUNCIONES CÓDIGOS ==========
+        
+        // Cargar empleados al inicio
+        loadEmployees();
+    </script>
+    <script src="keep-alive.js"></script>
+    <footer style="background: #f8f9fa; padding: 15px; text-align: center; color: #666; border-top: 1px solid #dee2e6; margin-top: 20px;">
+        <p>&copy; 2026 Bluedoors-Talentia. Desarrollado por Wilson Herrera.</p>
+    </footer>
+</body>
+</html>

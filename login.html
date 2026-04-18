@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Talentia</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 24px 16px;
+            gap: 16px;
+        }
+        
+        .login-container {
+            background: white;
+            padding: 28px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .page-footer {
+            width: 100%;
+            max-width: 760px;
+            background: #f8f9fa;
+            padding: 12px 16px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #dee2e6;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 640px) {
+            .login-container {
+                padding: 24px;
+            }
+            .page-footer {
+                font-size: 13px;
+            }
+        }
+        
+        .login-container h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        
+        .login-container p {
+            text-align: center;
+            color: #666;
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 4px solid #c33;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .success-message {
+            background: #efe;
+            color: #3c3;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 4px solid #3c3;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+        
+        .demo-credentials {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .demo-credentials strong {
+            color: #333;
+        }
+        
+        .logo-container {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        
+         .logo-container img {
+            max-width: 300px;
+            height: auto;
+            border: 2px solid #5143ce;
+        }
+
+
+        @media (max-height: 800px) {
+            .login-container {
+                padding: 20px;
+            }
+
+            .logo-container img {
+                max-width: 210px;
+            }
+
+            .demo-credentials {
+                margin-top: 12px;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-container">
+            <img src="Logo/logo_talentia.jpeg" alt="Logo Talentia">
+        </div>
+        <h1>🔐 Talentia</h1>
+        <p>Inicia sesión en tu cuenta</p>
+        
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    required
+                    placeholder="tu@email.com"
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    required
+                    placeholder="Tu contraseña"
+                >
+            </div>
+            
+            <button type="submit" class="login-btn" id="loginBtn">
+                Iniciar Sesión
+            </button>
+        </form>
+        
+<!--         <div class="demo-credentials">
+            <strong>👤 Credenciales de prueba (Admin):</strong><br>
+            Email: <strong>admin@bluedoors.com</strong><br>
+            Contraseña: <strong>Admin123!</strong><br>
+            <br>
+            ⚠️ Recuerda cambiar la contraseña después del primer login
+        </div> -->
+    </div>
+    
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const loginBtn = document.getElementById('loginBtn');
+
+        async function postLoginWithRetry(payload, options = {}) {
+            const timeoutMs = Number(options.timeoutMs) > 0 ? Number(options.timeoutMs) : 30000;
+            const retries = Number(options.retries) >= 0 ? Number(options.retries) : 1;
+
+            let lastError = null;
+
+            for (let attempt = 0; attempt <= retries; attempt++) {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload),
+                        signal: controller.signal
+                    });
+
+                    clearTimeout(timeoutId);
+                    return response;
+                } catch (error) {
+                    clearTimeout(timeoutId);
+                    lastError = error;
+
+                    const canRetry = attempt < retries && (
+                        error.name === 'AbortError' ||
+                        error.message.includes('Failed to fetch') ||
+                        error.message.includes('NetworkError')
+                    );
+
+                    if (!canRetry) {
+                        throw error;
+                    }
+
+                    await new Promise(resolve => setTimeout(resolve, 400 * (attempt + 1)));
+                }
+            }
+
+            throw lastError || new Error('No se pudo completar el inicio de sesión');
+        }
+        
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            errorMessage.classList.remove('show');
+            successMessage.classList.remove('show');
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Iniciando sesión...';
+            
+            const email = document.getElementById('email').value;
+            const contrasena = document.getElementById('password').value;
+
+            try {
+                const response = await postLoginWithRetry({
+                        email: email,
+                        contrasena: contrasena
+                    }, {
+                        timeoutMs: 30000,
+                        retries: 1
+                    }
+                );
+                
+                // Verificar si la respuesta es JSON antes de parsear
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('El servidor no está respondiendo correctamente. Verifique que el backend esté activo.');
+                }
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Guardar token
+                    sessionStorage.setItem('token', data.token);
+                    sessionStorage.setItem('usuario', JSON.stringify(data.usuario));
+                    
+                    showSuccess('¡Bienvenido! Redireccionando...');
+                    
+                    // Redirigir al dashboard
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    showError(data.error || 'Error en la autenticación');
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Iniciar Sesión';
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    showError('La solicitud tardó demasiado (30s). Verifique su conexión o intente nuevamente en unos segundos.');
+                } else {
+                    showError('Error de conexión: ' + error.message);
+                }
+                
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Iniciar Sesión';
+            }
+        });
+        
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+        }
+        
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.classList.add('show');
+        }
+    </script>
+</body>
+</html>

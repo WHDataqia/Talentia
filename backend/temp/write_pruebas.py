@@ -1,0 +1,765 @@
+from pathlib import Path
+
+html = r"""<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Talentia &ndash; Pruebas de Software y Modelo Canvas</title>
+  <style>
+    :root{--azul:#1a3a5c;--azul-med:#2563a8;--azul-claro:#e8f0fb;--verde:#15803d;--rojo:#b91c1c;--naranja:#d97706;--naranja-cl:#fef3c7;--gris:#f1f5f9;--borde:#cbd5e1;--blanco:#ffffff;--texto:#1e293b;--texto-sm:#475569;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:#f8fafc;color:var(--texto);font-size:15px;line-height:1.68;}
+    header{background:linear-gradient(135deg,var(--azul) 0%,#1d4ed8 100%);color:#fff;padding:2.4rem 3rem 2rem;border-bottom:4px solid #3b82f6;}
+    header .tag{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:.2rem .9rem;font-size:.8rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.8rem;}
+    header h1{font-size:1.9rem;font-weight:700;}
+    header p{opacity:.78;margin-top:.4rem;font-size:.92rem;}
+    nav.toc{background:#fff;border-bottom:1px solid var(--borde);padding:.65rem 3rem;display:flex;gap:2rem;flex-wrap:wrap;}
+    nav.toc a{text-decoration:none;color:var(--azul-med);font-weight:600;font-size:.86rem;}
+    nav.toc a:hover{text-decoration:underline;}
+    main{max-width:1180px;margin:0 auto;padding:2.5rem 2rem 4rem;}
+    section{margin-bottom:3.5rem;}
+    h2.sec{font-size:1.4rem;font-weight:700;color:var(--azul);border-left:5px solid var(--azul-med);padding-left:1rem;margin-bottom:1.5rem;}
+    h3.sub{font-size:1.05rem;font-weight:700;color:var(--azul-med);margin:1.8rem 0 .8rem;}
+    p+p{margin-top:.7rem;}
+    .mg{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin:1.4rem 0;}
+    @media(max-width:720px){.mg{grid-template-columns:1fr;}}
+    .mc{border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1);}
+    .mh{padding:1rem 1.4rem;display:flex;align-items:center;gap:.8rem;}
+    .mh .ico{font-size:1.7rem;}.mh h3{font-size:1.05rem;font-weight:700;}
+    .mb{padding:1.1rem 1.4rem;background:#fff;}.mb ul{padding-left:1.2rem;font-size:.9rem;}.mb li{margin-bottom:.4rem;}
+    .neg .mh{background:#1e293b;color:#fff;}
+    .bla .mh{background:var(--azul-claro);color:var(--azul);}
+    .tabla{width:100%;border-collapse:collapse;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07);font-size:.88rem;}
+    .tabla thead th{background:var(--azul);color:#fff;padding:.75rem 1rem;text-align:left;}
+    .tabla tbody td{padding:.65rem 1rem;border-bottom:1px solid var(--borde);vertical-align:top;}
+    .tabla tbody tr:nth-child(even) td{background:var(--gris);}
+    .tabla tbody tr:hover td{background:var(--azul-claro);}
+    .dim{font-weight:700;color:var(--texto-sm);white-space:nowrap;}
+    .bxn{display:inline-block;background:#1e293b;color:#fff;padding:.12rem .5rem;border-radius:4px;font-size:.72rem;font-weight:700;}
+    .bxb{display:inline-block;background:var(--azul-claro);color:var(--azul);border:1px solid var(--azul-med);padding:.12rem .5rem;border-radius:4px;font-size:.72rem;font-weight:700;}
+    .ok{color:var(--verde);font-weight:700;}.fail{color:var(--rojo);font-weight:700;}.warn{color:var(--naranja);font-weight:700;}
+    .caso{background:#fff;border:1px solid var(--borde);border-radius:10px;margin-bottom:1rem;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+    .caso-head{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1rem;padding:.6rem 1.2rem;border-bottom:1px solid var(--borde);background:var(--gris);}
+    .cid{font-family:monospace;font-size:.75rem;font-weight:700;background:var(--azul-claro);color:var(--azul-med);padding:.12rem .5rem;border-radius:4px;}
+    .cnombre{font-weight:600;font-size:.93rem;}
+    .caso-body{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;}
+    @media(max-width:680px){.caso-body{grid-template-columns:1fr;}}
+    .cc{padding:.6rem 1.2rem;border-right:1px solid var(--borde);font-size:.86rem;}
+    .cc:last-child{border-right:none;}
+    .cc label{display:block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--texto-sm);margin-bottom:.2rem;}
+    .code{background:#0f172a;color:#e2e8f0;border-radius:8px;padding:1.1rem 1.4rem;font-family:'Consolas','Courier New',monospace;font-size:.82rem;line-height:1.75;margin:.9rem 0;overflow-x:auto;white-space:pre;}
+    .code .kw{color:#7dd3fc;}.code .fn{color:#fde68a;}.code .cm{color:#6ee7b7;}.code .st{color:#fca5a5;}.code .nb{color:#c4b5fd;}
+    .ruta{display:inline-block;background:#1d4ed8;color:#fff;font-size:.72rem;font-weight:700;font-family:monospace;padding:.12rem .6rem;border-radius:4px;margin-bottom:.5rem;}
+    .caminos{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.9rem;margin:.8rem 0;}
+    .cam{background:var(--gris);border:1px solid var(--borde);border-radius:8px;padding:.85rem 1rem;}
+    .cam .num{display:inline-block;background:var(--azul-med);color:#fff;font-size:.72rem;font-weight:700;padding:.1rem .45rem;border-radius:4px;margin-bottom:.35rem;}
+    .cam p{font-size:.86rem;}
+    .info{border-left:4px solid;border-radius:0 8px 8px 0;padding:.85rem 1.1rem;margin:1rem 0;font-size:.9rem;}
+    .info.azul{border-color:var(--azul-med);background:var(--azul-claro);}
+    .info.amber{border-color:var(--naranja);background:var(--naranja-cl);}
+    .info strong{display:block;margin-bottom:.25rem;}
+    .cwrap{background:#fff;border:2px solid var(--azul);border-radius:14px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.13);}
+    .ctit{background:var(--azul);color:#fff;text-align:center;padding:.85rem;font-size:1rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
+    .csub{background:#0f2a47;color:rgba(255,255,255,.7);text-align:center;padding:.35rem 1rem;font-size:.78rem;letter-spacing:.04em;}
+    .cgrid{display:grid;grid-template-columns:1fr 1fr 1.25fr 1fr 1fr;border-top:2px solid var(--azul);}
+    @media(max-width:860px){.cgrid{grid-template-columns:1fr 1fr;}}
+    .cel{border-right:1px solid var(--borde);border-bottom:1px solid var(--borde);padding:1rem 1.1rem;min-height:175px;}
+    .g-socios{grid-column:1;grid-row:1/3;min-height:350px;}
+    .g-act{grid-column:2;grid-row:1;}
+    .g-prop{grid-column:3;grid-row:1/3;min-height:350px;}
+    .g-rel{grid-column:4;grid-row:1;}
+    .g-seg{grid-column:5;grid-row:1/3;border-right:none;min-height:350px;}
+    .g-rec{grid-column:2;grid-row:2;}
+    .g-can{grid-column:4;grid-row:2;}
+    .cbot{display:grid;grid-template-columns:1fr 1fr;border-top:2px solid var(--azul);}
+    .cbc{padding:1rem 1.2rem;border-right:1px solid var(--borde);}
+    .cbc:last-child{border-right:none;}
+    .ct{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em;padding-bottom:.4rem;margin-bottom:.5rem;border-bottom:2px solid;}
+    .cel ul,.cbc ul{padding-left:1rem;font-size:.83rem;}
+    .cel li,.cbc li{margin-bottom:.3rem;}
+    .g-socios .ct{color:#92400e;border-color:#d97706;}
+    .g-act .ct{color:#075985;border-color:#0ea5e9;}
+    .g-prop .ct{color:#14532d;border-color:#16a34a;}
+    .g-rel .ct{color:#6b21a8;border-color:#a855f7;}
+    .g-seg .ct{color:#9f1239;border-color:#f43f5e;}
+    .g-rec .ct{color:#1e3a8a;border-color:#3b82f6;}
+    .g-can .ct{color:#065f46;border-color:#10b981;}
+    .cb-cos .ct{color:#991b1b;border-color:#ef4444;}
+    .cb-ing .ct{color:#14532d;border-color:#22c55e;}
+    .g-socios{background:#fffbeb;}.g-act{background:#f0f9ff;}.g-prop{background:#f0fdf4;}
+    .g-rel{background:#faf5ff;}.g-seg{background:#fff1f2;}.g-rec{background:#eff6ff;}
+    .g-can{background:#ecfdf5;}.cb-cos{background:#fef2f2;}.cb-ing{background:#f0fdf4;}
+    footer{background:var(--azul);color:rgba(255,255,255,.65);text-align:center;padding:1.1rem;font-size:.8rem;margin-top:3rem;}
+    footer strong{color:#fff;}
+    code{background:#e2e8f0;padding:.1rem .35rem;border-radius:4px;font-size:.85em;}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="tag">Ingeniería de Software &mdash; Fase de Pruebas</div>
+  <h1>Talentia &mdash; Pruebas de Software &amp; Modelo de Negocio</h1>
+  <p>Sistema de Gestión del Desempeño &bull; Bluedoors Luxury Suites &bull; Desarrollado por Wilson Herrera &bull; 2026</p>
+</header>
+
+<nav class="toc">
+  <a href="#intro">1. Introducción</a>
+  <a href="#negra">2. Pruebas Caja Negra (Frontend)</a>
+  <a href="#blanca">3. Pruebas Caja Blanca (Backend)</a>
+  <a href="#canvas">4. Modelo de Negocio &mdash; Canvas</a>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════════════════════
+     SECCIÓN 1 · INTRODUCCIÓN
+════════════════════════════════════════ -->
+<section id="intro">
+  <h2 class="sec">1. Introducción a los Métodos de Prueba</h2>
+
+  <p>En el ciclo de vida de <strong>Talentia</strong> se aplican dos metodologías complementarias de verificación.
+  Las <strong>Pruebas de Caja Negra</strong> se ejecutan sobre la capa de presentación (HTML/JS), evaluando el
+  comportamiento visible sin acceder al código fuente.  Las <strong>Pruebas de Caja Blanca</strong> inspeccionan
+  el código Python/Flask del backend, garantizando cobertura de cada rama lógica.</p>
+
+  <div class="mg">
+    <div class="mc neg">
+      <div class="mh"><span class="ico">&#9632;</span><h3>Caja Negra &mdash; Frontend</h3></div>
+      <div class="mb">
+        <ul>
+          <li>Se prueba el <em>comportamiento externo</em> de cada pantalla HTML</li>
+          <li>El evaluador interactúa con formularios, botones y mensajes de error</li>
+          <li>No se requiere conocer el código JavaScript interno</li>
+          <li>Enfoque: <em>entradas &rarr; salidas esperadas</em></li>
+          <li>Cubre: validaciones de formulario, navegación, mensajes de estado</li>
+          <li>Técnicas: partición de equivalencia, valores límite, tablas de decisión</li>
+        </ul>
+      </div>
+    </div>
+    <div class="mc bla">
+      <div class="mh"><span class="ico">&#9633;</span><h3>Caja Blanca &mdash; Backend</h3></div>
+      <div class="mb">
+        <ul>
+          <li>Se prueba la <em>lógica interna</em> de las funciones Python/Flask</li>
+          <li>El evaluador conoce el código fuente y diseña pruebas por rama</li>
+          <li>Garantiza cobertura de cada condicional (<code>if/else/except</code>)</li>
+          <li>Enfoque: <em>caminos lógicos &rarr; resultado correcto por ruta</em></li>
+          <li>Cubre: autenticación, middleware JWT, pool de BD</li>
+          <li>Técnicas: cobertura de sentencias, ramas, caminos básicos</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub">Comparación de métodos aplicados en Talentia</h3>
+  <table class="tabla">
+    <thead>
+      <tr>
+        <th>Dimensión</th>
+        <th><span class="bxn">&#9632; Caja Negra</span> &nbsp;Frontend</th>
+        <th><span class="bxb">&#9633; Caja Blanca</span> &nbsp;Backend</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="dim">Capa evaluada</td>
+        <td>HTML, CSS, JavaScript &mdash; pantallas del navegador</td>
+        <td>Python, Flask, psycopg2 &mdash; lógica del servidor</td>
+      </tr>
+      <tr>
+        <td class="dim">Entradas</td>
+        <td>Acciones de usuario: clics, escritura en campos, envío de formularios</td>
+        <td>Argumentos de función, estado de BD, variables de entorno</td>
+      </tr>
+      <tr>
+        <td class="dim">Salidas esperadas</td>
+        <td>Mensajes de error UI, redirecciones, cambios de estado visual</td>
+        <td>Tuplas de retorno <code>(datos, None)</code> o <code>(None, error)</code>, respuestas HTTP</td>
+      </tr>
+      <tr>
+        <td class="dim">Conocimiento del código</td>
+        <td>No requerido (perspectiva del usuario final)</td>
+        <td>Obligatorio (se diseña por ramas del flujo de control)</td>
+      </tr>
+      <tr>
+        <td class="dim">Herramientas</td>
+        <td>Navegador, DevTools, casos manuales / Selenium</td>
+        <td><code>pytest</code>, <code>unittest.mock</code>, cobertura con <code>coverage.py</code></td>
+      </tr>
+      <tr>
+        <td class="dim">Archivos de Talentia</td>
+        <td><code>login.html</code>, <code>autoevaluacion.html</code>, <code>evaluacion-competencias.html</code>,
+            <code>historial.html</code>, <code>admin-maestras.html</code></td>
+        <td><code>auth.py</code>, <code>app.py</code>, <code>competencias_db.py</code></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════════════════════════════════════
+     SECCIÓN 2 · CAJA NEGRA (FRONTEND)
+════════════════════════════════════════ -->
+<section id="negra">
+  <h2 class="sec">2. Pruebas de Caja Negra &mdash; Frontend (HTML / JavaScript)</h2>
+
+  <p>Las pantallas de Talentia son documentos HTML puros con lógica JavaScript embebida que interactúa con la
+  API REST del backend.  Las pruebas de caja negra verifican que cada pantalla responde correctamente a las
+  acciones del usuario, <em>sin inspeccionar</em> el código fuente JavaScript.</p>
+
+  <div class="info azul">
+    <strong>Convención de IDs</strong>
+    CN-LG = login &bull; CN-AE = autoevaluación &bull; CN-EV = evaluación competencias &bull;
+    CN-HI = historial &bull; CN-AM = admin-maestras
+  </div>
+
+  <!-- ── login.html ── -->
+  <h3 class="sub">2.1 Pantalla <code>login.html</code> &mdash; Inicio de sesión</h3>
+  <p>Formulario de acceso para administradores, evaluadores y empleados.  Envía credenciales a
+  <code>POST /api/login</code> y redirige al módulo correspondiente según el rol recibido.</p>
+
+  <div class="caso">
+    <div class="caso-head">
+      <span class="cid">CN-LG-01</span>
+      <span class="cnombre">Credenciales v&aacute;lidas &rarr; redirecci&oacute;n al m&oacute;dulo</span>
+      <span class="ok">PASS</span>
+    </div>
+    <div class="caso-body">
+      <div class="cc"><label>Entrada</label>Email <code>admin@bluedoors.com</code>, contrase&ntilde;a correcta</div>
+      <div class="cc"><label>Resultado esperado</label>Token JWT almacenado en <code>localStorage</code>;  redirecci&oacute;n a <code>index.html</code></div>
+      <div class="cc"><label>T&eacute;cnica</label>Partici&oacute;n de equivalencia &mdash; clase v&aacute;lida</div>
+    </div>
+  </div>
+
+  <div class="caso">
+    <div class="caso-head">
+      <span class="cid">CN-LG-02</span>
+      <span class="cnombre">Contrase&ntilde;a incorrecta &rarr; mensaje de error</span>
+      <span class="ok">PASS</span>
+    </div>
+    <div class="caso-body">
+      <div class="cc"><label>Entrada</label>Email v&aacute;lido, contrase&ntilde;a err&oacute;nea</div>
+      <div class="cc"><label>Resultado esperado</label>Mensaje visible <em>"Usuario o contrase&ntilde;a incorrectos"</em>; no hay redirecci&oacute;n</div>
+      <div class="cc"><label>T&eacute;cnica</label>Partici&oacute;n de equivalencia &mdash; clase inv&aacute;lida</div>
+    </div>
+  </div>
+
+  <div class="caso">
+    <div class="caso-head">
+      <span class="cid">CN-LG-03</span>
+      <span class="cnombre">Campos vac&iacute;os &rarr; envío bloqueado</span>
+      <span class="ok">PASS</span>
+    </div>
+    <div class="caso-body">
+      <div class="cc"><label>Entrada</label>Formulario enviado sin datos</div>
+      <div class="cc"><label>Resultado esperado</label>Validaci&oacute;n HTML5 <code>required</code> impide el submit; no se realiza petici&oacute;n a la API</div>
+      <div class="cc"><label>T&eacute;cnica</label>Valor l&iacute;mite &mdash; entradas vac&iacute;as</div>
+    </div>
+  </div>
+
+  <div class="caso">
+    <div class="caso-head">
+      <span class="cid">CN-LG-04</span>
+      <span class="cnombre">Email con formato inv&aacute;lido &rarr; rechazo HTML5</span>
+      <span class="ok">PASS</span>
+    </div>
+    <div class="caso-body">
+      <div class="cc"><label>Entrada</label><code>notanemailATbluedoors</code> en el campo email</div>
+      <div class="cc"><label>Resultado esperado</label>El atributo <code>type="email"</code> muestra tooltip de validaci&oacute;n; no se env&iacute;a formulario</div>
+      <div class="cc"><label>T&eacute;cnica</label>Partici&oacute;n &mdash; clase inv&aacute;lida de formato</div>
+    </div>
+  </div>
+
+  <div class="caso">
+    <div class="caso-head">
+      <span class="cid">CN-LG-05</span>
+      <span class="cnombre">Doble clic en &ldquo;Iniciar sesi&oacute;n&rdquo; &rarr; petici&oacute;n &uacute;nica</span>
+      <span class="ok">PASS</span>
+    </div>
+    <div class="caso-body">
+      <div class="cc"><label>Entrada</label>Doble clic r&aacute;pido en el bot&oacute;n Submit</div>
+      <div class="cc"><label>Resultado esperado</label>Bot&oacute;n se deshabilita inmediatamente; solo se env&iacute;a <strong>una</strong> petici&oacute;n HTTP</div>
+      <div class="cc"><label>T&eacute;cnica</label>Tabla de decisi&oacute;n &mdash; guard de doble envío</div>
+    </div>
+  </div>
+
+  <!-- ── autoevaluacion.html ── -->
+  <h3 class="sub">2.2 Pantalla <code>autoevaluacion.html</code> &mdash; Autoevaluaci&oacute;n del empleado</h3>
+  <p>Los empleados operativos de Bluedoors ingresan con su c&eacute;dula y califican sus propias competencias
+  (Gesti&oacute;n Operativa, servicio al hu&eacute;sped, etc.) en una escala de 5 niveles.</p>
+
+  <div class="caso">
+    <div class="caso-head">
+      <span class="cid">CN-AE-01</span>
+      <span class="cnombre">Login por c&eacute;dula &rarr; formulario de competencias cargado</span>
+      <span class="ok">PASS</span>
+    </div>
+    <div class="caso-body">
+      <div class="cc"><label>Entrada</label>C&eacute;dula v&aacute;lida del empleado en el campo de acceso</div>
+      <div class="cc"><label>Resultado esperado</label>Pantalla carga las competencias del cargo del empleado; nombre visible en encabezado</div>
+      <div class="cc"><label>T&eacute;cnica</label>Partici&oacute;n &mdash; clase v&aacute;lida</div>
+    </div>
+  </div>
+
+  <div class="caso">
+    <div class="caso-head">
+      <span class="cid">CN-AE-02</span>
+      <span class="cnombre">Guardar con competencias incompletas &rarr; validaci&oacute;n</span>
+      <span class="ok">PASS</span>
+    </div>
+    <div class="caso-body">
+      <div class="cc"><label>Entrada</label>Formulario enviado con al menos una competencia sin calificaci&oacute;n</div>
+      <div class="cc"><label>Resultado esperado</label>Mensaje de advertencia; el registro <em>no</em> se guarda en BD</div>
+      <div class="cc"><label>T&eacute;cnica</label>Valor l&iacute;mite &mdash; conjunto incompleto</div>
+    </div>
+  </div>
+
+  <div class="caso">
+    <div class="caso-head">
+      <span class="cid">CN-AE-03</span>
+      <span class="cnombre">Guardar todas las competencias &rarr; confirmaci&oacute;n de &eacute;xito</span>
+      <span class="ok">PASS</span>
+    </div>
+    <div class="caso-body">
+      <div class="cc"><label>Entrada</label>Todos los niveles seleccionados (1&ndash;5) para cada competencia</div>
+      <div class="cc"><label>Resultado esperado</label>Mensaje <em>"Autoevaluaci&oacute;n guardada exitosamente"</em>; datos persistidos en BD</div>
+      <div class="cc"><label>T&eacute;cnica</label>Partici&oacute;n &mdash; clase v&aacute;lida completa</div>
+    </div>
+  </div>
+
+  <div class="caso">
+    <div class="caso-head">
+      <span class="cid">CN-AE-04</span>
+      <span class="cnombre">Guardar dos veces seguido &rarr; guard de duplicados activo</span>
+      <span class="ok">PASS</span>
+    </div>
+    <div class="caso-body">
+      <div class="cc"><label>Entrada</label>Clic en &ldquo;Guardar&rdquo; mientras la primera petici&oacute;n est&aacute; en vuelo</div>
+      <div class="cc"><label>Resultado esperado</label>Flag JavaScript bloquea la segunda petici&oacute;n; solo se guarda un registro</div>
+      <div class="cc"><label>T&eacute;cnica</label>Tabla de decisi&oacute;n &mdash; estado en vuelo</div>
+    </div>
+  </div>
+
+  <!-- ── evaluacion-competencias.html ── -->
+  <h3 class="sub">2.3 Pantalla <code>evaluacion-competencias.html</code> &mdash; Evaluaci&oacute;n por supervisor</h3>
+  <p>Los jefes de &aacute;rea (Rooms, Alimentos &amp; Bebidas, Mantenimiento, Ventas) seleccionan un subordinado
+  de Bluedoors y califican sus competencias con evidencias textuales.</p>
+
+  <div class="caso">
+    <div class="caso-head">
+      <span class="cid">CN-EV-01</span>
+      <span class="cnombre">Seleccionar subordinado &rarr; formulario de competencias cargado</span>
+      <span class="ok">PASS</span>
+    </div>
+    <div class="caso-body">
+      <div class="cc"><label>Entrada</label>Supervisor elige un empleado del selector desplegable</div>
+      <div class="cc"><label>Resultado esperado</label>Competencias del cargo del empleado seleccionado se muestran; campo de nivel habilitado por competencia</div>
+      <div class="cc"><label>T&eacute;cnica</label>Partici&oacute;n &mdash; clase v&aacute;lida</div>
+    </div>
+  </div>
+
+  <div class="caso">
+    <div class="caso-head">
+      <span class="cid">CN-EV-02</span>
+      <span class="cnombre">Supervisor sin subordinados &rarr; selector vac&iacute;o</span>
+      <span class="ok">PASS</span>
+    </div>
+    <div class="caso-body">
+      <div class="cc"><label>Entrada</label>Login de un evaluador sin empleados asignados en BD</div>
+      <div class="cc"><label>Resultado esperado</label>Selector muestra &ldquo;Sin empleados asignados&rdquo;; bot&oacute;n evaluar deshabilitado</div>
+      <div class="cc"><label>T&eacute;cnica</label>Valor l&iacute;mite &mdash; lista vac&iacute;a</div>
+    </div>
+  </div>
+
+  <div class="caso">
+    <div class="caso-head">
+      <span class="cid">CN-EV-03</span>
+      <span class="cnombre">Texto de evidencia largo &rarr; campo acepta sin truncar</span>
+      <span class="ok">PASS</span>
+    </div>
+    <div class="caso-body">
+      <div class="cc"><label>Entrada</label>Cadena de 500 caracteres en campo <code>textarea</code> de observaciones</div>
+      <div class="cc"><label>Resultado esperado</label>Campo tipo TEXT acepta el contenido; sin truncaci&oacute;n ni error de UI</div>
+      <div class="cc"><label>T&eacute;cnica</label>Valor l&iacute;mite &mdash; m&aacute;ximo de caracteres</div>
+    </div>
+  </div>
+
+  <!-- ── historial.html ── -->
+  <h3 class="sub">2.4 Pantalla <code>historial.html</code> &mdash; Historial de evaluaciones</h3>
+
+  <div class="caso">
+    <div class="caso-head">
+      <span class="cid">CN-HI-01</span>
+      <span class="cnombre">Filtrar por empleado y per&iacute;odo &rarr; resultados correctos</span>
+      <span class="ok">PASS</span>
+    </div>
+    <div class="caso-body">
+      <div class="cc"><label>Entrada</label>Nombre del empleado y per&iacute;odo <em>2025-Q1</em> seleccionados</div>
+      <div class="cc"><label>Resultado esperado</label>Tabla muestra solo evaluaciones que coinciden; conteo correcto</div>
+      <div class="cc"><label>T&eacute;cnica</label>Tabla de decisi&oacute;n &mdash; combinaci&oacute;n de filtros</div>
+    </div>
+  </div>
+
+  <div class="caso">
+    <div class="caso-head">
+      <span class="cid">CN-HI-02</span>
+      <span class="cnombre">Filtro sin coincidencias &rarr; mensaje amigable</span>
+      <span class="ok">PASS</span>
+    </div>
+    <div class="caso-body">
+      <div class="cc"><label>Entrada</label>Per&iacute;odo futuro sin registros (<em>2030-Q3</em>)</div>
+      <div class="cc"><label>Resultado esperado</label>Tabla vac&iacute;a con mensaje <em>"No hay evaluaciones para este per&iacute;odo"</em></div>
+      <div class="cc"><label>T&eacute;cnica</label>Partici&oacute;n &mdash; clase sin resultados</div>
+    </div>
+  </div>
+
+  <!-- ── admin-maestras.html ── -->
+  <h3 class="sub">2.5 Pantalla <code>admin-maestras.html</code> &mdash; Administraci&oacute;n de maestras</h3>
+
+  <div class="caso">
+    <div class="caso-head">
+      <span class="cid">CN-AM-01</span>
+      <span class="cnombre">Cambio de pesta&ntilde;a &rarr; sin recarga de p&aacute;gina</span>
+      <span class="ok">PASS</span>
+    </div>
+    <div class="caso-body">
+      <div class="cc"><label>Entrada</label>Clic en pesta&ntilde;as <em>Empresas</em>, <em>Cargos</em>, <em>Competencias</em></div>
+      <div class="cc"><label>Resultado esperado</label>Contenido cambia mediante JavaScript SPA; URL no recarga; spinner solo aparece una vez</div>
+      <div class="cc"><label>T&eacute;cnica</label>Partici&oacute;n &mdash; navegaci&oacute;n por pesta&ntilde;as</div>
+    </div>
+  </div>
+
+  <div class="caso">
+    <div class="caso-head">
+      <span class="cid">CN-AM-02</span>
+      <span class="cnombre">Crear empresa con nombre duplicado &rarr; error de la API</span>
+      <span class="ok">PASS</span>
+    </div>
+    <div class="caso-body">
+      <div class="cc"><label>Entrada</label>Intentar crear <em>BLUEDOORS 100 LUXURY SUITES</em> una segunda vez</div>
+      <div class="cc"><label>Resultado esperado</label>La API retorna 409; la UI muestra <em>"Ya existe una empresa con ese nombre"</em></div>
+      <div class="cc"><label>T&eacute;cnica</label>Partici&oacute;n &mdash; violaci&oacute;n de unicidad</div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════════════
+     SECCIÓN 3 · CAJA BLANCA (BACKEND)
+════════════════════════════════════════ -->
+<section id="blanca">
+  <h2 class="sec">3. Pruebas de Caja Blanca &mdash; Backend (Python / Flask)</h2>
+
+  <p>Las pruebas de caja blanca analizan el <em>grafo de flujo de control</em> de las funciones cr&iacute;ticas
+  del backend.  Para cada funci&oacute;n se identifican los caminos b&aacute;sicos independientes (m&eacute;todo
+  de McCabe) y se dise&ntilde;a un caso de prueba por camino, asegurando cobertura total de ramas.</p>
+
+  <div class="info azul">
+    <strong>Herramientas de prueba utilizadas</strong>
+    <code>pytest</code> para ejecuci&oacute;n &bull; <code>unittest.mock.patch</code> para aislar la BD &bull;
+    <code>coverage.py --branch</code> para medir cobertura de ramas del c&oacute;digo Python.
+  </div>
+
+  <!-- ── autenticar_usuario ── -->
+  <h3 class="sub">3.1 Funci&oacute;n <code>autenticar_usuario(conn, email, contrasena)</code></h3>
+  <span class="ruta">backend/auth.py</span>
+
+  <p>Autentica administradores y evaluadores mediante email.  Retorna <code>(usuario_dict, None)</code>
+  en &eacute;xito o <code>(None, mensaje_error)</code> en fallo.  La tabla de decisiones protege contra
+  enumeraci&oacute;n: error gen&eacute;rico tanto si el usuario no existe como si la contrase&ntilde;a es incorrecta.</p>
+
+  <div class="code"><span class="kw">def</span> <span class="fn">autenticar_usuario</span>(conn, email, contrasena):
+    <span class="kw">try</span>:
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute(<span class="st">"SELECT * FROM usuarios WHERE email=%s"</span>, (email,))
+        usuario = cur.fetchone()
+        <span class="kw">if not</span> usuario:                          <span class="cm"># Rama 1: usuario no encontrado</span>
+            <span class="kw">return</span> <span class="nb">None</span>, <span class="st">"Usuario o contrase&ntilde;a incorrectos"</span>
+        stored = usuario[<span class="st">"contrasena_hash"</span>]
+        <span class="kw">if not</span> verificar_contrasena(contrasena, stored): <span class="cm"># Rama 2: hash incorrecto</span>
+            <span class="kw">return</span> <span class="nb">None</span>, <span class="st">"Usuario o contrase&ntilde;a incorrectos"</span>
+        <span class="kw">return</span> dict(usuario), <span class="nb">None</span>                 <span class="cm"># Rama 3: &eacute;xito</span>
+    <span class="kw">except</span> Exception <span class="kw">as</span> e:                        <span class="cm"># Rama 4: excepci&oacute;n BD</span>
+        <span class="kw">return</span> <span class="nb">None</span>, <span class="st">f"Error en autenticaci&oacute;n: </span>{e}<span class="st">"</span></div>
+
+  <p><strong>Complejidad ciclom&aacute;tica V(G) = 4</strong> (cuatro caminos independientes)</p>
+
+  <div class="caminos">
+    <div class="cam"><span class="num">Camino 1</span><p>Email no existe en BD &rarr; <code>return (None, "incorrectos")</code></p></div>
+    <div class="cam"><span class="num">Camino 2</span><p>Email existe &mdash; hash no coincide &rarr; <code>return (None, "incorrectos")</code></p></div>
+    <div class="cam"><span class="num">Camino 3</span><p>Email existe &mdash; hash correcto &rarr; <code>return (dict_usuario, None)</code></p></div>
+    <div class="cam"><span class="num">Camino 4</span><p>Excepci&oacute;n en BD &rarr; <code>return (None, "Error en autenticaci&oacute;n: ...")</code></p></div>
+  </div>
+
+  <table class="tabla">
+    <thead>
+      <tr><th>ID</th><th>Condici&oacute;n / Camino</th><th>Entrada</th><th>Resultado esperado</th><th>Estado</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>CB-AU-01</code></td>
+        <td>Usuario no encontrado (Camino 1)</td>
+        <td><code>email="x@bd.com"</code> (no en BD)</td>
+        <td><code>(None, "Usuario o contrase&ntilde;a incorrectos")</code></td>
+        <td><span class="ok">PASS</span></td>
+      </tr>
+      <tr>
+        <td><code>CB-AU-02</code></td>
+        <td>Hash incorrecto (Camino 2)</td>
+        <td>Email v&aacute;lido, contrase&ntilde;a incorrecta</td>
+        <td><code>(None, "Usuario o contrase&ntilde;a incorrectos")</code></td>
+        <td><span class="ok">PASS</span></td>
+      </tr>
+      <tr>
+        <td><code>CB-AU-03</code></td>
+        <td>Credenciales correctas (Camino 3)</td>
+        <td>Email y hash coinciden</td>
+        <td><code>({"id":1,"email":"...",...}, None)</code></td>
+        <td><span class="ok">PASS</span></td>
+      </tr>
+      <tr>
+        <td><code>CB-AU-04</code></td>
+        <td>Excepci&oacute;n de BD simulada (Camino 4)</td>
+        <td><code>conn</code> lanza <code>Exception("timeout")</code></td>
+        <td><code>(None, "Error en autenticaci&oacute;n: timeout")</code></td>
+        <td><span class="ok">PASS</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ── autenticar_empleado_por_cedula ── -->
+  <h3 class="sub">3.2 Funci&oacute;n <code>autenticar_empleado_por_cedula(conn, cedula, contrasena)</code></h3>
+  <span class="ruta">backend/auth.py</span>
+
+  <p>Autentica empleados operativos de Bluedoors usando c&eacute;dula.  Incluye b&uacute;squeda primaria
+  por columna <code>cedula</code> y un <em>fallback</em> por <code>identificacion</code> para compatibilidad
+  retroactiva con registros migrados.  Complejidad ciclom&aacute;tica <strong>V(G) = 6</strong>.</p>
+
+  <div class="caminos">
+    <div class="cam"><span class="num">Camino 1</span><p>C&eacute;dula encontrada directamente &rarr; verificar hash</p></div>
+    <div class="cam"><span class="num">Camino 2</span><p>No en <code>cedula</code>, s&iacute; en <code>identificacion</code> &rarr; fallback exitoso</p></div>
+    <div class="cam"><span class="num">Camino 3</span><p>No encontrado por ninguna columna &rarr; error gen&eacute;rico</p></div>
+    <div class="cam"><span class="num">Camino 4</span><p>Empleado encontrado pero sin hash de contrase&ntilde;a</p></div>
+    <div class="cam"><span class="num">Camino 5</span><p>Hash no coincide &rarr; error gen&eacute;rico</p></div>
+    <div class="cam"><span class="num">Camino 6</span><p>Hash correcto &rarr; &eacute;xito</p></div>
+  </div>
+
+  <table class="tabla">
+    <thead>
+      <tr><th>ID</th><th>Camino</th><th>Entrada</th><th>Resultado esperado</th><th>Estado</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>CB-CE-01</code></td><td>B&uacute;squeda directa por <code>cedula</code> (C1)</td><td>C&eacute;dula correcta, hash correcto</td><td><code>(dict_empleado, None)</code></td><td><span class="ok">PASS</span></td></tr>
+      <tr><td><code>CB-CE-02</code></td><td>Fallback por <code>identificacion</code> (C2)</td><td>C&eacute;dula en campo <code>identificacion</code></td><td><code>(dict_empleado, None)</code></td><td><span class="ok">PASS</span></td></tr>
+      <tr><td><code>CB-CE-03</code></td><td>No encontrado (C3)</td><td>C&eacute;dula inexistente en BD</td><td><code>(None, "C&eacute;dula o contrase&ntilde;a incorrectos")</code></td><td><span class="ok">PASS</span></td></tr>
+      <tr><td><code>CB-CE-04</code></td><td>Sin hash de contrase&ntilde;a (C4)</td><td>Empleado encontrado, campo hash <code>NULL</code></td><td><code>(None, "C&eacute;dula o contrase&ntilde;a incorrectos")</code></td><td><span class="ok">PASS</span></td></tr>
+      <tr><td><code>CB-CE-05</code></td><td>Hash incorrecto (C5)</td><td>C&eacute;dula v&aacute;lida, contrase&ntilde;a err&oacute;nea</td><td><code>(None, "C&eacute;dula o contrase&ntilde;a incorrectos")</code></td><td><span class="ok">PASS</span></td></tr>
+      <tr><td><code>CB-CE-06</code></td><td>Hash correcto &mdash; &eacute;xito (C6)</td><td>C&eacute;dula y contrase&ntilde;a correctas</td><td><code>({"cedula":"...","nombre":"...",...}, None)</code></td><td><span class="ok">PASS</span></td></tr>
+    </tbody>
+  </table>
+
+  <!-- ── jwt_required_if_hardening_enabled ── -->
+  <h3 class="sub">3.3 Decorador <code>jwt_required_if_hardening_enabled()</code></h3>
+  <span class="ruta">backend/app.py</span>
+
+  <p>Aplica la validaci&oacute;n JWT solo si la variable de entorno
+  <code>SECURITY_HARDENING</code> est&aacute; activa.  Permite despliegues en desarrollo sin token
+  mientras protege producci&oacute;n.  <strong>V(G) = 2</strong>.</p>
+
+  <div class="code"><span class="kw">def</span> <span class="fn">jwt_required_if_hardening_enabled</span>():
+    <span class="kw">def</span> <span class="fn">decorator</span>(fn):
+        <span class="kw">@wraps</span>(fn)
+        <span class="kw">def</span> <span class="fn">wrapper</span>(*args, **kwargs):
+            <span class="kw">if</span> SECURITY_HARDENING:       <span class="cm"># Rama 1: hardening ON &rarr; validar JWT</span>
+                <span class="kw">return</span> jwt_required()(fn)(*args, **kwargs)
+            <span class="kw">return</span> fn(*args, **kwargs)  <span class="cm"># Rama 2: hardening OFF &rarr; paso libre</span>
+        <span class="kw">return</span> wrapper
+    <span class="kw">return</span> decorator</div>
+
+  <table class="tabla">
+    <thead>
+      <tr><th>ID</th><th>Escenario</th><th>Condici&oacute;n</th><th>Resultado esperado</th><th>Estado</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>CB-HE-01</code></td><td>Hardening desactivado, sin token</td><td><code>SECURITY_HARDENING=0</code></td><td>Endpoint responde 200 sin exigir Bearer</td><td><span class="ok">PASS</span></td></tr>
+      <tr><td><code>CB-HE-02</code></td><td>Hardening activo, sin token</td><td><code>SECURITY_HARDENING=1</code>, sin cabecera</td><td>Flask-JWT retorna <strong>401 Unauthorized</strong></td><td><span class="ok">PASS</span></td></tr>
+      <tr><td><code>CB-HE-03</code></td><td>Hardening activo, token v&aacute;lido</td><td><code>SECURITY_HARDENING=1</code>, JWT firmado</td><td>Endpoint responde 200 con datos</td><td><span class="ok">PASS</span></td></tr>
+    </tbody>
+  </table>
+
+  <!-- ── validar_sesion_activa ── -->
+  <h3 class="sub">3.4 Middleware <code>validar_sesion_activa()</code> (<code>@before_request</code>)</h3>
+  <span class="ruta">backend/app.py</span>
+
+  <p>Intercepta todas las peticiones antes de llegar a las rutas.  Combina cach&eacute; en memoria
+  (<code>TOKEN_VALIDATION_CACHE_SECONDS = 8</code>) con verificaci&oacute;n en la tabla
+  <code>sesiones_activas</code> de PostgreSQL.  <strong>V(G) = 6</strong>.</p>
+
+  <div class="caminos">
+    <div class="cam"><span class="num">Camino 1</span><p>Ruta no-API (<code>/</code>, est&aacute;ticos) &rarr; pasa sin validar</p></div>
+    <div class="cam"><span class="num">Camino 2</span><p>Endpoint p&uacute;blico (<code>/api/login</code>) &rarr; pasa sin validar</p></div>
+    <div class="cam"><span class="num">Camino 3</span><p>Sin cabecera <code>Authorization</code> &rarr; 401</p></div>
+    <div class="cam"><span class="num">Camino 4</span><p>Token en cach&eacute; v&aacute;lido dentro de ventana 8&nbsp;s &rarr; pasa</p></div>
+    <div class="cam"><span class="num">Camino 5</span><p>Token fuera de cach&eacute;, v&aacute;lido en BD &rarr; actualiza cach&eacute; y pasa</p></div>
+    <div class="cam"><span class="num">Camino 6</span><p>Token revocado en BD &rarr; 401 sesión expirada</p></div>
+  </div>
+
+  <table class="tabla">
+    <thead>
+      <tr><th>ID</th><th>Camino</th><th>Condici&oacute;n</th><th>Resultado esperado</th><th>Estado</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>CB-MW-01</code></td><td>Ruta est&aacute;tica (C1)</td><td>Request a <code>/login.html</code></td><td>Sin validaci&oacute;n JWT; continúa</td><td><span class="ok">PASS</span></td></tr>
+      <tr><td><code>CB-MW-02</code></td><td>Endpoint p&uacute;blico (C2)</td><td>Request a <code>POST /api/login</code></td><td>Sin validaci&oacute;n JWT; continúa</td><td><span class="ok">PASS</span></td></tr>
+      <tr><td><code>CB-MW-03</code></td><td>Sin header (C3)</td><td>Request a <code>GET /api/empleados</code>, sin Bearer</td><td><strong>401</strong> <em>"Token requerido"</em></td><td><span class="ok">PASS</span></td></tr>
+      <tr><td><code>CB-MW-04</code></td><td>Cach&eacute; hit (C4)</td><td>Token v&aacute;lido, segunda petici&oacute;n &lt;8&nbsp;s</td><td>200 sin consulta adicional a BD</td><td><span class="ok">PASS</span></td></tr>
+      <tr><td><code>CB-MW-05</code></td><td>BD hit v&aacute;lido (C5)</td><td>Token fuera de ventana de cach&eacute;</td><td>200; cach&eacute; actualizado con timestamp</td><td><span class="ok">PASS</span></td></tr>
+      <tr><td><code>CB-MW-06</code></td><td>Sesi&oacute;n revocada (C6)</td><td>Token no encontrado en <code>sesiones_activas</code></td><td><strong>401</strong> <em>"Sesión expirada"</em></td><td><span class="ok">PASS</span></td></tr>
+    </tbody>
+  </table>
+
+</section>
+
+<!-- ═══════════════════════════════════════
+     SECCIÓN 4 · MODELO CANVAS
+════════════════════════════════════════ -->
+<section id="canvas">
+  <h2 class="sec">4. Modelo de Negocio &mdash; Business Model Canvas</h2>
+  <p>Canvas construido desde el <strong>referente organizacional real</strong>: <em>Bluedoors Luxury Suites</em>,
+  cadena hotelera colombiana de lujo con propiedades <em>Bluedoors 100 Luxury Suites</em> y
+  <em>Bluedoors 93 Luxury Suites</em>, contexto en el que Talentia fue dise&ntilde;ado e implementado.</p>
+
+  <div class="cwrap">
+    <div class="ctit">Modelo de Negocio &mdash; Canvas</div>
+    <div class="csub">Talentia &mdash; Sistema de Gesti&oacute;n del Desempe&ntilde;o &bull; Referente organizacional: Bluedoors Luxury Suites &bull; 2026</div>
+
+    <div class="cgrid">
+
+      <!-- Socios -->
+      <div class="cel g-socios">
+        <div class="ct">&#129309; Socios Clave</div>
+        <ul>
+          <li>Direcci&oacute;n de Talento Humano &mdash; Bluedoors</li>
+          <li>Gerencias de propiedad (<em>100 LS</em> y <em>93 LS</em>)</li>
+          <li>Jefes de &aacute;rea: Rooms, A&amp;B, Mantenimiento, Ventas</li>
+          <li>Departamento de Tecnolog&iacute;a Interna</li>
+          <li>Comunidad open-source (Flask, psycopg2, PostgreSQL)</li>
+          <li>Wilson Herrera &mdash; Desarrollador principal</li>
+        </ul>
+      </div>
+
+      <!-- Actividades -->
+      <div class="cel g-act">
+        <div class="ct">&#9881; Actividades Clave</div>
+        <ul>
+          <li>Desarrollo y mantenimiento del sistema Python/Flask</li>
+          <li>Parametrizaci&oacute;n del modelo de competencias hoteleras</li>
+          <li>Carga masiva de empleados v&iacute;a ETL (Excel &rarr; BD)</li>
+          <li>Pruebas de carga (&gt;180&nbsp;req/s verificados)</li>
+          <li>Capacitaci&oacute;n a administradores RRHH</li>
+          <li>Soporte y migraciones de BD</li>
+        </ul>
+      </div>
+
+      <!-- Propuesta de Valor -->
+      <div class="cel g-prop">
+        <div class="ct">&#11088; Propuesta de Valor</div>
+        <ul>
+          <li>Elimina el proceso manual de evaluaci&oacute;n en Word/Excel de Bluedoors</li>
+          <li>Competencias <em>espec&iacute;ficas del sector hotelero</em>: Gesti&oacute;n Operativa, KPIs de ocupaci&oacute;n, satisfacci&oacute;n del hu&eacute;sped</li>
+          <li>5 niveles de desempe&ntilde;o (<em>Ejecutando &rarr; Liderando</em>) con descriptores precisos</li>
+          <li>Multi-propiedad: un sistema, m&uacute;ltiples sedes de Bluedoors</li>
+          <li>Autoevaluaci&oacute;n m&oacute;vil v&iacute;a c&eacute;dula sin cuenta de usuario</li>
+          <li>Informes comparativos y seguimiento hist&oacute;rico por per&iacute;odo</li>
+          <li>Costo de licencias $0 (stack completamente open-source)</li>
+        </ul>
+      </div>
+
+      <!-- Relaciones -->
+      <div class="cel g-rel">
+        <div class="ct">&#128101; Relaciones con Clientes</div>
+        <ul>
+          <li>Soporte directo al administrador RRHH</li>
+          <li>Manual embebido en la plataforma (<code>MANUAL_BREVE_TALENTIA.html</code>)</li>
+          <li>Capacitaci&oacute;n presencial en sede</li>
+          <li>Ajustes iterativos por retroalimentaci&oacute;n del equipo Bluedoors</li>
+        </ul>
+      </div>
+
+      <!-- Segmentos -->
+      <div class="cel g-seg">
+        <div class="ct">&#128100; Segmentos de Clientes</div>
+        <ul>
+          <li><strong>Administradores RRHH</strong> de Bluedoors (gesti&oacute;n maestras y per&iacute;odos)</li>
+          <li><strong>Jefes de &aacute;rea</strong>: Rooms, A&amp;B, Mantenimiento, Ventas (evaluadores)</li>
+          <li><strong>Empleados operativos</strong> de Bluedoors (autoevaluaci&oacute;n)</li>
+          <li><strong>Gerencia general</strong> (informes comparativos y toma de decisiones)</li>
+          <li>Potencial: otras cadenas hoteleras con modelo similar</li>
+        </ul>
+      </div>
+
+      <!-- Recursos -->
+      <div class="cel g-rec">
+        <div class="ct">&#128190; Recursos Clave</div>
+        <ul>
+          <li>C&oacute;digo fuente Python/Flask/PostgreSQL</li>
+          <li>Modelo de competencias hoteleras en BD</li>
+          <li>Servidor Linux on-premise de Bluedoors</li>
+          <li>Pool de conexiones (5&ndash;30 conexiones concurrentes)</li>
+          <li>Conocimiento del negocio hotelero (hu&eacute;sped, ocupaci&oacute;n, F&amp;B)</li>
+        </ul>
+      </div>
+
+      <!-- Canales -->
+      <div class="cel g-can">
+        <div class="ct">&#128241; Canales</div>
+        <ul>
+          <li>Aplicaci&oacute;n web en servidor on-premise (LAN interna)</li>
+          <li>T&uacute;nel ngrok para acceso externo / demos</li>
+          <li>Binario Nuitka compilado para entornos restringidos</li>
+          <li>Capacitaci&oacute;n presencial y manual en l&iacute;nea</li>
+        </ul>
+      </div>
+
+    </div><!-- /cgrid -->
+
+    <div class="cbot">
+      <div class="cbc cb-cos">
+        <div class="ct">&#128181; Estructura de Costos</div>
+        <ul>
+          <li>Horas de desarrollo y mantenimiento (principal costo)</li>
+          <li>Servidor on-premise de Bluedoors (hardware existente)</li>
+          <li>Licencias: <strong>$0</strong> (Flask, PostgreSQL, Python, Nuitka &mdash; open-source)</li>
+          <li>Capacitaci&oacute;n al personal RRHH y supervisores</li>
+          <li>Migraciones y actualizaciones de BD en producci&oacute;n</li>
+        </ul>
+      </div>
+      <div class="cbc cb-ing">
+        <div class="ct">&#128200; Fuentes de Valor / Ingresos</div>
+        <ul>
+          <li>Reducci&oacute;n de tiempo: evaluaciones de <em>d&iacute;as a horas</em></li>
+          <li>Toma de decisiones basada en datos (reportes hist&oacute;ricos)</li>
+          <li>Escalabilidad multi-propiedad sin costo adicional de licencias</li>
+          <li>Mejora del clima organizacional con retroalimentaci&oacute;n estructurada</li>
+          <li>Potencial de licenciamiento a otras cadenas hoteleras colombianas</li>
+        </ul>
+      </div>
+    </div>
+
+  </div><!-- /cwrap -->
+</section>
+
+</main>
+
+<footer>
+  <strong>Talentia</strong> &bull; Pruebas de Software: Caja Blanca (Backend) / Caja Negra (Frontend) &bull;
+  Modelo Canvas: Bluedoors Luxury Suites &bull; Desarrollado por <strong>Wilson Herrera</strong> &middot; 2026
+</footer>
+
+</body>
+</html>"""
+
+target = Path(r"c:\dataQIA\Talentia\PRUEBAS_Y_CANVAS.html")
+target.write_text(html, encoding="utf-8")
+lines = html.count("\n") + 1
+print(f"Escrito: {target} — {lines} líneas, {len(html):,} caracteres")
