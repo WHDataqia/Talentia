@@ -27,7 +27,7 @@ function Dif($msg)  { Write-Host "[!] $msg" -ForegroundColor Yellow }
 function Err($msg)  { Write-Host "[ERROR] $msg" -ForegroundColor Red }
 function Sec($msg)  { Write-Host "`n--- $msg ---" -ForegroundColor Magenta }
 
-$SSH_OPTS = @("-p", "$PuertoSSH", "-o", "StrictHostKeyChecking=accept-new", "-o", "ConnectTimeout=8", "-o", "BatchMode=yes")
+$SSH_OPTS = @("-p", "$PuertoSSH", "-o", "StrictHostKeyChecking=accept-new", "-o", "ConnectTimeout=8")
 
 # ---- 0. Validar conectividad ----
 Log "Conectando a $Servidor ..."
