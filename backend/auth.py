@@ -123,7 +123,7 @@ def validar_token_contra_bd(conn, usuario_id, token_del_request):
             return False, "Usuario no encontrado"
         
         # Si no hay sesión activa, rechazar
-        if usuario['sesion_activa'] != True:
+        if not usuario['sesion_activa']:
             return False, "No hay sesión activa registrada"
         
         # Si el token NO coincide con el registrado, rechazar
@@ -182,7 +182,7 @@ def verificar_sesion_activa(conn, usuario_id):
         if not usuario:
             return False, "Usuario no encontrado"
         
-        if usuario['sesion_activa'] == True:
+        if usuario['sesion_activa']:
             sesion_inicio = usuario.get('sesion_inicio')
             
             # Verificar si la sesión es válida (menos de 1 hora)
@@ -253,7 +253,7 @@ def registrar_sesion_atomico(conn, usuario_id, token):
     except Exception as e:
         try:
             conn.rollback()
-        except:
+        except Exception:
             pass
         return False, f"Error al registrar sesión: {str(e)}"
 
@@ -302,7 +302,7 @@ def obtener_usuario_actual(conn):
         usuario = cursor.fetchone()
         cursor.close()
         return dict(usuario) if usuario else None
-    except:
+    except Exception:
         return None
 
 def puede_ver_empleado(conn, usuario_id, empleado_id):

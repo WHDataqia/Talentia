@@ -14,19 +14,21 @@ import time
 import threading
 from functools import wraps
 from dotenv import load_dotenv
-import jwt
+import jwt as _jwt
 import secrets
 import string
-from competencias_db import upgrade_db_with_competencias, upgrade_empleados_con_jerarquia, upgrade_evaluaciones_con_nivel, upgrade_evaluaciones_autoevaluacion, upgrade_plan_formacion, upgrade_empleados_campos_adicionales, upgrade_nombres_competencias_con_numeros, upgrade_tablas_maestras, upgrade_empleados_nuevos_campos, upgrade_db_with_acceso_codes, get_subordinados_directos, upgrade_evaluaciones_expandir_campos, upgrade_evaluaciones_fecha_hora
+import decimal as _decimal
+from flask.json.provider import DefaultJSONProvider as _DefaultJSONProvider
+from competencias_db import upgrade_db_with_acceso_codes, get_subordinados_directos, upgrade_evaluaciones_expandir_campos, upgrade_evaluaciones_fecha_hora
 from rutas_competencias import registrar_rutas_competencias
 from migrations import upgrade_empleados_agregar_cargo, upgrade_empleados_agregar_identificacion, upgrade_empleados_agregar_nivel_ocupacional, upgrade_empleados_agregar_items_kpi, upgrade_competencia_kpi
 from actualizar_empleados import analizar_archivo_empleados, recargar_empleados_desde_excel, asignar_contrasenas_cedula_existentes
 from auth import (
-    hashear_contrasena, verificar_contrasena, autenticar_usuario, 
-    autenticar_empleado_por_cedula, generar_token_acceso, obtener_usuario_actual, 
+    hashear_contrasena, verificar_contrasena, autenticar_usuario,
+    autenticar_empleado_por_cedula, generar_token_acceso,
     puede_ver_empleado, puede_evaluar_empleado, get_toda_jerarquia_subordinados,
-    verificar_sesion_activa, registrar_sesion, limpiar_sesion, registrar_sesion_atomico,
-    validar_token_contra_bd, obtener_y_validar_token_usuario
+    limpiar_sesion, registrar_sesion_atomico,
+    validar_token_contra_bd
 )
 
 # Resolver directorio base de la app para modo desarrollo y binario compilado.
@@ -48,9 +50,6 @@ APP_BASE_DIR = _resolve_app_base_dir()
 # Cargar variables de entorno desde la raíz del proyecto o bundle compilado.
 load_dotenv(dotenv_path=os.path.join(APP_BASE_DIR, '.env'))
 load_dotenv()
-
-import decimal as _decimal
-from flask.json.provider import DefaultJSONProvider as _DefaultJSONProvider
 
 class _TalentiaJSONProvider(_DefaultJSONProvider):
     """JSON provider que convierte tipos no serializables de PostgreSQL (Decimal, date, etc.)"""
@@ -200,7 +199,7 @@ def validar_sesion_activa():
 
         _set_cached_token_validation(token_string, usuario_id)
     
-    except Exception as e:
+    except Exception:
         # Si hay error decodificando o validando, dejar que @jwt_required() lo maneje
         # Solo rechazamos si es un caso de "token revocado"
         pass
@@ -319,10 +318,10 @@ def obtener_usuario_id_del_token(request_obj):
     try:
         # Decodificar usando jwt.decode() con la llave secreta
         secret_key = os.getenv('JWT_SECRET_KEY', 'tu-clave-super-segura-cambiar-en-produccion-2024')
-        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
+        payload = _jwt.decode(token, secret_key, algorithms=['HS256'])
         usuario_id = payload.get('sub')
         return usuario_id
-    except Exception as e:
+    except Exception:
         return None
 
 def init_db():
@@ -819,7 +818,7 @@ def cambiar_rol_empleado(empleado_id):
         conn.close()
         
         return jsonify({
-            'message': f'Rol actualizado exitosamente',
+            'message': 'Rol actualizado exitosamente',
             'empleado': {
                 'id': empleado['id'],
                 'nombres_completos': empleado.get('nombres_completos', ''),
@@ -1606,7 +1605,7 @@ def save_plan_formacion(evaluacion_id):
         if conn:
             try:
                 conn.close()
-            except:
+            except Exception:
                 pass
         return jsonify({'error': str(e)}), 500
 
@@ -2806,7 +2805,7 @@ def serve_file(filename):
                 # Exigir JWT para otros HTML
                 try:
                     verify_jwt_in_request()
-                except Exception as e:
+                except Exception:
                     # Si no hay token válido, redirigir a login
                     return redirect('/login.html')
         
